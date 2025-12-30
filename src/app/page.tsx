@@ -2,6 +2,8 @@
 import { LoginForm } from '@/components/auth/LoginForm';
 import { Wrench } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 export default function LoginPage() {
   const { t } = useTranslation();
@@ -20,6 +22,11 @@ export default function LoginPage() {
           </p>
         </div>
         <LoginForm />
+        <div className="mt-4 text-center">
+            <Link href="/partner-signup" passHref>
+                <Button variant="link">{t('login_page.become_partner')}</Button>
+            </Link>
+        </div>
       </div>
     </main>
   );

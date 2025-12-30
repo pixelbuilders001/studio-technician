@@ -1,7 +1,8 @@
 {
     "login_page": {
         "title": "FixFast Technician",
-        "subtitle": "Sign in to manage your repair jobs."
+        "subtitle": "Sign in to manage your repair jobs.",
+        "become_partner": "Become a Partner"
     },
     "login_form": {
         "mobile_number": "Mobile Number",
@@ -114,5 +115,21 @@
         "job-789": "Cracked screen, touch not responsive.",
         "job-101": "Not cooling, freezer is fine.",
         "job-112": "AC not turning on."
+    },
+    "partner_signup_page": {
+        "title": "Become a Partner",
+        "subtitle": "Fill out the form below to start the process of joining our network of skilled technicians."
+    },
+    "partner_signup_form": {
+        "full_name": "Full Name",
+        "full_name_placeholder": "e.g., Ramesh Kumar",
+        "service_area": "Primary Service Area",
+        "service_area_placeholder": "e.g., South Delhi",
+        "service_categories_description": "Select the categories you are an expert in.",
+        "submit_application": "Submit Application",
+        "submitting": "Submitting...",
+        "submitted_title": "Application Received!",
+        "submitted_message": "Thank you for your interest. We have received your application and will call you for verification within 2-3 business days.",
+        "back_to_login": "Back to Login"
     }
 }
