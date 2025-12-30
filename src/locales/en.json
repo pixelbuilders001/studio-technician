@@ -6,8 +6,8 @@
         "login": "Login"
     },
     "login_page": {
-        "title": "FixFast Technician",
-        "subtitle": "Sign in to manage your repair jobs.",
+        "title": "",
+        "subtitle": "",
         "become_partner": "Become a Partner",
         "registration_subtitle": "Enter your mobile number to receive a verification code."
     },

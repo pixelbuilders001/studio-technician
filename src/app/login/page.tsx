@@ -32,12 +32,6 @@ export default function LoginPage() {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/50 to-transparent z-10"></div>
         <div className="relative z-20 w-full text-center">
-          <h1 className="text-4xl font-bold font-headline leading-tight">
-            {t("login_page.title")}
-          </h1>
-          <p className="mt-2 text-lg text-primary-foreground/80 max-w-xs mx-auto">
-            {t("login_page.subtitle")}
-          </p>
         </div>
       </div>
 
