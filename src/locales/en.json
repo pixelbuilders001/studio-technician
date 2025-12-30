@@ -14,8 +14,13 @@
     },
     "login_form": {
         "mobile_number": "Mobile Number",
-        "send_otp": "Get Code",
-        "sending": "Sending..."
+        "send_otp": "Send Code",
+        "sending": "Sending...",
+        "verify_otp_title": "Verify OTP",
+        "verify_otp_subtitle": "Enter the 6-digit code sent to {0}",
+        "verifying": "Verifying...",
+        "verify_otp_button": "Verify & Proceed",
+        "wrong_number": "Wrong number?"
     },
     "jobs_page": {
         "title": "Jobs"
