@@ -11,7 +11,7 @@ export default function WelcomePage() {
     <main className="flex flex-col min-h-screen bg-background">
       <div className="relative flex-1 flex flex-col items-center justify-end p-8 text-white">
         <Image
-          src="https://dv09dhgcrv5ld6ct.public.blob.vercel-storage.com/Gemini_Generated_Image_901bfk901bfk901b.png"
+          src="https://dv09dhgcrv5ld6ct.public.blob.vercel-storage.com/ChatGPT%20Image%20Dec%2030%2C%202025%2C%2011_58_14%20AM.png"
           alt="Technician working"
           fill
           className="object-cover"
