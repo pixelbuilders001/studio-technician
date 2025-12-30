@@ -18,6 +18,7 @@ import {
   Camera,
   DollarSign,
   AlertTriangle,
+  AlertCircle,
 } from "lucide-react";
 import { StatusUpdater } from "@/components/jobs/StatusUpdater";
 import Image from "next/image";
