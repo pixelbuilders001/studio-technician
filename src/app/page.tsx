@@ -18,7 +18,7 @@ export default function WelcomePage() {
           className="w-full h-auto"
           priority
         />
-        <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
+        <div className="flex-grow flex flex-col items-center justify-center text-center p-6">
             <h1 className="text-3xl font-bold font-headline">
             {t('welcome_page.title')}
             </h1>
@@ -27,7 +27,7 @@ export default function WelcomePage() {
             </p>
         </div>
       </div>
-      <div className="space-y-3 p-8 pt-0">
+      <div className="space-y-3 p-6">
         <Link href="/partner-signup" passHref>
           <Button className="w-full text-lg h-12">
             {t('welcome_page.create_account')}
