@@ -4,20 +4,13 @@ import { useTranslation } from '@/hooks/useTranslation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { CheckCircle, ArrowRight, ShieldCheck, Clock, Shield, Award, Banknote, ListChecks, Calendar, LockKeyhole, FileText } from 'lucide-react';
+import { CheckCircle, ArrowRight, ShieldCheck, Clock, Shield, Award } from 'lucide-react';
 
 const FeatureListItem = ({ children }: { children: React.ReactNode }) => (
     <li className='flex items-center gap-3 bg-white/80 backdrop-blur-sm rounded-full px-4 py-3 text-foreground/80 shadow-sm'>
         <CheckCircle className='h-6 w-6 text-green-500' />
         <span className='font-medium'>{children}</span>
     </li>
-);
-
-const BenefitItem = ({ icon: Icon, children }: { icon: React.ElementType, children: React.ReactNode }) => (
-  <div className="flex items-center gap-2 text-sm text-gray-600">
-    <Icon className="h-5 w-5 text-primary" />
-    <span>{children}</span>
-  </div>
 );
 
 const WhyChooseUsItem = ({ icon: Icon, children }: { icon: React.ElementType, children: React.ReactNode }) => (
@@ -83,12 +76,6 @@ export default function LoginPage() {
             
             <div className="mt-6">
               <LoginForm />
-            </div>
-
-            <div className="mt-4 grid grid-cols-3 gap-2 text-center">
-              <BenefitItem icon={LockKeyhole}>{t('login_page.benefit1')}</BenefitItem>
-              <BenefitItem icon={Banknote}>{t('login_page.benefit2')}</BenefitItem>
-              <BenefitItem icon={FileText}>{t('login_page.benefit3')}</BenefitItem>
             </div>
 
             <div className="mt-8 text-center">
