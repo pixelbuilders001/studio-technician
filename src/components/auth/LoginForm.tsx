@@ -99,19 +99,15 @@ export function LoginForm({ onStepChange }: LoginFormProps) {
   if (step === 'otp') {
       return (
           <div className="flex flex-col items-center text-center">
-            <CardHeader className="p-0 text-center">
-                <CardTitle className="text-2xl font-bold font-headline">{t('login_form.verify_otp_title')}</CardTitle>
-                <CardDescription className="pt-1">{t('login_form.verify_otp_subtitle', `+91 ${mobileNumber}`)}</CardDescription>
-            </CardHeader>
             <Form {...otpForm}>
-                <form onSubmit={otpForm.handleSubmit(onOtpSubmit)} className="space-y-6 mt-8 w-full">
+                <form onSubmit={otpForm.handleSubmit(onOtpSubmit)} className="space-y-6 w-full">
                     <FormField
                         control={otpForm.control}
                         name="otp"
                         render={({ field }) => (
                             <FormItem>
                                 <FormControl>
-                                   <OtpInput {...field} length={6} onChange={field.onChange} />
+                                   <OtpInput {...field} length={6} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>

@@ -34,16 +34,14 @@ export default function LoginPage() {
 
       <div className="bg-background p-8 rounded-t-3xl -mt-6 relative z-20">
         <Card className="border-none shadow-none">
-          {formStep === 'mobile' && (
             <CardHeader className="p-0 text-center">
               <CardTitle className="text-2xl font-bold font-headline">
-                {t('login_page.login_title')}
+                {formStep === 'mobile' ? t('login_form.login_title') : t('login_form.verify_otp_title')}
               </CardTitle>
               <CardDescription className="pt-1">
-                {t("login_page.registration_subtitle")}
+                {formStep === 'mobile' ? t("login_page.registration_subtitle") : t('login_form.verify_otp_subtitle', "")}
               </CardDescription>
             </CardHeader>
-          )}
           <CardContent className="p-0 pt-6">
             <LoginForm onStepChange={setFormStep} />
           </CardContent>
