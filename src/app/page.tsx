@@ -63,7 +63,7 @@ export default function LoginPage() {
               </div>
               <div className="hidden md:flex justify-center">
                   <Image
-                      src="https://dv09dhgcrv5ld6ct.public.blob.vercel-storage.com/technician-YkC9HOCJqA0oB9g6v5yGzB3s4gfZkS1c.png"
+                      src="https://dv09dhgcrv5ld6ct.public.blob.vercel-storage.com/technician-hero-zE3V51LdGgUeYt5zWz3gD8v6tA4s5u.png"
                       alt="FixFast Technician"
                       width={400}
                       height={400}
