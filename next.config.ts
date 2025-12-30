@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
     turbo: {
       rules: {
         '**/*.json': {
+          loaders: ['json-loader'],
           as: '*.js',
         },
       },
