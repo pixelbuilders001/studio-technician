@@ -25,7 +25,8 @@ import {
     SelectValue,
   } from "@/components/ui/select"
 import { cn } from "@/lib/utils";
-import { OtpInput, type OtpInputProps } from "./OtpInput";
+import { OtpInput } from "./OtpInput";
+import { CardDescription, CardHeader, CardTitle } from "../ui/card";
 
 const mobileSchema = z.object({
   mobile: z.string().min(10, { message: "Enter a valid 10-digit mobile number." }).max(10),
@@ -97,9 +98,11 @@ export function LoginForm({ onStepChange }: LoginFormProps) {
 
   if (step === 'otp') {
       return (
-          <div className="flex flex-col items-center text-center pt-8">
-            <h2 className="text-xl font-bold mt-4">{t('login_form.verify_otp_title')}</h2>
-            <p className="text-muted-foreground mt-2">{t('login_form.verify_otp_subtitle', `+91 ${mobileNumber}`)}</p>
+          <div className="flex flex-col items-center text-center">
+            <CardHeader className="p-0 text-center">
+                <CardTitle className="text-2xl font-bold font-headline">{t('login_form.verify_otp_title')}</CardTitle>
+                <CardDescription className="pt-1">{t('login_form.verify_otp_subtitle', `+91 ${mobileNumber}`)}</CardDescription>
+            </CardHeader>
             <Form {...otpForm}>
                 <form onSubmit={otpForm.handleSubmit(onOtpSubmit)} className="space-y-6 mt-8 w-full">
                     <FormField

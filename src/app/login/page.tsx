@@ -22,32 +22,30 @@ export default function LoginPage() {
 
   return (
     <main className="flex flex-col min-h-screen bg-background">
-      {formStep === 'mobile' && (
-        <div className="relative flex-1 flex flex-col items-center justify-end p-8 text-white bg-gradient-to-b from-primary/80 to-primary">
-          <Image
-            src="https://dv09dhgcrv5ld6ct.public.blob.vercel-storage.com/technician-WdKuaTBrj9p2f19GzTfdXfTqbInE9Z.png"
-            alt="FixFast Technician"
-            fill
-            className="object-cover object-top"
-            quality={100}
-          />
-          <div className="relative z-10 w-full text-center">
-            <h1 className="text-4xl font-bold font-headline leading-tight">
-              {t("login_page.title")}
-            </h1>
-            <p className="mt-2 text-lg text-primary-foreground/80 max-w-xs mx-auto">
-              {t("login_page.subtitle")}
-            </p>
-          </div>
+      <div className="relative flex-1 flex flex-col items-center justify-end p-8 text-white bg-gradient-to-b from-primary/80 to-primary">
+        <Image
+          src="https://dv09dhgcrv5ld6ct.public.blob.vercel-storage.com/technician-WdKuaTBrj9p2f19GzTfdXfTqbInE9Z.png"
+          alt="FixFast Technician"
+          fill
+          className="object-cover object-top"
+          quality={100}
+        />
+        <div className="relative z-10 w-full text-center">
+          <h1 className="text-4xl font-bold font-headline leading-tight">
+            {t("login_page.title")}
+          </h1>
+          <p className="mt-2 text-lg text-primary-foreground/80 max-w-xs mx-auto">
+            {t("login_page.subtitle")}
+          </p>
         </div>
-      )}
+      </div>
 
-      <div className={`bg-background p-8 ${formStep === 'mobile' ? 'rounded-t-3xl -mt-6' : 'pt-20'} relative z-20`}>
+      <div className="bg-background p-8 rounded-t-3xl -mt-6 relative z-20">
         <Card className="border-none shadow-none">
           {formStep === 'mobile' && (
             <CardHeader className="p-0 text-center">
               <CardTitle className="text-2xl font-bold font-headline">
-                {t("login_page.registration_title")}
+                {t("login_page.login_title")}
               </CardTitle>
               <CardDescription className="pt-1">
                 {t("login_page.registration_subtitle")}
