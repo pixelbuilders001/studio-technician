@@ -12,10 +12,9 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Loader2 } from "lucide-react";
+import { Loader2, CheckCircle } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
 import {
     Select,
@@ -24,6 +23,7 @@ import {
     SelectTrigger,
     SelectValue,
   } from "@/components/ui/select"
+import { cn } from "@/lib/utils";
 
 const formSchema = z.object({
   mobile: z.string().min(10, { message: "Enter a valid 10-digit mobile number." }).max(10),
@@ -32,6 +32,7 @@ const formSchema = z.object({
 export function LoginForm() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   const { t } = useTranslation();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -43,11 +44,13 @@ export function LoginForm() {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
-    // Mock OTP sending and verification
     console.log("Sending OTP to:", values.mobile);
     setTimeout(() => {
-      // In a real app, you'd navigate after OTP verification
-      router.push("/jobs");
+      setIsLoading(false);
+      setIsSuccess(true);
+      // In a real app, you'd handle OTP input here.
+      // For this demo, we'll just go to jobs page after a delay.
+      setTimeout(() => router.push("/jobs"), 1500);
     }, 1000);
   }
 
@@ -60,9 +63,13 @@ export function LoginForm() {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <div className="flex gap-0 items-center">
+                <div className={cn(
+                    "flex items-center gap-0 rounded-lg border bg-white overflow-hidden transition-all",
+                    form.formState.errors.mobile ? "border-destructive ring-2 ring-destructive/50" : "focus-within:ring-2 focus-within:ring-ring",
+                    isSuccess && "border-green-500 ring-2 ring-green-500/50"
+                    )}>
                     <Select defaultValue="+91">
-                        <SelectTrigger className="w-auto rounded-r-none focus:ring-0 focus:ring-offset-0">
+                        <SelectTrigger className="w-auto h-12 border-0 focus:ring-0 focus:ring-offset-0 text-base">
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -71,20 +78,21 @@ export function LoginForm() {
                     </Select>
                     <div className="relative w-full">
                         <Input 
-                            placeholder="991 98765 43210" 
+                            placeholder="000 000 0000" 
                             {...field} 
                             type="tel"
-                            className="rounded-l-none text-base h-12"
+                            className="border-0 text-base h-12 focus-visible:ring-0 focus-visible:ring-offset-0"
                             maxLength={10}
                         />
-                         <FormMessage className="absolute -bottom-5 left-0 text-xs" />
                     </div>
+                    {isSuccess && <CheckCircle className="h-6 w-6 text-green-500 mx-3" />}
                 </div>
               </FormControl>
+               <FormMessage className="text-left" />
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full text-lg py-6 h-12" disabled={isLoading}>
+        <Button type="submit" className="w-full text-lg py-6 h-12" disabled={isLoading || isSuccess}>
           {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           {isLoading ? t('login_form.sending') : t('login_form.send_otp')}
         </Button>

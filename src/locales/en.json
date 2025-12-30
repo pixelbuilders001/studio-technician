@@ -1,29 +1,20 @@
 {
+    "welcome_page": {
+        "title": "Let's Get Started",
+        "subtitle": "Join our network of skilled technicians and start earning instantly.",
+        "create_account": "Create Account",
+        "login": "Login"
+    },
     "login_page": {
         "title": "FixFast Technician",
         "subtitle": "Sign in to manage your repair jobs.",
         "become_partner": "Become a Partner",
-        "promo_title": "Join FixFast Today!",
-        "promo_subtitle": "Become a partner and take control of your earnings.",
-        "promo_earn": "Earn up to ₹2000 daily",
-        "promo_flexible": "Flexible working hours",
-        "hero_title": "Earn Daily by Repairing Devices Near You",
-        "hero_subtitle": "Join 1,000+ verified technicians working with FixFast",
-        "feature1": "Get jobs near your location",
-        "feature2": "Earn ₹1,500-₹2,250/day",
-        "feature3": "Weekly payouts to bank",
-        "feature4": "Work on your own schedule",
-        "form_title": "Enter your mobile number to get started",
-        "form_subtitle": "We'll send an OTP to verify. No spam.",
-        "why_choose_title": "Why technicians choose FixFast",
-        "why1": "Earn ₹1,500-₹2,500/day",
-        "why2": "Flexible working hours",
-        "why3": "Govt ID verified & secure",
-        "why4": "Govt ID verified & secure"
+        "registration_title": "Registration",
+        "registration_subtitle": "Enter your mobile number to receive a verification code."
     },
     "login_form": {
         "mobile_number": "Mobile Number",
-        "send_otp": "Get Started",
+        "send_otp": "Get Code",
         "sending": "Sending..."
     },
     "jobs_page": {

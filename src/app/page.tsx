@@ -1,101 +1,53 @@
 "use client";
-import { LoginForm } from '@/components/auth/LoginForm';
-import { useTranslation } from '@/hooks/useTranslation';
+
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import Image from 'next/image';
-import { CheckCircle, ArrowRight, ShieldCheck, Clock, Shield, Award } from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
 
-const FeatureListItem = ({ children }: { children: React.ReactNode }) => (
-    <li className='flex items-center gap-3 bg-white/80 backdrop-blur-sm rounded-full px-4 py-3 text-foreground/80 shadow-sm'>
-        <CheckCircle className='h-6 w-6 text-green-500' />
-        <span className='font-medium'>{children}</span>
-    </li>
-);
+const WelcomeIllustration = () => (
+    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" className="w-full h-auto max-w-sm mx-auto">
+        <circle cx="100" cy="100" r="80" fill="hsl(var(--primary) / 0.1)" />
+        <g transform="translate(100 110)">
+            <path d="M0 -30 a 15 15 0 0 1 0 30 a 15 15 0 0 1 0 -30" fill="hsl(var(--primary))" />
+            <rect x="-25" y="0" width="50" height="40" rx="10" fill="hsl(var(--primary) / 0.8)" />
+            <g transform="translate(0, 10)">
+                <path d="M-40 -20 L-60 -30 V-50 H-30 Z" fill="hsl(var(--primary))" />
+                <path d="M40 -20 L60 -30 V-50 H30 Z" fill="hsl(var(--primary))" />
+                <circle cx="-50" cy="-60" r="5" fill="white" />
+                <circle cx="-35" cy="-60" r="5" fill="white" />
+                 <circle cx="-20" cy="-60" r="5" fill="white" />
+                <circle cx="50" cy="-60" r="5" fill="white" />
+                <circle cx="35"cy="-60" r="5" fill="white" />
+                 <circle cx="20" cy="-60" r="5" fill="white" />
+            </g>
+        </g>
+    </svg>
+)
 
-const WhyChooseUsItem = ({ icon: Icon, children }: { icon: React.ElementType, children: React.ReactNode }) => (
-  <div className="flex items-center gap-2">
-    <Icon className="h-5 w-5 text-primary" />
-    <span className="font-medium">{children}</span>
-  </div>
-);
-
-
-export default function LoginPage() {
+export default function WelcomePage() {
   const { t } = useTranslation();
   return (
-    <main className="min-h-screen bg-background">
-      {/* Hero Section */}
-      <div className="relative overflow-hidden bg-blue-50">
-        <div className="absolute inset-0">
-            <Image
-                src="https://dv09dhgcrv5ld6ct.public.blob.vercel-storage.com/hero-bg-A3gN1GkGvKxtiFvWCHiE8GZcT3sJ0cDs.jpg"
-                alt="Repair background"
-                fill
-                className="object-cover opacity-20"
-            />
-        </div>
-        <div className="relative container mx-auto px-4 pt-8 pb-12">
-            <h2 className="text-2xl font-bold text-primary font-headline">
-                FixFast
-            </h2>
-            <div className="grid md:grid-cols-2 gap-8 items-center mt-6">
-              <div>
-                <h1 className="text-4xl md:text-5xl font-bold text-foreground font-headline !leading-tight">
-                    {t('login_page.hero_title')}
-                </h1>
-                <p className="mt-4 text-lg text-muted-foreground">
-                    {t('login_page.hero_subtitle')}
-                </p>
-                <ul className='mt-8 space-y-3'>
-                   <FeatureListItem>{t('login_page.feature1')}</FeatureListItem>
-                   <FeatureListItem>{t('login_page.feature2')}</FeatureListItem>
-                   <FeatureListItem>{t('login_page.feature3')}</FeatureListItem>
-                   <FeatureListItem>{t('login_page.feature4')}</FeatureListItem>
-                </ul>
-              </div>
-              <div className="hidden md:flex justify-center">
-                  <Image
-                      src="https://dv09dhgcrv5ld6ct.public.blob.vercel-storage.com/technician-hero-zE3V51LdGgUeYt5zWz3gD8v6tA4s5u.png"
-                      alt="FixFast Technician"
-                      width={400}
-                      height={400}
-                      className="object-contain"
-                      priority
-                  />
-              </div>
-            </div>
-        </div>
+    <main className="flex flex-col min-h-screen bg-background p-8">
+      <div className="flex-1 flex flex-col items-center justify-center text-center">
+        <WelcomeIllustration />
+        <h1 className="text-3xl font-bold font-headline mt-8">
+          {t('welcome_page.title')}
+        </h1>
+        <p className="mt-2 text-muted-foreground max-w-xs mx-auto">
+          {t('welcome_page.subtitle')}
+        </p>
       </div>
-
-      {/* Form Section */}
-      <div className="bg-background rounded-t-3xl -mt-8 relative p-6 pb-20">
-          <div className="max-w-md mx-auto">
-            <h3 className="text-xl font-bold text-center font-headline">{t('login_page.form_title')}</h3>
-            <p className="text-muted-foreground text-center text-sm mt-1">{t('login_page.form_subtitle')}</p>
-            
-            <div className="mt-6">
-              <LoginForm />
-            </div>
-
-            <div className="mt-8 text-center">
-              <Link href="/partner-signup" passHref>
-                  <Button variant="link" className="text-lg font-bold text-primary">
-                    {t('login_page.become_partner')} <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-              </Link>
-            </div>
-
-            <div className="mt-8 border-t pt-8">
-                <h3 className='text-lg font-bold text-center font-headline'>{t('login_page.why_choose_title')}</h3>
-                <div className='mt-6 grid grid-cols-2 gap-4'>
-                    <WhyChooseUsItem icon={Award}>{t('login_page.why1')}</WhyChooseUsItem>
-                    <WhyChooseUsItem icon={Clock}>{t('login_page.why2')}</WhyChooseUsItem>
-                    <WhyChooseUsItem icon={Shield}>{t('login_page.why3')}</WhyChooseUsItem>
-                    <WhyChooseUsItem icon={ShieldCheck}>{t('login_page.why4')}</WhyChooseUsItem>
-                </div>
-            </div>
-          </div>
+      <div className="space-y-3">
+        <Link href="/partner-signup" passHref>
+          <Button className="w-full text-lg h-12">
+            {t('welcome_page.create_account')}
+          </Button>
+        </Link>
+        <Link href="/login" passHref>
+          <Button variant="outline" className="w-full text-lg h-12">
+            {t('welcome_page.login')}
+          </Button>
+        </Link>
       </div>
     </main>
   );
