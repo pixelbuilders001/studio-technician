@@ -17,6 +17,13 @@ import {
 } from "@/components/ui/form";
 import { Loader2 } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+  } from "@/components/ui/select"
 
 const formSchema = z.object({
   mobile: z.string().min(10, { message: "Enter a valid 10-digit mobile number." }).max(10),
@@ -46,32 +53,38 @@ export function LoginForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="mobile"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t('login_form.mobile_number')}</FormLabel>
               <FormControl>
-                <div className="relative">
-                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
-                    +91
-                  </span>
-                  <Input 
-                    placeholder="98765 43210" 
-                    {...field} 
-                    type="tel"
-                    className="pl-10"
-                    maxLength={10}
-                  />
+                <div className="flex gap-0 items-center">
+                    <Select defaultValue="+91">
+                        <SelectTrigger className="w-auto rounded-r-none focus:ring-0 focus:ring-offset-0">
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="+91">+91</SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <div className="relative w-full">
+                        <Input 
+                            placeholder="991 98765 43210" 
+                            {...field} 
+                            type="tel"
+                            className="rounded-l-none text-base h-12"
+                            maxLength={10}
+                        />
+                         <FormMessage className="absolute -bottom-5 left-0 text-xs" />
+                    </div>
                 </div>
               </FormControl>
-              <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full text-lg py-6" disabled={isLoading}>
+        <Button type="submit" className="w-full text-lg py-6 h-12" disabled={isLoading}>
           {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           {isLoading ? t('login_form.sending') : t('login_form.send_otp')}
         </Button>
