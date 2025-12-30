@@ -96,7 +96,7 @@ export function LoginForm() {
                         render={({ field }) => (
                             <FormItem>
                                 <FormControl>
-                                   <OtpInput {...field} length={6} />
+                                   <OtpInput {...field} length={6} onChange={field.onChange} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
