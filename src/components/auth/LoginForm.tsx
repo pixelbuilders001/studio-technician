@@ -16,6 +16,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Loader2 } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const formSchema = z.object({
   mobile: z.string().min(10, { message: "Enter a valid 10-digit mobile number." }).max(10),
@@ -24,6 +25,7 @@ const formSchema = z.object({
 export function LoginForm() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const { t } = useTranslation();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -50,7 +52,7 @@ export function LoginForm() {
           name="mobile"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Mobile Number</FormLabel>
+              <FormLabel>{t('login_form.mobile_number')}</FormLabel>
               <FormControl>
                 <div className="relative">
                   <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
@@ -71,7 +73,7 @@ export function LoginForm() {
         />
         <Button type="submit" className="w-full text-lg py-6" disabled={isLoading}>
           {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {isLoading ? "Sending..." : "Send OTP"}
+          {isLoading ? t('login_form.sending') : t('login_form.send_otp')}
         </Button>
       </form>
     </Form>

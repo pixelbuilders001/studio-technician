@@ -1,3 +1,4 @@
+"use client"
 import Image from 'next/image';
 import Link from 'next/link';
 import { technicianProfile } from '@/lib/data';
@@ -6,6 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { User, Phone, Map, Tag, Briefcase, LogOut, IndianRupee } from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
+import { LanguageSelector } from '@/components/common/LanguageSelector';
 
 const ProfileInfoItem = ({ icon: Icon, label, value }: { icon: React.ElementType, label: string, value: string | React.ReactNode }) => (
     <div className="flex items-center gap-4">
@@ -35,12 +38,14 @@ const EarningsStat = ({ label, value }: { label: string, value: number }) => {
 
 
 export default function ProfilePage() {
+  const { t } = useTranslation();
   const { name, phone, serviceCategories, areaCovered, totalJobs, avatarUrl, lifetimeEarnings, todaysEarnings } = technicianProfile;
 
   return (
     <div className="flex flex-col">
-      <header className="flex h-14 items-center border-b bg-background px-4">
-        <h1 className="text-xl font-bold font-headline">Profile</h1>
+      <header className="flex h-14 items-center border-b bg-background px-4 justify-between">
+        <h1 className="text-xl font-bold font-headline">{t('profile_page.title')}</h1>
+        <LanguageSelector />
       </header>
       
       <div className="flex-1 space-y-6 p-4">
@@ -58,27 +63,27 @@ export default function ProfilePage() {
                         />
                     </div>
                     <h2 className="mt-4 text-2xl font-bold font-headline">{name}</h2>
-                    <p className="text-muted-foreground">Technician ID: T5-8231</p>
+                    <p className="text-muted-foreground">{t('profile_page.technician_id')}: T5-8231</p>
                 </div>
             </CardContent>
         </Card>
 
         <Card>
             <CardContent className="flex justify-around pt-6 text-center">
-               <EarningsStat label="Today's Earnings" value={todaysEarnings} />
-               <EarningsStat label="Lifetime Earnings" value={lifetimeEarnings} />
+               <EarningsStat label={t('profile_page.todays_earnings')} value={todaysEarnings} />
+               <EarningsStat label={t('profile_page.lifetime_earnings')} value={lifetimeEarnings} />
             </CardContent>
         </Card>
 
         <Card>
             <CardContent className="space-y-4 pt-6">
-                <ProfileInfoItem icon={Phone} label="Phone Number" value={phone} />
+                <ProfileInfoItem icon={Phone} label={t('profile_page.phone_number')} value={phone} />
                 <Separator />
-                <ProfileInfoItem icon={Map} label="Service Area" value={areaCovered} />
+                <ProfileInfoItem icon={Map} label={t('profile_page.service_area')} value={areaCovered} />
                 <Separator />
                 <ProfileInfoItem 
                     icon={Tag} 
-                    label="Service Categories" 
+                    label={t('profile_page.service_categories')} 
                     value={
                         <div className="flex flex-wrap gap-2 pt-1">
                             {serviceCategories.map(cat => <Badge key={cat} variant="secondary">{cat}</Badge>)}
@@ -86,13 +91,13 @@ export default function ProfilePage() {
                     } 
                 />
                 <Separator />
-                <ProfileInfoItem icon={Briefcase} label="Total Jobs Completed" value={`${totalJobs}`} />
+                <ProfileInfoItem icon={Briefcase} label={t('profile_page.total_jobs_completed')} value={`${totalJobs}`} />
             </CardContent>
         </Card>
 
         <Link href="/" className='w-full'>
             <Button variant="destructive" className="w-full">
-                <LogOut className="mr-2 h-4 w-4" /> Logout
+                <LogOut className="mr-2 h-4 w-4" /> {t('profile_page.logout')}
             </Button>
         </Link>
       </div>

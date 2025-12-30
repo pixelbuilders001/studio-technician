@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { MapPin, Settings, Check, X, AlertCircle, Tv2, Refrigerator, Microwave, AirVent, Smartphone, WashingMachine, Wrench } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import React from "react";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const iconMap: { [key: string]: React.ElementType } = {
   Tv2,
@@ -27,12 +28,13 @@ const iconMap: { [key: string]: React.ElementType } = {
 export function JobCard({ job }: { job: Job }) {
   const router = useRouter();
   const { toast } = useToast();
+  const { t, language } = useTranslation();
 
   const handleAccept = (e: React.MouseEvent) => {
     e.preventDefault();
     toast({
-      title: "Job Accepted",
-      description: `Job #${job.id} has been moved to Active Jobs.`,
+      title: t('job_card.job_accepted_title'),
+      description: `${t('job_card.job_accepted_description')} #${job.id}`,
     });
     // In a real app, this would be an API call.
     // For now, we just navigate.
@@ -42,9 +44,9 @@ export function JobCard({ job }: { job: Job }) {
   const handleReject = (e: React.MouseEvent) => {
     e.preventDefault();
     toast({
-      title: "Job Rejected",
+      title: t('job_card.job_rejected_title'),
       variant: "destructive",
-      description: `You have rejected job #${job.id}.`,
+      description: `${t('job_card.job_rejected_description')} #${job.id}`,
     });
     // In a real app, this would be an API call.
   };
@@ -53,14 +55,19 @@ export function JobCard({ job }: { job: Job }) {
 
 
   const statusBadge = () => {
-    if (job.status === "active") {
-        return <Badge variant="secondary" className="bg-blue-100 text-blue-800">{job.activeStatus?.replace(/_/g, ' ')}</Badge>
+    const statusKey = job.activeStatus?.replace(/_/g, ' ');
+    if (job.status === "active" && statusKey) {
+        return <Badge variant="secondary" className="bg-blue-100 text-blue-800">{t(`job_status.${job.activeStatus}`)}</Badge>
     }
     if (job.status === "completed") {
-        return <Badge variant="secondary" className="bg-green-100 text-green-800">Completed</Badge>
+        return <Badge variant="secondary" className="bg-green-100 text-green-800">{t('job_status.completed')}</Badge>
     }
     return null
   }
+
+  const deviceType = language === 'hi' ? t(`devices.${job.deviceType.toLowerCase().replace(' ', '_')}`) : job.deviceType;
+  const problemSummary = language === 'hi' ? t(`problems.${job.id}`) : job.problemSummary;
+
 
   return (
     <Link href={`/jobs/${job.id}`} className="block">
@@ -72,9 +79,9 @@ export function JobCard({ job }: { job: Job }) {
                 <DeviceIcon className="h-7 w-7 text-secondary-foreground" />
               </div>
               <div>
-                <h3 className="font-bold font-headline">{job.deviceType}</h3>
+                <h3 className="font-bold font-headline">{deviceType}</h3>
                 <p className="text-sm text-muted-foreground line-clamp-1">
-                  {job.problemSummary}
+                  {problemSummary}
                 </p>
               </div>
             </div>
@@ -90,7 +97,7 @@ export function JobCard({ job }: { job: Job }) {
             <div className="font-semibold text-foreground">
               ₹{job.inspectionCharge}
               <span className="ml-1 font-normal text-muted-foreground">
-                (insp.)
+                ({t('job_card.inspection_short')})
               </span>
             </div>
           </div>
@@ -98,10 +105,10 @@ export function JobCard({ job }: { job: Job }) {
         {job.status === "new" && (
           <CardFooter className="grid grid-cols-2 gap-3 bg-muted/50 p-2">
             <Button variant="outline" className="w-full bg-card" onClick={handleReject}>
-              <X className="mr-2 h-4 w-4" /> Reject
+              <X className="mr-2 h-4 w-4" /> {t('job_card.reject')}
             </Button>
             <Button className="w-full" onClick={handleAccept}>
-              <Check className="mr-2 h-4 w-4" /> Accept
+              <Check className="mr-2 h-4 w-4" /> {t('job_card.accept')}
             </Button>
           </CardFooter>
         )}

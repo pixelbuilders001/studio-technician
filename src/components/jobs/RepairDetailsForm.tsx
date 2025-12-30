@@ -25,6 +25,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const repairDetailsSchema = z.object({
   finalCost: z.coerce.number().positive({ message: "Please enter a valid cost." }),
@@ -35,6 +36,7 @@ const repairDetailsSchema = z.object({
 export function RepairDetailsForm() {
   const [open, setOpen] = useState(true);
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const form = useForm<z.infer<typeof repairDetailsSchema>>({
     resolver: zodResolver(repairDetailsSchema),
@@ -49,8 +51,8 @@ export function RepairDetailsForm() {
     console.log("Repair Details Submitted:", values);
     // Here you would typically call a server action to save the data.
     toast({
-      title: "Repair Details Saved",
-      description: `Final cost recorded as ₹${values.finalCost}.`,
+      title: t('repair_details_form.toast_title'),
+      description: `${t('repair_details_form.toast_description')} ₹${values.finalCost}.`,
     });
     setOpen(false);
     // In a real app, this would trigger a re-render with the completion screen.
@@ -59,11 +61,11 @@ export function RepairDetailsForm() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="w-full">Add Repair Details</Button>
+        <Button className="w-full">{t('repair_details_form.trigger_button')}</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Complete Job</DialogTitle>
+          <DialogTitle>{t('repair_details_form.title')}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
@@ -72,9 +74,9 @@ export function RepairDetailsForm() {
               name="finalCost"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Final Repair Cost</FormLabel>
+                  <FormLabel>{t('repair_details_form.final_cost_label')}</FormLabel>
                   <FormControl>
-                    <Input type="number" placeholder="e.g., 1500" {...field} />
+                    <Input type="number" placeholder={t('repair_details_form.final_cost_placeholder')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -85,9 +87,9 @@ export function RepairDetailsForm() {
               name="spareParts"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Spare Parts Used (Optional)</FormLabel>
+                  <FormLabel>{t('repair_details_form.spare_parts_label')}</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., 1x Capacitor, 1x Fuse" {...field} />
+                    <Input placeholder={t('repair_details_form.spare_parts_placeholder')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -98,9 +100,9 @@ export function RepairDetailsForm() {
               name="notes"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Notes (Optional)</FormLabel>
+                  <FormLabel>{t('repair_details_form.notes_label')}</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Any additional notes about the repair..." {...field} />
+                    <Textarea placeholder={t('repair_details_form.notes_placeholder')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -108,9 +110,9 @@ export function RepairDetailsForm() {
             />
             <DialogFooter className="pt-4">
               <DialogClose asChild>
-                <Button type="button" variant="outline">Cancel</Button>
+                <Button type="button" variant="outline">{t('repair_details_form.cancel_button')}</Button>
               </DialogClose>
-              <Button type="submit">Confirm Completion</Button>
+              <Button type="submit">{t('repair_details_form.confirm_button')}</Button>
             </DialogFooter>
           </form>
         </Form>

@@ -1,0 +1,118 @@
+{
+    "login_page": {
+        "title": "फिक्सफास्ट तकनीशियन",
+        "subtitle": "अपनी मरम्मत नौकरियों का प्रबंधन करने के लिए साइन इन करें।"
+    },
+    "login_form": {
+        "mobile_number": "मोबाइल नंबर",
+        "send_otp": "ओटीपी भेजें",
+        "sending": "भेज रहा है..."
+    },
+    "jobs_page": {
+        "title": "नौकरियाँ"
+    },
+    "job_tabs": {
+        "new": "नया",
+        "active": "सक्रिय",
+        "completed": "पूरा हुआ",
+        "no_new_jobs": "कोई नई नौकरी उपलब्ध नहीं है।",
+        "no_active_jobs": "आपके पास कोई सक्रिय नौकरी नहीं है।",
+        "no_completed_jobs": "अभी तक कोई नौकरी पूरी नहीं हुई है।"
+    },
+    "job_card": {
+        "inspection_short": "निरीक्षण",
+        "reject": "अस्वीकार",
+        "accept": "स्वीकार",
+        "job_accepted_title": "नौकरी स्वीकृत",
+        "job_accepted_description": "नौकरी को सक्रिय नौकरियों में ले जाया गया है।",
+        "job_rejected_title": "नौकरी अस्वीकृत",
+        "job_rejected_description": "आपने नौकरी अस्वीकार कर दी है"
+    },
+    "profile_page": {
+        "title": "प्रोफ़ाइल",
+        "technician_id": "तकनीशियन आईडी",
+        "todays_earnings": "आज की कमाई",
+        "lifetime_earnings": "जीवन भर की कमाई",
+        "phone_number": "फ़ोन नंबर",
+        "service_area": "सेवा क्षेत्र",
+        "service_categories": "सेवा श्रेणियाँ",
+        "total_jobs_completed": "कुल पूरी की गई नौकरियाँ",
+        "logout": "लॉग आउट"
+    },
+    "bottom_nav": {
+        "jobs": "नौकरियाँ",
+        "profile": "प्रोफ़ाइल"
+    },
+    "duty_status": {
+        "on_duty": "ड्यूटी पर",
+        "off_duty": "छुट्टी पर"
+    },
+    "job_page": {
+        "job": "नौकरी",
+        "job_completed": "नौकरी पूरी हुई!",
+        "final_amount_to_collect": "अंतिम राशि एकत्र करने के लिए:",
+        "remind_customer": "ग्राहक को नकद/यूपीआई के माध्यम से भुगतान के बारे में याद दिलाएं। व्यवस्थापक कमीशन स्वतः काट लिया जाएगा।",
+        "update_status": "स्थिति अपडेट करें",
+        "customer_details": "ग्राहक विवरण",
+        "call_customer": "ग्राहक को बुलाओ",
+        "open_maps": "नक्शे खोलो",
+        "job_details": "नौकरी का विवरण",
+        "device": "उपकरण",
+        "problem": "समस्या",
+        "price_range": "मूल्य सीमा",
+        "inspection": "निरीक्षण",
+        "uploaded_photos": "अपलोड की गई तस्वीरें",
+        "cancel_job": "नौकरी रद्द करें",
+        "start_job": "नौकरी शुरू करें"
+    },
+    "estimate_time": {
+        "ai_estimated_time": "एआई अनुमानित समय",
+        "estimated_completion_time_is": "अनुमानित समापन समय है",
+        "error": "त्रुटि",
+        "error_message": "अनुमान प्राप्त करने में विफल। कृपया पुन: प्रयास करें।",
+        "get_ai_estimate": "एआई समय अनुमान प्राप्त करें",
+        "estimate_job_time": "नौकरी पूरा होने के समय का अनुमान लगाएं"
+    },
+    "repair_details_form": {
+        "trigger_button": "मरम्मत विवरण जोड़ें",
+        "title": "नौकरी पूरी करें",
+        "final_cost_label": "अंतिम मरम्मत लागत",
+        "final_cost_placeholder": "उदा., 1500",
+        "spare_parts_label": "स्पेयर पार्ट्स का इस्तेमाल (वैकल्पिक)",
+        "spare_parts_placeholder": "उदा., 1x कैपेसिटर, 1x फ्यूज",
+        "notes_label": "नोट्स (वैकल्पिक)",
+        "notes_placeholder": "मरम्मत के बारे में कोई अतिरिक्त नोट्स...",
+        "cancel_button": "रद्द करें",
+        "confirm_button": "पूर्णता की पुष्टि करें",
+        "toast_title": "मरम्मत विवरण सहेजा गया",
+        "toast_description": "अंतिम लागत के रूप में दर्ज की गई"
+    },
+    "status_updater": {
+        "toast_title": "स्थिति अपडेट की गई",
+        "toast_description": "नौकरी की स्थिति अब है:",
+        "toast_error_title": "अपडेट विफल",
+        "toast_error_description": "नौकरी की स्थिति को अपडेट नहीं किया जा सका।"
+    },
+    "job_status": {
+        "scheduled": "अनुसूचित",
+        "reached_location": "स्थान पर पहुंचा",
+        "inspection_done": "निरीक्षण किया गया",
+        "repair_in_progress": "मरम्मत प्रगति पर है",
+        "repair_completed": "मरम्मत पूरी हुई",
+        "completed": "पूरा हुआ"
+    },
+    "devices": {
+        "television": "टेलीविजन",
+        "washing_machine": "वॉशिंग मशीन",
+        "smartphone": "स्मार्टफोन",
+        "refrigerator": "फ्रिज",
+        "air_conditioner": "एयर कंडीशनर"
+    },
+    "problems": {
+        "job-123": "स्क्रीन टिमटिमा रही है और उसमें खड़ी धारियाँ हैं।",
+        "job-456": "पानी नहीं निकल रहा है और तेज आवाज कर रहा है।",
+        "job-789": "स्क्रीन टूट गई, टच रिस्पॉन्सिव नहीं है।",
+        "job-101": "ठंडा नहीं हो रहा, फ्रीजर ठीक है।",
+        "job-112": "एसी चालू नहीं हो रहा है।"
+    }
+}

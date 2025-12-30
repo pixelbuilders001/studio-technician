@@ -4,14 +4,16 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Wrench, User } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const navItems = [
-  { href: "/jobs", icon: Wrench, label: "Jobs" },
-  { href: "/profile", icon: User, label: "Profile" },
+  { href: "/jobs", icon: Wrench, labelKey: "jobs" },
+  { href: "/profile", icon: User, labelKey: "profile" },
 ];
 
 export function BottomNav() {
   const pathname = usePathname();
+  const { t } = useTranslation();
 
   return (
     <nav className="fixed bottom-0 left-1/2 z-50 h-16 w-full max-w-md -translate-x-1/2 border-t bg-background">
@@ -28,7 +30,7 @@ export function BottomNav() {
               )}
             >
               <item.icon className="h-6 w-6" />
-              <span>{item.label}</span>
+              <span>{t(`bottom_nav.${item.labelKey}`)}</span>
             </Link>
           );
         })}

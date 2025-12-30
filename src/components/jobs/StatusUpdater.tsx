@@ -7,13 +7,14 @@ import { useTransition } from "react";
 import { updateJobStatusAction } from "@/app/actions";
 import { usePathname } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "@/hooks/useTranslation";
 
-const statuses: { id: ActiveJobStatus; label: string }[] = [
-  { id: "scheduled", label: "Scheduled" },
-  { id: "reached_location", label: "Reached Location" },
-  { id: "inspection_done", label: "Inspection Done" },
-  { id: "repair_in_progress", label: "Repair In Progress" },
-  { id: "repair_completed", label: "Repair Completed" },
+const statuses: { id: ActiveJobStatus; labelKey: string }[] = [
+  { id: "scheduled", labelKey: "scheduled" },
+  { id: "reached_location", labelKey: "reached_location" },
+  { id: "inspection_done", labelKey: "inspection_done" },
+  { id: "repair_in_progress", labelKey: "repair_in_progress" },
+  { id: "repair_completed", labelKey: "repair_completed" },
 ];
 
 type StatusUpdaterProps = {
@@ -25,6 +26,7 @@ export function StatusUpdater({ jobId, currentStatus }: StatusUpdaterProps) {
   const [isPending, startTransition] = useTransition();
   const pathname = usePathname();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const currentIndex = statuses.findIndex((s) => s.id === currentStatus);
 
   const handleUpdateStatus = (statusId: ActiveJobStatus) => {
@@ -32,14 +34,14 @@ export function StatusUpdater({ jobId, currentStatus }: StatusUpdaterProps) {
       try {
         await updateJobStatusAction(jobId, pathname);
         toast({
-          title: "Status Updated",
-          description: `Job status is now: ${statusId.replace(/_/g, ' ')}`,
+          title: t('status_updater.toast_title'),
+          description: `${t('status_updater.toast_description')} ${t(`job_status.${statusId}`)}`,
         });
       } catch (error) {
         toast({
           variant: "destructive",
-          title: "Update Failed",
-          description: "Could not update the job status.",
+          title: t('status_updater.toast_error_title'),
+          description: t('status_updater.toast_error_description'),
         });
       }
     });
@@ -57,6 +59,7 @@ export function StatusUpdater({ jobId, currentStatus }: StatusUpdaterProps) {
           const isCompleted = index < currentIndex;
           const isCurrent = index === currentIndex;
           const isClickable = index === currentIndex + 1;
+          const label = t(`job_status.${status.labelKey}`);
 
           return (
             <li key={status.id} className="flex items-center gap-4">
@@ -80,7 +83,7 @@ export function StatusUpdater({ jobId, currentStatus }: StatusUpdaterProps) {
                   isClickable && "hover:text-primary",
                 )}
               >
-                {status.label}
+                {label}
               </button>
             </li>
           );
