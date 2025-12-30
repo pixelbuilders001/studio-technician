@@ -36,9 +36,13 @@ const otpSchema = z.object({
     otp: z.string().min(6, { message: "OTP must be 6 digits."}),
 });
 
-type Step = 'mobile' | 'otp';
+export type Step = 'mobile' | 'otp';
 
-export function LoginForm() {
+type LoginFormProps = {
+    onStepChange?: (step: Step) => void;
+}
+
+export function LoginForm({ onStepChange }: LoginFormProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -60,13 +64,20 @@ export function LoginForm() {
       }
   })
 
+  const handleStepChange = (newStep: Step) => {
+    setStep(newStep);
+    if(onStepChange) {
+        onStepChange(newStep)
+    }
+  }
+
   function onMobileSubmit(values: z.infer<typeof mobileSchema>) {
     setIsLoading(true);
     console.log("Sending OTP to:", values.mobile);
     setTimeout(() => {
       setIsLoading(false);
       setMobileNumber(values.mobile);
-      setStep('otp');
+      handleStepChange('otp');
     }, 1000);
   }
 
@@ -118,7 +129,7 @@ export function LoginForm() {
                     </Button>
                 </form>
             </Form>
-            <Button variant="link" onClick={() => setStep('mobile')} className="mt-4">{t('login_form.wrong_number')}</Button>
+            <Button variant="link" onClick={() => handleStepChange('mobile')} className="mt-4">{t('login_form.wrong_number')}</Button>
           </div>
       )
   }
