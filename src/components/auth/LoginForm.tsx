@@ -2,7 +2,6 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -98,14 +97,7 @@ export function LoginForm({ onStepChange }: LoginFormProps) {
 
   if (step === 'otp') {
       return (
-          <div className="flex flex-col items-center text-center">
-            <Image 
-                src="https://dv09dhgcrv5ld6ct.public.blob.vercel-storage.com/Gemini_Generated_Image_lo7g9dlo7g9dlo7g.png"
-                alt="OTP Verification"
-                width={200}
-                height={200}
-                className="w-48 h-48 mx-auto"
-            />
+          <div className="flex flex-col items-center text-center pt-8">
             <h2 className="text-xl font-bold mt-4">{t('login_form.verify_otp_title')}</h2>
             <p className="text-muted-foreground mt-2">{t('login_form.verify_otp_subtitle', `+91 ${mobileNumber}`)}</p>
             <Form {...otpForm}>
