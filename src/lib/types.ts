@@ -33,4 +33,6 @@ export type Technician = {
   areaCovered: string;
   totalJobs: number;
   avatarUrl: string;
+  lifetimeEarnings: number;
+  todaysEarnings: number;
 };

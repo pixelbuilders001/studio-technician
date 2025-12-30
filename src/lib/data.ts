@@ -101,6 +101,8 @@ export const technicianProfile: Technician = {
   areaCovered: 'Anytown',
   totalJobs: 134,
   avatarUrl: 'https://picsum.photos/seed/tech/200/200',
+  lifetimeEarnings: 254200,
+  todaysEarnings: 1800,
 };
 
 export const sparePartsInventory = [

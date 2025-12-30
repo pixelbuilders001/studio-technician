@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { User, Phone, Map, Tag, Briefcase, LogOut } from 'lucide-react';
+import { User, Phone, Map, Tag, Briefcase, LogOut, IndianRupee } from 'lucide-react';
 
 const ProfileInfoItem = ({ icon: Icon, label, value }: { icon: React.ElementType, label: string, value: string | React.ReactNode }) => (
     <div className="flex items-center gap-4">
@@ -17,9 +17,25 @@ const ProfileInfoItem = ({ icon: Icon, label, value }: { icon: React.ElementType
     </div>
 );
 
+const EarningsStat = ({ label, value }: { label: string, value: number }) => {
+    const formattedValue = new Intl.NumberFormat('en-IN', {
+        style: 'currency',
+        currency: 'INR',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+    }).format(value);
+
+    return (
+        <div className="flex flex-col items-center">
+            <p className="text-sm text-muted-foreground">{label}</p>
+            <p className="text-2xl font-bold">{formattedValue}</p>
+        </div>
+    )
+};
+
 
 export default function ProfilePage() {
-  const { name, phone, serviceCategories, areaCovered, totalJobs, avatarUrl } = technicianProfile;
+  const { name, phone, serviceCategories, areaCovered, totalJobs, avatarUrl, lifetimeEarnings, todaysEarnings } = technicianProfile;
 
   return (
     <div className="flex flex-col">
@@ -48,6 +64,13 @@ export default function ProfilePage() {
         </Card>
 
         <Card>
+            <CardContent className="flex justify-around pt-6 text-center">
+               <EarningsStat label="Today's Earnings" value={todaysEarnings} />
+               <EarningsStat label="Lifetime Earnings" value={lifetimeEarnings} />
+            </CardContent>
+        </Card>
+
+        <Card>
             <CardContent className="space-y-4 pt-6">
                 <ProfileInfoItem icon={Phone} label="Phone Number" value={phone} />
                 <Separator />
@@ -63,7 +86,7 @@ export default function ProfilePage() {
                     } 
                 />
                 <Separator />
-                <ProfileInfoItem icon={Briefcase} label="Total Jobs Completed" value={totalJobs} />
+                <ProfileInfoItem icon={Briefcase} label="Total Jobs Completed" value={`${totalJobs}`} />
             </CardContent>
         </Card>
 
