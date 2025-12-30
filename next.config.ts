@@ -2,6 +2,15 @@ import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
   /* config options here */
+  experimental: {
+    turbo: {
+      rules: {
+        '**/*.json': {
+          as: '*.js',
+        },
+      },
+    },
+  },
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -36,6 +45,15 @@ const nextConfig: NextConfig = {
       }
     ],
   },
+  devIndicators: {
+    buildActivity: true,
+    buildActivityPosition: 'bottom-right',
+  },
+  // CAUTION: This is an experimental feature.
+  // Note that the cloud IDE domains are temporary and will change.
+  allowedDevOrigins: [
+    'https://6000-firebase-studio-1767068471018.cluster-ulqnojp5endvgve6krhe7klaws.cloudworkstations.dev',
+  ],
 };
 
 export default nextConfig;
