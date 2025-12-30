@@ -23,13 +23,6 @@ export default function LoginPage() {
   return (
     <main className="flex flex-col min-h-screen bg-background">
       <div className="relative flex-1 flex flex-col items-center justify-end p-8 text-white bg-gradient-to-b from-primary/80 to-primary">
-        <Image
-          src="https://dv09dhgcrv5ld6ct.public.blob.vercel-storage.com/Gemini_Generated_Image_901bfk901bfk901b.png"
-          alt="FixFast Technician"
-          fill
-          className="object-cover object-top"
-          quality={100}
-        />
         <div className="relative z-10 w-full text-center">
           <h1 className="text-4xl font-bold font-headline leading-tight">
             {t("login_page.title")}
