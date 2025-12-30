@@ -1,0 +1,25 @@
+import { MetadataRoute } from 'next'
+ 
+export default function manifest(): MetadataRoute.Manifest {
+  return {
+    name: 'FixFast Technician',
+    short_name: 'FixFast',
+    description: 'Repair jobs management app for technicians.',
+    start_url: '/',
+    display: 'standalone',
+    background_color: '#F0F4F8',
+    theme_color: '#F0F4F8',
+    icons: [
+      {
+        src: '/icon-192x192.png',
+        sizes: '192x192',
+        type: 'image/png',
+      },
+      {
+        src: '/icon-512x512.png',
+        sizes: '512x512',
+        type: 'image/png',
+      },
+    ],
+  }
+}
