@@ -32,10 +32,14 @@ const serviceCategories = [
 const formSchema = z.object({
   fullName: z.string().min(2, { message: "Please enter your full name." }),
   mobile: z.string().min(10, { message: "Enter a valid 10-digit mobile number." }).max(10),
+  aadharNumber: z.string().length(12, { message: "Aadhar number must be 12 digits."}),
+  pincode: z.string().length(6, { message: "Pincode must be 6 digits." }),
   serviceArea: z.string().min(3, { message: "Please enter your service area." }),
   serviceCategories: z.array(z.string()).refine(value => value.some(item => item), {
       message: "You have to select at least one service category.",
-  })
+  }),
+  aadharFront: z.any().refine(files => files?.length == 1, "Aadhar front photo is required."),
+  aadharBack: z.any().refine(files => files?.length == 1, "Aadhar back photo is required."),
 });
 
 export function PartnerSignupForm() {
@@ -49,6 +53,8 @@ export function PartnerSignupForm() {
     defaultValues: {
       fullName: "",
       mobile: "",
+      aadharNumber: "",
+      pincode: "",
       serviceArea: "",
       serviceCategories: [],
     },
@@ -62,6 +68,9 @@ export function PartnerSignupForm() {
       setIsSubmitted(true);
     }, 1500);
   }
+  
+  const aadharFrontRef = form.register("aadharFront");
+  const aadharBackRef = form.register("aadharBack");
 
   if (isSubmitted) {
       return (
@@ -111,6 +120,32 @@ export function PartnerSignupForm() {
                     maxLength={10}
                   />
                 </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="aadharNumber"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t('partner_signup_form.aadhar_number')}</FormLabel>
+              <FormControl>
+                <Input placeholder="1234 5678 9012" {...field} maxLength={12} type="number"/>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="pincode"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t('partner_signup_form.pincode')}</FormLabel>
+              <FormControl>
+                <Input placeholder="e.g., 110011" {...field} maxLength={6} type="number" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -177,6 +212,35 @@ export function PartnerSignupForm() {
                 </FormItem>
             )}
         />
+
+        <FormField
+          control={form.control}
+          name="aadharFront"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t('partner_signup_form.aadhar_front')}</FormLabel>
+              <FormControl>
+                <Input type="file" {...aadharFrontRef} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="aadharBack"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t('partner_signup_form.aadhar_back')}</FormLabel>
+              <FormControl>
+                <Input type="file" {...aadharBackRef} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <Button type="submit" className="w-full text-lg py-6" disabled={isLoading}>
           {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           {isLoading ? t('partner_signup_form.submitting') : t('partner_signup_form.submit_application')}

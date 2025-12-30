@@ -130,6 +130,10 @@
         "submitting": "Submitting...",
         "submitted_title": "Application Received!",
         "submitted_message": "Thank you for your interest. We have received your application and will call you for verification within 2-3 business days.",
-        "back_to_login": "Back to Login"
+        "back_to_login": "Back to Login",
+        "aadhar_number": "Aadhar Number",
+        "pincode": "Pincode",
+        "aadhar_front": "Aadhar Card (Front Photo)",
+        "aadhar_back": "Aadhar Card (Back Photo)"
     }
 }
