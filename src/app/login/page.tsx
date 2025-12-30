@@ -37,7 +37,7 @@ export default function LoginPage() {
           {formStep === 'mobile' && (
             <CardHeader className="p-0 text-center">
               <CardTitle className="text-2xl font-bold font-headline">
-                {t("login_page.login_title")}
+                {t('login_page.login_title')}
               </CardTitle>
               <CardDescription className="pt-1">
                 {t("login_page.registration_subtitle")}
