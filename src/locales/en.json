@@ -2,7 +2,11 @@
     "login_page": {
         "title": "FixFast Technician",
         "subtitle": "Sign in to manage your repair jobs.",
-        "become_partner": "Become a Partner"
+        "become_partner": "Become a Partner",
+        "promo_title": "Join FixFast Today!",
+        "promo_subtitle": "Become a partner and take control of your earnings.",
+        "promo_earn": "Earn up to ₹2000 daily",
+        "promo_flexible": "Flexible working hours"
     },
     "login_form": {
         "mobile_number": "Mobile Number",
