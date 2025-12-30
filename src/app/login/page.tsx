@@ -2,6 +2,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import {
   Card,
   CardContent,
@@ -21,8 +22,16 @@ export default function LoginPage() {
 
   return (
     <main className="flex flex-col min-h-screen bg-background">
-      <div className="relative flex-1 flex flex-col items-center justify-end p-8 text-white bg-gradient-to-b from-primary/80 to-primary">
-        <div className="relative z-10 w-full text-center">
+      <div className="relative flex-1 flex flex-col items-center justify-end p-8 text-white">
+        <Image
+          src="https://dv09dhgcrv5ld6ct.public.blob.vercel-storage.com/Gemini_Generated_Image_901bfk901bfk901b.png"
+          alt="Technician working"
+          fill
+          className="object-cover"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/50 to-transparent z-10"></div>
+        <div className="relative z-20 w-full text-center">
           <h1 className="text-4xl font-bold font-headline leading-tight">
             {t("login_page.title")}
           </h1>
@@ -34,14 +43,26 @@ export default function LoginPage() {
 
       <div className="bg-background p-8 rounded-t-3xl -mt-6 relative z-20">
         <Card className="border-none shadow-none">
-            <CardHeader className="p-0 text-center">
-              <CardTitle className="text-2xl font-bold font-headline">
-                {formStep === 'mobile' ? t('login_form.login_title') : t('login_form.verify_otp_title')}
-              </CardTitle>
-              <CardDescription className="pt-1">
-                {formStep === 'mobile' ? t("login_page.registration_subtitle") : t('login_form.verify_otp_subtitle', "")}
-              </CardDescription>
-            </CardHeader>
+            {formStep === 'mobile' && (
+              <CardHeader className="p-0 text-center">
+                <CardTitle className="text-2xl font-bold font-headline">
+                  {t('login_form.login_title')}
+                </CardTitle>
+                <CardDescription className="pt-1">
+                  {t("login_page.registration_subtitle")}
+                </CardDescription>
+              </CardHeader>
+            )}
+             {formStep === 'otp' && (
+                <CardHeader className="p-0 text-center">
+                    <CardTitle className="text-2xl font-bold font-headline">
+                        {t('login_form.verify_otp_title')}
+                    </CardTitle>
+                    <CardDescription className="pt-1">
+                        {t('login_form.verify_otp_subtitle', "")}
+                    </CardDescription>
+                </CardHeader>
+             )}
           <CardContent className="p-0 pt-6">
             <LoginForm onStepChange={setFormStep} />
           </CardContent>
