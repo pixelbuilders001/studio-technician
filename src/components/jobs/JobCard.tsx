@@ -11,8 +11,18 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Settings, Check, X, AlertCircle } from "lucide-react";
+import { MapPin, Settings, Check, X, AlertCircle, Tv2, Refrigerator, Microwave, AirVent, Smartphone, WashingMachine, Wrench } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import React from "react";
+
+const iconMap: { [key: string]: React.ElementType } = {
+  Tv2,
+  Refrigerator,
+  Microwave,
+  AirVent,
+  Smartphone,
+  WashingMachine,
+};
 
 export function JobCard({ job }: { job: Job }) {
   const router = useRouter();
@@ -38,6 +48,9 @@ export function JobCard({ job }: { job: Job }) {
     });
     // In a real app, this would be an API call.
   };
+  
+  const DeviceIcon = typeof job.deviceIcon === 'string' ? iconMap[job.deviceIcon] || Wrench : Wrench;
+
 
   const statusBadge = () => {
     if (job.status === "active") {
@@ -56,7 +69,7 @@ export function JobCard({ job }: { job: Job }) {
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-secondary">
-                <job.deviceIcon className="h-7 w-7 text-secondary-foreground" />
+                <DeviceIcon className="h-7 w-7 text-secondary-foreground" />
               </div>
               <div>
                 <h3 className="font-bold font-headline">{job.deviceType}</h3>

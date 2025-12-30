@@ -1,11 +1,10 @@
 import type { Job, Technician } from './types';
-import { Tv2, Refrigerator, Microwave, AirVent, Smartphone, WashingMachine } from 'lucide-react';
 
 export const jobs: Job[] = [
   {
     id: 'job-123',
     deviceType: 'Television',
-    deviceIcon: Tv2,
+    deviceIcon: 'Tv2',
     problemSummary: 'Screen is flickering and has vertical lines.',
     location: 'Downtown',
     estimatedPrice: '1500-2500',
@@ -22,7 +21,7 @@ export const jobs: Job[] = [
   {
     id: 'job-456',
     deviceType: 'Washing Machine',
-    deviceIcon: WashingMachine,
+    deviceIcon: 'WashingMachine',
     problemSummary: 'Not draining water and making a loud noise.',
     location: 'Suburbia',
     estimatedPrice: '800-1200',
@@ -40,7 +39,7 @@ export const jobs: Job[] = [
   {
     id: 'job-789',
     deviceType: 'Smartphone',
-    deviceIcon: Smartphone,
+    deviceIcon: 'Smartphone',
     problemSummary: 'Cracked screen, touch not responsive.',
     location: 'City Center',
     estimatedPrice: '4000-6000',
@@ -58,7 +57,7 @@ export const jobs: Job[] = [
   {
     id: 'job-101',
     deviceType: 'Refrigerator',
-    deviceIcon: Refrigerator,
+    deviceIcon: 'Refrigerator',
     problemSummary: 'Not cooling, freezer is fine.',
     location: 'Northside',
     estimatedPrice: '1200-2000',
@@ -79,7 +78,7 @@ export const jobs: Job[] = [
     {
     id: 'job-112',
     deviceType: 'Air Conditioner',
-    deviceIcon: AirVent,
+    deviceIcon: 'AirVent',
     problemSummary: 'AC not turning on.',
     location: 'West End',
     estimatedPrice: '1000-1500',
