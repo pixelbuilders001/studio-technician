@@ -24,7 +24,7 @@ export default function LoginPage() {
     <main className="flex flex-col min-h-screen bg-background">
       <div className="relative flex-1 flex flex-col items-center justify-end p-8 text-white bg-gradient-to-b from-primary/80 to-primary">
         <Image
-          src="https://dv09dhgcrv5ld6ct.public.blob.vercel-storage.com/technician-WdKuaTBrj9p2f19GzTfdXfTqbInE9Z.png"
+          src="https://dv09dhgcrv5ld6ct.public.blob.vercel-storage.com/Gemini_Generated_Image_901bfk901bfk901b.png"
           alt="FixFast Technician"
           fill
           className="object-cover object-top"
