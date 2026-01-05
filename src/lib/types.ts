@@ -14,6 +14,7 @@ export type Job = {
   net_inspection_fee: number;
   media_url: string | null;
   user_name: string;
+  mobile_number: string;
   categories: {
     id: string;
     name: string;

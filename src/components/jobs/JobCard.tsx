@@ -8,11 +8,13 @@ import {
   Card,
   CardContent,
   CardFooter,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { MapPin, Check, X, Wrench, Tv, Refrigerator, Smartphone, AirVent, WashingMachine, Calendar, User, ShoppingCart, Tag, Camera, Info, Circle } from "lucide-react";
+import { MapPin, Check, X, Wrench, Tv, Refrigerator, Smartphone, AirVent, WashingMachine, Calendar, User, ShoppingCart, Tag, Camera, Info, Circle, Phone } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import React from "react";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -90,32 +92,37 @@ export function JobCard({ job }: { job: Job }) {
   }
 
   const handleCardClick = () => {
-    router.push(`/jobs/${job.id}`);
+    // router.push(`/jobs/${job.id}`);
   };
+
+  const formatPhoneNumber = (phone: string) => {
+    if (!phone || phone.length < 10) return phone;
+    const countryCode = phone.length > 10 ? phone.slice(0, -10) : '91';
+    const number = phone.slice(-10);
+    return `${countryCode}XXXXXX${number.slice(-2)}`;
+  }
 
   return (
       <Card className="overflow-hidden transition-all shadow-md" onClick={handleCardClick}>
-        <div className="p-4">
-            <div className="flex items-start justify-between gap-2">
-                <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-secondary">
-                        <DeviceIcon className="h-6 w-6 text-secondary-foreground" />
-                    </div>
-                    <div>
-                        <p className="font-bold font-headline">{job.categories.name}</p>
-                        <p className="text-xs text-muted-foreground">
-                        #{job.order_id}
-                        </p>
-                    </div>
+        <CardHeader className="flex-row items-start justify-between gap-4 p-4">
+             <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-secondary">
+                    <DeviceIcon className="h-6 w-6 text-secondary-foreground" />
                 </div>
-                <div className="flex items-center gap-2">
-                    {statusBadge()}
-                    <p className="font-bold text-lg">₹{job.total_estimated_price}</p>
+                <div>
+                    <CardTitle className="text-base font-bold font-headline">{job.categories.name}</CardTitle>
+                    <p className="text-xs text-muted-foreground">
+                    #{job.order_id}
+                    </p>
                 </div>
             </div>
-        </div>
-        <Separator/>
-        <CardContent className="p-4 space-y-3 text-sm">
+             <div className="text-right">
+                <p className="font-bold text-lg">₹{job.total_estimated_price}</p>
+                {statusBadge()}
+            </div>
+        </CardHeader>
+        
+        <CardContent className="p-4 pt-0 space-y-3 text-sm">
             <InfoRow icon={Info} value={job.issues.title} />
             <InfoRow icon={MapPin} value={job.full_address} />
             <p className="text-sm text-muted-foreground ml-7">{format(new Date(job.created_at), 'MMM dd · h:mm a')}</p>
@@ -123,41 +130,41 @@ export function JobCard({ job }: { job: Job }) {
         <Separator/>
         <div className="p-4">
             <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                    <User className="h-4 w-4 text-muted-foreground"/>
-                    <p className="font-medium text-sm">{job.user_name}</p>
-                    {job.media_url && (
-                        <Dialog>
-                            <DialogTrigger asChild>
-                                <div className="flex items-center gap-1 cursor-pointer text-muted-foreground">
-                                    <Camera className="h-4 w-4" />
-                                    <span className="text-sm">1 photo</span>
-                                    <div className="ml-1 relative h-6 w-6 rounded overflow-hidden">
-                                        <Image src={job.media_url} alt="Job photo" fill className="object-cover"/>
-                                    </div>
-                                </div>
-                            </DialogTrigger>
-                            <DialogContent className="p-0 border-0 max-w-screen-md">
-                                 <Image 
-                                    src={job.media_url} 
-                                    alt="Job photo" 
-                                    width={800}
-                                    height={600}
-                                    className="w-full h-auto object-contain rounded-lg"
-                                />
-                            </DialogContent>
-                        </Dialog>
+                <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                        <User className="h-4 w-4 text-muted-foreground"/>
+                        <p className="font-medium text-sm">{job.user_name}</p>
+                    </div>
+                    {job.mobile_number && (
+                        <div className="flex items-center gap-2">
+                            <Phone className="h-4 w-4 text-muted-foreground" />
+                            <p className="font-medium text-sm">{formatPhoneNumber(job.mobile_number)}</p>
+                        </div>
                     )}
                 </div>
-                <div className="text-right">
-                    <p className="font-bold text-sm">₹{job.net_inspection_fee}</p>
-                    <p className="text-xs text-muted-foreground">Inspection Fee</p>
-                </div>
+                {job.media_url && (
+                    <Dialog>
+                        <DialogTrigger asChild>
+                            <div className="relative h-10 w-10 rounded-md overflow-hidden cursor-pointer">
+                                <Image src={job.media_url} alt="Job photo" fill className="object-cover"/>
+                            </div>
+                        </DialogTrigger>
+                        <DialogContent className="p-0 border-0 max-w-screen-md">
+                                <Image 
+                                src={job.media_url} 
+                                alt="Job photo" 
+                                width={800}
+                                height={600}
+                                className="w-full h-auto object-contain rounded-lg"
+                            />
+                        </DialogContent>
+                    </Dialog>
+                )}
             </div>
         </div>
 
         {job.status === "assigned" && (
-          <CardFooter className="grid grid-cols-2 gap-3 p-2">
+          <CardFooter className="grid grid-cols-2 gap-3 p-2 bg-muted/50">
             <Button variant="outline" className="w-full bg-card" onClick={handleReject}>
               <X className="mr-2 h-4 w-4" /> {t('job_card.reject')}
             </Button>
