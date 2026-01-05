@@ -113,17 +113,22 @@ export function PartnerSignupForm() {
 
       setIsSubmitted(true);
     } catch (error: any) {
+        let title = "Submission Failed";
+        let description = error.message || "An unexpected error occurred.";
+
         if (error.message.includes("technicians_mobile_key")) {
-            form.setError("mobile", { type: "manual", message: "This mobile number is already registered." });
+            description = "This mobile number is already registered.";
+            form.setError("mobile", { type: "manual", message: description });
         } else if (error.message.includes("technicians_aadhaar_number_key")) {
-            form.setError("aadhaar_number", { type: "manual", message: "This Aadhaar number is already registered." });
-        } else {
-            toast({
-                variant: "destructive",
-                title: "Submission Failed",
-                description: error.message || "An unexpected error occurred.",
-            });
+            description = "This Aadhaar number is already registered.";
+            form.setError("aadhaar_number", { type: "manual", message: description });
         }
+        
+        toast({
+            variant: "destructive",
+            title: title,
+            description: description,
+        });
     } finally {
         setIsLoading(false);
     }
@@ -319,5 +324,7 @@ export function PartnerSignupForm() {
     </Form>
   );
 }
+
+    
 
     
