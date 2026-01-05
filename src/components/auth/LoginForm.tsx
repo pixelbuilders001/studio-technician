@@ -68,8 +68,6 @@ export function LoginForm({ initialStep = 'mobile', mobileNumber: initialMobile 
   })
 
   function onMobileSubmit(values: z.infer<typeof mobileSchema>) {
-    // In a real app you might send an OTP here.
-    // For this app, we just navigate to the OTP screen.
     router.push(`/login?mobile=${values.mobile}`);
   }
 
@@ -79,6 +77,7 @@ export function LoginForm({ initialStep = 'mobile', mobileNumber: initialMobile 
         const result = await technicianLoginAction({ mobile: mobileNumber, code: values.otp });
         if (result.success && result.token && result.technician) {
             localStorage.setItem('authToken', result.token);
+            localStorage.setItem('technicianProfile', JSON.stringify(result.technician));
             setIsSuccess(true);
             toast({
                 title: "Login Successful",
