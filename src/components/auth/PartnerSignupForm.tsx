@@ -19,7 +19,6 @@ import {
 } from "@/components/ui/form";
 import { Loader2, PartyPopper } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
-import { partnerSignupAction } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
 import {
     Select,
@@ -85,8 +84,34 @@ export function PartnerSignupForm() {
       }
     });
 
+    const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/create-technician`;
+    const apikey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!url || !apikey) {
+      toast({
+        variant: "destructive",
+        title: "Configuration Error",
+        description: "API URL or key is missing.",
+      });
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      await partnerSignupAction(formData);
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'apikey': apikey,
+                // The Authorization header with service role key is removed for client-side calls
+            },
+            body: formData,
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || `API Error: ${response.status} ${response.statusText}`);
+        }
+
       setIsSubmitted(true);
     } catch (error: any) {
         toast({

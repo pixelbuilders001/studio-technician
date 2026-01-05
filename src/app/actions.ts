@@ -143,38 +143,3 @@ export async function getJobsAction(technicianId: string) {
     throw new Error(error.message || "An unexpected error occurred while fetching jobs.");
   }
 }
-
-export async function partnerSignupAction(formData: FormData) {
-  const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/create-technician`;
-  const apikey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  const authToken = process.env.SUPABASE_SERVICE_ROLE_KEY; 
-
-  if (!url || !apikey || !authToken) {
-    console.error("Supabase URL, anon key, or auth token is not defined.");
-    throw new Error("Server configuration error.");
-  }
-
-  try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'apikey': apikey,
-        'Authorization': `Bearer ${authToken}`,
-      },
-      body: formData,
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error("API Error Data:", errorData);
-      throw new Error(errorData.error || `API Error: ${response.status} ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    return { success: true, data };
-
-  } catch (error: any) {
-    console.error('Partner signup API error:', error);
-    throw new Error(error.message || "An unexpected error occurred during signup.");
-  }
-}
