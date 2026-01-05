@@ -1,7 +1,6 @@
 
 "use client"
 import { JobTabs } from "@/components/jobs/JobTabs";
-import { DutyStatus } from "@/components/profile/DutyStatus";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useEffect, useState } from "react";
 import { getJobsAction } from "../actions";
@@ -48,7 +47,7 @@ export default function JobsPage() {
     <div className="flex h-full flex-col">
       <header className="flex h-14 items-center justify-between border-b bg-background px-4">
         <h1 className="text-xl font-bold font-headline">{t('jobs_page.title')}</h1>
-        <DutyStatus />
+        {profile && <span className="text-sm font-medium">Welcome, {profile.name.split(' ')[0]}</span>}
       </header>
       {profileLoading || loading ? (
         <JobsSkeleton />
