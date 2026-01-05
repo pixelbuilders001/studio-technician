@@ -102,7 +102,6 @@ export function PartnerSignupForm() {
             method: 'POST',
             headers: {
                 'apikey': apikey,
-                // The Authorization header with service role key is removed for client-side calls
             },
             body: formData,
         });
@@ -114,11 +113,17 @@ export function PartnerSignupForm() {
 
       setIsSubmitted(true);
     } catch (error: any) {
-        toast({
-            variant: "destructive",
-            title: "Submission Failed",
-            description: error.message || "An unexpected error occurred.",
-        });
+        if (error.message.includes("technicians_mobile_key")) {
+            form.setError("mobile", { type: "manual", message: "This mobile number is already registered." });
+        } else if (error.message.includes("technicians_aadhaar_number_key")) {
+            form.setError("aadhaar_number", { type: "manual", message: "This Aadhaar number is already registered." });
+        } else {
+            toast({
+                variant: "destructive",
+                title: "Submission Failed",
+                description: error.message || "An unexpected error occurred.",
+            });
+        }
     } finally {
         setIsLoading(false);
     }
@@ -314,3 +319,5 @@ export function PartnerSignupForm() {
     </Form>
   );
 }
+
+    
