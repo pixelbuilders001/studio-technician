@@ -18,6 +18,7 @@ import React from "react";
 import { useTranslation } from "@/hooks/useTranslation";
 import { format } from 'date-fns';
 import { Separator } from "../ui/separator";
+import { cn } from "@/lib/utils";
 
 const iconMap: { [key: string]: React.ElementType } = {
   LAPTOPS: Wrench,
@@ -89,9 +90,7 @@ export function JobCard({ job }: { job: Job }) {
   }
 
   const handleCardClick = () => {
-    if (job.status !== 'assigned') {
-      router.push(`/jobs/${job.id}`);
-    }
+    router.push(`/jobs/${job.id}`);
   };
 
   return (
@@ -152,6 +151,7 @@ export function JobCard({ job }: { job: Job }) {
                 </div>
                 <div className="text-right">
                     <p className="font-bold text-sm">₹{job.net_inspection_fee}</p>
+                    <p className="text-xs text-muted-foreground">Inspection Fee</p>
                 </div>
             </div>
         </div>
