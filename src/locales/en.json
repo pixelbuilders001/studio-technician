@@ -7,8 +7,8 @@
         "login": "Login"
     },
     "login_page": {
-        "title": "",
-        "subtitle": "",
+        "title": "FixFast Technician",
+        "subtitle": "Sign in to manage your repair jobs.",
         "become_partner": "Become a Partner",
         "registration_subtitle": "Enter your mobile number to receive a verification code."
     },
@@ -35,13 +35,15 @@
         "no_completed_jobs": "No jobs completed yet."
     },
     "job_card": {
-        "inspection_short": "insp.",
+        "inspection_short": "Inspection",
         "reject": "Reject",
         "accept": "Accept",
         "job_accepted_title": "Job Accepted",
         "job_accepted_description": "Job has been moved to Active Jobs.",
         "job_rejected_title": "Job Rejected",
-        "job_rejected_description": "You have rejected job"
+        "job_rejected_description": "You have rejected job",
+        "address": "Address",
+        "booked_on": "Booked On"
     },
     "profile_page": {
         "title": "Profile",
@@ -74,7 +76,7 @@
         "job_details": "Job Details",
         "device": "Device",
         "problem": "Problem",
-        "price_range": "Price Range",
+        "price_range": "Est. Price",
         "inspection": "Inspection",
         "uploaded_photos": "Uploaded Photos",
         "cancel_job": "Cancel Job",

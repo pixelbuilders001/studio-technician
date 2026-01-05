@@ -7,8 +7,8 @@
         "login": "लॉग इन करें"
     },
     "login_page": {
-        "title": "",
-        "subtitle": "",
+        "title": "FixFast Technician",
+        "subtitle": "अपनी मरम्मत की नौकरियों का प्रबंधन करने के लिए साइन इन करें।",
         "become_partner": "पार्टनर बनें",
         "registration_subtitle": "सत्यापन कोड प्राप्त करने के लिए अपना मोबाइल नंबर दर्ज करें।"
     },
@@ -41,7 +41,9 @@
         "job_accepted_title": "नौकरी स्वीकृत",
         "job_accepted_description": "नौकरी को सक्रिय नौकरियों में ले जाया गया है।",
         "job_rejected_title": "नौकरी अस्वीकृत",
-        "job_rejected_description": "आपने नौकरी अस्वीकार कर दी है"
+        "job_rejected_description": "आपने नौकरी अस्वीकार कर दी है",
+        "address": "पता",
+        "booked_on": "बुक किया गया"
     },
     "profile_page": {
         "title": "प्रोफ़ाइल",
@@ -74,7 +76,7 @@
         "job_details": "नौकरी का विवरण",
         "device": "उपकरण",
         "problem": "समस्या",
-        "price_range": "मूल्य सीमा",
+        "price_range": "अनुमानित मूल्य",
         "inspection": "निरीक्षण",
         "uploaded_photos": "अपलोड की गई तस्वीरें",
         "cancel_job": "नौकरी रद्द करें",
@@ -143,7 +145,7 @@
     },
     "partner_signup_form": {
         "full_name": "पूरा नाम",
-        "full_name_placeholder": "उदा., रमेश कुमार",
+        "full_name_placeholder": "उदा., रमेश Kumar",
         "service_area": "प्राथमिक सेवा क्षेत्र",
         "service_area_placeholder": "उदा., दक्षिण दिल्ली",
         "service_categories_description": "उन श्रेणियों का चयन करें जिनमें आप विशेषज्ञ हैं।",
