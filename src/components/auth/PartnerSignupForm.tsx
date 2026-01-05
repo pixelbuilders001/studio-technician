@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -7,7 +8,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Form,
   FormControl,
@@ -19,31 +19,42 @@ import {
 } from "@/components/ui/form";
 import { Loader2, PartyPopper } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
-import { Alert, AlertTitle, AlertDescription } from "../ui/alert";
+import { partnerSignupAction } from "@/app/actions";
+import { useToast } from "@/hooks/use-toast";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "../ui/textarea";
 
 const serviceCategories = [
-    { id: "tv", labelKey: "devices.television" },
-    { id: "washing_machine", labelKey: "devices.washing_machine" },
-    { id: "refrigerator", labelKey: "devices.refrigerator" },
-    { id: "air_conditioner", labelKey: "devices.air_conditioner" },
-    { id: "smartphone", labelKey: "devices.smartphone" },
+    { id: "tv_repair", label: "TV Repair" },
+    { id: "washing_machine_repair", label: "Washing Machine Repair" },
+    { id: "refrigerator_repair", label: "Refrigerator Repair" },
+    { id: "ac_repair", label: "AC Repair" },
+    { id: "smartphone_repair", label: "Smartphone Repair" },
+    { id: "plumber", label: "Plumber" },
+    { id: "electrician", label: "Electrician" },
 ] as const;
 
 const formSchema = z.object({
-  fullName: z.string().min(2, { message: "Please enter your full name." }),
+  full_name: z.string().min(2, { message: "Please enter your full name." }),
   mobile: z.string().min(10, { message: "Enter a valid 10-digit mobile number." }).max(10),
-  aadharNumber: z.string().length(12, { message: "Aadhar number must be 12 digits."}),
-  pincode: z.string().length(6, { message: "Pincode must be 6 digits." }),
-  serviceArea: z.string().min(3, { message: "Please enter your service area." }),
-  serviceCategories: z.array(z.string()).refine(value => value.some(item => item), {
-      message: "You have to select at least one service category.",
-  }),
-  aadharFront: z.any().refine(files => files?.length == 1, "Aadhar front photo is required."),
-  aadharBack: z.any().refine(files => files?.length == 1, "Aadhar back photo is required."),
+  aadhaar_number: z.string().length(12, { message: "Aadhaar number must be 12 digits."}),
+  current_address: z.string().min(10, { message: "Please enter your full address." }),
+  primary_skill: z.string().min(1, { message: "Please select your primary skill."}),
+  total_experience: z.coerce.number().min(0, "Experience can't be negative.").max(50, "Experience seems too high."),
+  aadhaar_front: z.any().refine(file => file instanceof File, "Aadhaar front photo is required."),
+  aadhaar_back: z.any().refine(file => file instanceof File, "Aadhaar back photo is required."),
+  selfie: z.any().refine(file => file instanceof File, "A selfie is required."),
 });
 
 export function PartnerSignupForm() {
   const router = useRouter();
+  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const { t } = useTranslation();
@@ -51,26 +62,42 @@ export function PartnerSignupForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      fullName: "",
+      full_name: "",
       mobile: "",
-      aadharNumber: "",
-      pincode: "",
-      serviceArea: "",
-      serviceCategories: [],
+      aadhaar_number: "",
+      current_address: "",
+      primary_skill: "",
+      total_experience: 0,
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
-    console.log("Partner Signup Details:", values);
-    setTimeout(() => {
-      setIsLoading(false);
+    
+    const formData = new FormData();
+    Object.entries(values).forEach(([key, value]) => {
+      if (value !== null && value !== undefined) {
+        if (value instanceof File) {
+          formData.append(key, value);
+        } else {
+          formData.append(key, String(value));
+        }
+      }
+    });
+
+    try {
+      await partnerSignupAction(formData);
       setIsSubmitted(true);
-    }, 1500);
+    } catch (error: any) {
+        toast({
+            variant: "destructive",
+            title: "Submission Failed",
+            description: error.message || "An unexpected error occurred.",
+        });
+    } finally {
+        setIsLoading(false);
+    }
   }
-  
-  const aadharFrontRef = form.register("aadharFront");
-  const aadharBackRef = form.register("aadharBack");
 
   if (isSubmitted) {
       return (
@@ -90,7 +117,7 @@ export function PartnerSignupForm() {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <FormField
           control={form.control}
-          name="fullName"
+          name="full_name"
           render={({ field }) => (
             <FormItem>
               <FormLabel>{t('partner_signup_form.full_name')}</FormLabel>
@@ -127,7 +154,7 @@ export function PartnerSignupForm() {
         />
         <FormField
           control={form.control}
-          name="aadharNumber"
+          name="aadhaar_number"
           render={({ field }) => (
             <FormItem>
               <FormLabel>{t('partner_signup_form.aadhar_number')}</FormLabel>
@@ -140,87 +167,69 @@ export function PartnerSignupForm() {
         />
         <FormField
           control={form.control}
-          name="pincode"
+          name="current_address"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t('partner_signup_form.pincode')}</FormLabel>
+              <FormLabel>Current Address</FormLabel>
               <FormControl>
-                <Input placeholder="e.g., 110011" {...field} maxLength={6} type="number" />
+                <Textarea placeholder="Enter your full current address" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-         <FormField
-          control={form.control}
-          name="serviceArea"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t('partner_signup_form.service_area')}</FormLabel>
-              <FormControl>
-                <Input placeholder={t('partner_signup_form.service_area_placeholder')} {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-            control={form.control}
-            name="serviceCategories"
-            render={() => (
-                <FormItem>
-                    <div className="mb-4">
-                        <FormLabel>{t('profile_page.service_categories')}</FormLabel>
-                        <FormDescription>
-                           {t('partner_signup_form.service_categories_description')}
-                        </FormDescription>
-                    </div>
-                    {serviceCategories.map((item) => (
-                        <FormField
-                            key={item.id}
-                            control={form.control}
-                            name="serviceCategories"
-                            render={({ field }) => {
-                                return (
-                                <FormItem
-                                    key={item.id}
-                                    className="flex flex-row items-start space-x-3 space-y-0"
-                                >
-                                    <FormControl>
-                                    <Checkbox
-                                        checked={field.value?.includes(item.id)}
-                                        onCheckedChange={(checked) => {
-                                        return checked
-                                            ? field.onChange([...field.value, item.id])
-                                            : field.onChange(
-                                                field.value?.filter(
-                                                (value) => value !== item.id
-                                                )
-                                            )
-                                        }}
-                                    />
-                                    </FormControl>
-                                    <FormLabel className="font-normal">
-                                        {t(item.labelKey)}
-                                    </FormLabel>
-                                </FormItem>
-                                )
-                            }}
-                        />
-                    ))}
-                    <FormMessage />
-                </FormItem>
-            )}
-        />
+        
+        <div className="grid grid-cols-2 gap-4">
+            <FormField
+                control={form.control}
+                name="primary_skill"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Primary Skill</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select skill" />
+                                </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                    {serviceCategories.map(cat => (
+                                        <SelectItem key={cat.id} value={cat.id}>{cat.label}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+            <FormField
+                control={form.control}
+                name="total_experience"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Experience (Yrs)</FormLabel>
+                        <FormControl>
+                            <Input type="number" placeholder="e.g., 5" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+        </div>
 
         <FormField
           control={form.control}
-          name="aadharFront"
-          render={({ field }) => (
+          name="aadhaar_front"
+          render={({ field: { onChange, ...fieldProps } }) => (
             <FormItem>
               <FormLabel>{t('partner_signup_form.aadhar_front')}</FormLabel>
               <FormControl>
-                <Input type="file" {...aadharFrontRef} />
+                <Input 
+                    type="file" 
+                    accept="image/*"
+                    onChange={(e) => onChange(e.target.files?.[0])} 
+                    {...fieldProps} 
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -229,12 +238,37 @@ export function PartnerSignupForm() {
 
         <FormField
           control={form.control}
-          name="aadharBack"
-          render={({ field }) => (
+          name="aadhaar_back"
+          render={({ field: { onChange, ...fieldProps } }) => (
             <FormItem>
               <FormLabel>{t('partner_signup_form.aadhar_back')}</FormLabel>
               <FormControl>
-                <Input type="file" {...aadharBackRef} />
+                <Input 
+                    type="file" 
+                    accept="image/*"
+                    onChange={(e) => onChange(e.target.files?.[0])}
+                    {...fieldProps} 
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="selfie"
+          render={({ field: { onChange, ...fieldProps } }) => (
+            <FormItem>
+              <FormLabel>Selfie</FormLabel>
+               <FormDescription>Please upload a clear photo of yourself.</FormDescription>
+              <FormControl>
+                <Input 
+                    type="file" 
+                    accept="image/*"
+                    onChange={(e) => onChange(e.target.files?.[0])}
+                    {...fieldProps}
+                 />
               </FormControl>
               <FormMessage />
             </FormItem>
