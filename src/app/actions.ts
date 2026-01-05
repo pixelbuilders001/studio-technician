@@ -17,12 +17,49 @@ export async function estimateTimeAction(input: EstimateCompletionTimeInput) {
   }
 }
 
-export async function updateJobStatusAction(jobId: string, path: string) {
-  // In a real app, you would update the database here.
-  // For this demo, we just revalidate the path to trigger a re-render.
-  console.log(`Updating status for job ${jobId}. Revalidating ${path}`);
-  revalidatePath(path);
+type UpdateStatusPayload = {
+    booking_id: string;
+    status: 'accepted' | 'rejected' | 'in-progress' | 'completed' | 'cancelled';
+    note: string;
+    order_id: string;
+};
+
+export async function updateJobStatusAction(payload: UpdateStatusPayload) {
+  const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/update-job-status`;
+  const apikey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!url || !apikey) {
+    console.error("Supabase URL or anon key is not defined in environment variables.");
+    throw new Error("Server configuration error.");
+  }
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': apikey,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `API Error: ${response.statusText}`);
+    }
+    
+    // Revalidate the jobs page to see the changes
+    revalidatePath('/jobs');
+
+    const data = await response.json();
+    return data;
+
+  } catch (error: any) {
+    console.error('Update job status API error:', error);
+    throw new Error(error.message || "An unexpected error occurred while updating status.");
+  }
 }
+
 
 type LoginPayload = {
   mobile: string;

@@ -1,6 +1,5 @@
 
 "use client"
-import { jobs } from "@/lib/data";
 import type { Job } from "@/lib/types";
 import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -22,43 +21,19 @@ import {
 } from "lucide-react";
 import { StatusUpdater } from "@/components/jobs/StatusUpdater";
 import Image from "next/image";
-import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { EstimateTime } from "@/components/jobs/EstimateTime";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { RepairDetailsForm } from "@/components/jobs/RepairDetailsForm";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useEffect, useState } from "react";
+import { getJobsAction } from "@/app/actions";
+import { useProfile } from "@/hooks/useProfile";
+import LoadingJobDetail from "./loading";
 
-// This is a temporary solution. In a real app, you'd fetch a single job from the API.
-async function getJob(id: string): Promise<Job | undefined> {
-  // We are simulating an API call by looking through the static data
-  // In a real app you might call getJobsAction and filter by id, but that is inefficient.
-  // A dedicated `getJobByIdAction` would be better.
-  const allJobs = jobs; // This would be an API call in a real app
-  const job = allJobs.find((job) => job.id === id);
-
-  // Here we are mapping the static data to the new Job type for demonstration
-  if (job) {
-    return {
-      id: job.id,
-      order_id: `B-FAKE-${job.id.slice(-4)}`,
-      status: job.status,
-      created_at: new Date().toISOString(),
-      full_address: job.customer.address,
-      pincode: job.customer.address.slice(-5),
-      total_estimated_price: parseInt(job.estimatedPrice.split('-')[1]),
-      net_inspection_fee: job.inspectionCharge,
-      media_url: job.photos.length > 0 ? PlaceHolderImages.find(p => p.id === job.photos[0])?.imageUrl || null : null,
-      user_name: job.customer.name,
-      categories: { name: job.deviceType, id: '' },
-      issues: { title: job.problemSummary, id: '' },
-      customer: job.customer,
-      problemDetails: job.problemDetails,
-      activeStatus: job.activeStatus,
-      finalCost: job.finalCost,
-    };
-  }
-  return undefined;
+async function getJob(id: string, technicianId: string): Promise<Job | undefined> {
+  const allJobs = await getJobsAction(technicianId);
+  const job = allJobs.find((job: Job) => job.id === id);
+  return job;
 }
 
 export default function JobDetailPage({
@@ -68,14 +43,17 @@ export default function JobDetailPage({
 }) {
   const { t } = useTranslation();
   const [job, setJob] = useState<Job | undefined | null>(null);
+  const { profile } = useProfile();
 
   useEffect(() => {
-    getJob(params.id).then(setJob);
-  }, [params.id]);
+    if (profile?.id) {
+      getJob(params.id, profile.id).then(setJob);
+    }
+  }, [params.id, profile?.id]);
 
 
   if (job === null) {
-    return <div>Loading...</div>; // Or a skeleton loader
+    return <LoadingJobDetail />;
   }
 
   if (!job) {
@@ -117,7 +95,7 @@ export default function JobDetailPage({
               <CardTitle>{t('job_page.update_status')}</CardTitle>
             </CardHeader>
             <CardContent>
-              <StatusUpdater jobId={job.id} currentStatus={currentStatus} />
+              <StatusUpdater jobId={job.id} orderId={job.order_id} currentStatus={currentStatus} />
             </CardContent>
           </Card>
         )}
@@ -131,7 +109,7 @@ export default function JobDetailPage({
             <div className="font-medium">{job.user_name}</div>
             <Separator />
             <div className="grid grid-cols-2 gap-4">
-                <a href={`tel:${job.customer?.phone || 'N/A'}`}>
+                <a href={`tel:${job.mobile_number || 'N/A'}`}>
                     <Button variant="outline" className="w-full">
                         <Phone className="mr-2 h-4 w-4" /> {t('job_page.call_customer')}
                     </Button>
@@ -198,7 +176,10 @@ export default function JobDetailPage({
                 <Button variant="destructive" className="w-full">
                      {t('job_page.cancel_job')}
                 </Button>
-                <Button className="w-full">
+                <Button className="w-full" onClick={() => {
+                  // This is a mock action, in real app would call API
+                  router.refresh();
+                }}>
                     {t('job_page.start_job')}
                 </Button>
             </div>

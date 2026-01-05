@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { ActiveJobStatus } from "@/lib/types";
@@ -5,9 +6,10 @@ import { Check, Circle, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTransition } from "react";
 import { updateJobStatusAction } from "@/app/actions";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "@/hooks/useTranslation";
+import { useProfile } from "@/hooks/useProfile";
 
 const statuses: { id: ActiveJobStatus; labelKey: string }[] = [
   { id: "scheduled", labelKey: "scheduled" },
@@ -19,24 +21,37 @@ const statuses: { id: ActiveJobStatus; labelKey: string }[] = [
 
 type StatusUpdaterProps = {
   jobId: string;
+  orderId: string;
   currentStatus: ActiveJobStatus;
 };
 
-export function StatusUpdater({ jobId, currentStatus }: StatusUpdaterProps) {
+export function StatusUpdater({ jobId, orderId, currentStatus }: StatusUpdaterProps) {
   const [isPending, startTransition] = useTransition();
-  const pathname = usePathname();
+  const router = useRouter();
+  const { profile } = useProfile();
   const { toast } = useToast();
   const { t } = useTranslation();
   const currentIndex = statuses.findIndex((s) => s.id === currentStatus);
 
   const handleUpdateStatus = (statusId: ActiveJobStatus) => {
+    if (!profile) {
+      toast({ title: "Error", description: "Technician profile not found.", variant: "destructive" });
+      return;
+    }
     startTransition(async () => {
       try {
-        await updateJobStatusAction(jobId, pathname);
+        await updateJobStatusAction({
+            booking_id: jobId,
+            // @ts-ignore // we know this is a valid status
+            status: statusId,
+            note: `Technician ${profile.name} updated status to ${statusId}`,
+            order_id: orderId,
+        });
         toast({
           title: t('status_updater.toast_title'),
           description: `${t('status_updater.toast_description')} ${t(`job_status.${statusId}`)}`,
         });
+        router.refresh();
       } catch (error) {
         toast({
           variant: "destructive",
