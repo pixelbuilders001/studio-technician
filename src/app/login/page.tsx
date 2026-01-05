@@ -57,7 +57,7 @@ export default function LoginPage() {
     <main className="flex flex-col min-h-screen bg-background">
       <div className="relative flex-1">
         <Image
-          src="https://dv09dhgcrv5ld6ct.public.blob.vercel-storage.com/Gemini_Generated_Image_901bfk901bfk901b.png"
+          src="https://dv09dhgcrv5ld6ct.public.blob.vercel-storage.com/ChatGPT%20Image%20Jan%205%2C%202026%2C%2002_26_40%20PM.png"
           alt="Technician working"
           fill
           className="object-cover"
