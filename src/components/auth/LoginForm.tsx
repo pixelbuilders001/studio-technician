@@ -26,28 +26,31 @@ import {
   } from "@/components/ui/select"
 import { cn } from "@/lib/utils";
 import { OtpInput } from "./OtpInput";
-import { CardDescription, CardHeader, CardTitle } from "../ui/card";
+import { technicianLoginAction } from "@/app/actions";
+import { useToast } from "@/hooks/use-toast";
 
 const mobileSchema = z.object({
   mobile: z.string().min(10, { message: "Enter a valid 10-digit mobile number." }).max(10),
 });
 
 const otpSchema = z.object({
-    otp: z.string().min(6, { message: "OTP must be 6 digits."}),
+    otp: z.string().min(4, { message: "Code must be 4 digits."}),
 });
 
 export type Step = 'mobile' | 'otp';
 
 type LoginFormProps = {
-    onStepChange?: (step: Step) => void;
+    initialStep?: Step;
+    mobileNumber?: string;
 }
 
-export function LoginForm({ onStepChange }: LoginFormProps) {
+export function LoginForm({ initialStep = 'mobile', mobileNumber: initialMobile }: LoginFormProps) {
   const router = useRouter();
+  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [step, setStep] = useState<Step>('mobile');
-  const [mobileNumber, setMobileNumber] = useState("");
+  const [step, setStep] = useState<Step>(initialStep);
+  const [mobileNumber, setMobileNumber] = useState(initialMobile || "");
   const { t } = useTranslation();
 
   const mobileForm = useForm<z.infer<typeof mobileSchema>>({
@@ -64,36 +67,32 @@ export function LoginForm({ onStepChange }: LoginFormProps) {
       }
   })
 
-  const handleStepChange = (newStep: Step) => {
-    setStep(newStep);
-    if(onStepChange) {
-        onStepChange(newStep)
-    }
-  }
-
   function onMobileSubmit(values: z.infer<typeof mobileSchema>) {
-    setIsLoading(true);
-    console.log("Sending OTP to:", values.mobile);
-    setTimeout(() => {
-      setIsLoading(false);
-      setMobileNumber(values.mobile);
-      handleStepChange('otp');
-    }, 1000);
+    // In a real app you might send an OTP here.
+    // For this app, we just navigate to the OTP screen.
+    router.push(`/login?mobile=${values.mobile}`);
   }
 
-  function onOtpSubmit(values: z.infer<typeof otpSchema>) {
+  async function onOtpSubmit(values: z.infer<typeof otpSchema>) {
     setIsLoading(true);
-    console.log("Verifying OTP:", values.otp);
-    setTimeout(() => {
-        setIsLoading(false);
-        // Dummy OTP validation
-        if (values.otp === "123456") {
+    try {
+        const result = await technicianLoginAction({ mobile: mobileNumber, code: values.otp });
+        if (result.success && result.token && result.technician) {
+            localStorage.setItem('authToken', result.token);
             setIsSuccess(true);
+            toast({
+                title: "Login Successful",
+                description: `Welcome back, ${result.technician.name}!`,
+            });
             setTimeout(() => router.push('/jobs'), 1500);
         } else {
-            otpForm.setError("otp", { type: "manual", message: "Invalid OTP. Please try again."})
+            throw new Error(result.error || "Login failed. Please check your code.");
         }
-    }, 1000)
+    } catch (error: any) {
+        otpForm.setError("otp", { type: "manual", message: error.message || "Invalid code. Please try again."});
+    } finally {
+        setIsLoading(false);
+    }
   }
 
   if (step === 'otp') {
@@ -107,7 +106,7 @@ export function LoginForm({ onStepChange }: LoginFormProps) {
                         render={({ field }) => (
                             <FormItem>
                                 <FormControl>
-                                   <OtpInput {...field} length={6} />
+                                   <OtpInput {...field} length={4} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -120,7 +119,7 @@ export function LoginForm({ onStepChange }: LoginFormProps) {
                     </Button>
                 </form>
             </Form>
-            <Button variant="link" onClick={() => handleStepChange('mobile')} className="mt-4">{t('login_form.wrong_number')}</Button>
+            <Button variant="link" onClick={() => router.push('/')} className="mt-4">{t('login_form.wrong_number')}</Button>
           </div>
       )
   }

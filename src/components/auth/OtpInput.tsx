@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useRef, useState, useImperativeHandle } from 'react';
@@ -9,7 +10,7 @@ interface OtpInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>
 }
 
 export const OtpInput = React.forwardRef<HTMLInputElement, OtpInputProps>(
-  ({ className, length = 6, onChange, ...props }, ref) => {
+  ({ className, length = 4, onChange, ...props }, ref) => {
     const [otp, setOtp] = useState(new Array(length).fill(''));
     const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
