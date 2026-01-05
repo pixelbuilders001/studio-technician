@@ -220,15 +220,17 @@ export function PartnerSignupForm() {
         <FormField
           control={form.control}
           name="aadhaar_front"
-          render={({ field: { onChange, ...fieldProps } }) => (
+          render={({ field: { onChange, onBlur, name, ref } }) => (
             <FormItem>
               <FormLabel>{t('partner_signup_form.aadhar_front')}</FormLabel>
               <FormControl>
                 <Input 
                     type="file" 
                     accept="image/*"
-                    onChange={(e) => onChange(e.target.files?.[0])} 
-                    {...fieldProps} 
+                    onChange={(e) => onChange(e.target.files?.[0])}
+                    onBlur={onBlur}
+                    name={name}
+                    ref={ref}
                 />
               </FormControl>
               <FormMessage />
@@ -239,7 +241,7 @@ export function PartnerSignupForm() {
         <FormField
           control={form.control}
           name="aadhaar_back"
-          render={({ field: { onChange, ...fieldProps } }) => (
+          render={({ field: { onChange, onBlur, name, ref } }) => (
             <FormItem>
               <FormLabel>{t('partner_signup_form.aadhar_back')}</FormLabel>
               <FormControl>
@@ -247,7 +249,9 @@ export function PartnerSignupForm() {
                     type="file" 
                     accept="image/*"
                     onChange={(e) => onChange(e.target.files?.[0])}
-                    {...fieldProps} 
+                    onBlur={onBlur}
+                    name={name}
+                    ref={ref}
                 />
               </FormControl>
               <FormMessage />
@@ -258,7 +262,7 @@ export function PartnerSignupForm() {
         <FormField
           control={form.control}
           name="selfie"
-          render={({ field: { onChange, ...fieldProps } }) => (
+          render={({ field: { onChange, onBlur, name, ref } }) => (
             <FormItem>
               <FormLabel>Selfie</FormLabel>
                <FormDescription>Please upload a clear photo of yourself.</FormDescription>
@@ -267,7 +271,9 @@ export function PartnerSignupForm() {
                     type="file" 
                     accept="image/*"
                     onChange={(e) => onChange(e.target.files?.[0])}
-                    {...fieldProps}
+                    onBlur={onBlur}
+                    name={name}
+                    ref={ref}
                  />
               </FormControl>
               <FormMessage />
