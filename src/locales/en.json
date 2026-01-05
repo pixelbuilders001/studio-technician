@@ -18,7 +18,7 @@
         "send_otp": "Send Code",
         "sending": "Sending...",
         "verify_otp_title": "Verify Code",
-        "verify_otp_subtitle": "Enter the 4-digit code sent to +91 {0}",
+        "verify_otp_subtitle": "Enter the 4-digit code sent to {0}",
         "verifying": "Verifying...",
         "verify_otp_button": "Verify & Proceed",
         "wrong_number": "Change Number"

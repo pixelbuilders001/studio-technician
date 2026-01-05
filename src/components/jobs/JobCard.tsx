@@ -3,6 +3,7 @@
 
 import { useRouter } from "next/navigation";
 import type { Job } from "@/lib/types";
+import Image from "next/image";
 import {
   Card,
   CardContent,
@@ -12,7 +13,8 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Check, X, Wrench, Tv, Refrigerator, Smartphone, AirVent, WashingMachine, Calendar, User, ShoppingCart, Tag } from "lucide-react";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { MapPin, Check, X, Wrench, Tv, Refrigerator, Smartphone, AirVent, WashingMachine, Calendar, User, ShoppingCart, Tag, Camera } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import React from "react";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -100,7 +102,7 @@ export function JobCard({ job }: { job: Job }) {
   };
 
   return (
-      <Card className="overflow-hidden transition-all" onClick={handleCardClick}>
+      <Card className="overflow-hidden transition-all">
         <CardHeader className="p-4 bg-muted/30">
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-3">
@@ -122,6 +124,36 @@ export function JobCard({ job }: { job: Job }) {
             <InfoRow icon={User} label={t('job_page.customer_details')} value={job.user_name} />
             <InfoRow icon={MapPin} label={t('job_card.address')} value={job.full_address} />
             <InfoRow icon={Calendar} label={t('job_card.booked_on')} value={format(new Date(job.created_at), 'MMM dd, yyyy @ h:mm a')} />
+            
+            {job.media_url && (
+                 <div className="flex items-start gap-3">
+                    <Camera className="h-4 w-4 mt-1 flex-shrink-0 text-muted-foreground" />
+                    <div className="text-sm">
+                        <p className="font-medium text-foreground">{t('job_page.uploaded_photos')}</p>
+                        <Dialog>
+                            <DialogTrigger asChild>
+                                <div className="mt-1 relative h-24 w-24 rounded-lg overflow-hidden cursor-pointer">
+                                <Image 
+                                    src={job.media_url} 
+                                    alt="Job photo" 
+                                    fill
+                                    className="object-cover"
+                                />
+                                </div>
+                            </DialogTrigger>
+                            <DialogContent className="p-0 border-0 max-w-screen-md">
+                                 <Image 
+                                    src={job.media_url} 
+                                    alt="Job photo" 
+                                    width={800}
+                                    height={600}
+                                    className="w-full h-auto object-contain rounded-lg"
+                                />
+                            </DialogContent>
+                        </Dialog>
+                    </div>
+                </div>
+            )}
             
             <div className="flex items-center justify-between text-sm rounded-lg bg-secondary/50 p-3">
                 <div className='text-center'>

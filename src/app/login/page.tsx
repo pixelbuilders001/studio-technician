@@ -39,7 +39,7 @@ export default function LoginPage() {
                     {t('login_form.verify_otp_title')}
                 </CardTitle>
                 <CardDescription className="pt-1">
-                    {t('login_form.verify_otp_subtitle', mobile || "")}
+                    {t('login_form.verify_otp_subtitle', mobile ? `+91${mobile}`: "")}
                 </CardDescription>
             </CardHeader>
           <CardContent className="p-0 pt-6">

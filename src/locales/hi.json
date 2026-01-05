@@ -18,7 +18,7 @@
         "send_otp": "कोड भेजें",
         "sending": "भेज रहा है...",
         "verify_otp_title": "कोड सत्यापित करें",
-        "verify_otp_subtitle": "+91 {0} पर भेजा गया 4-अंकीय कोड दर्ज करें",
+        "verify_otp_subtitle": "{0} पर भेजा गया 4-अंकीय कोड दर्ज करें",
         "verifying": "सत्यापित हो रहा है...",
         "verify_otp_button": "सत्यापित करें और आगे बढ़ें",
         "wrong_number": "नंबर बदलें"
