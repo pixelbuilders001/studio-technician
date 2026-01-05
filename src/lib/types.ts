@@ -15,6 +15,7 @@ export type Job = {
   media_url: string | null;
   user_name: string;
   mobile_number: string;
+  map_url?: string;
   categories: {
     id: string;
     name: string;

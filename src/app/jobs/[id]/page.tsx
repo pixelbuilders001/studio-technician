@@ -1,7 +1,7 @@
 
 "use client"
 import type { Job } from "@/lib/types";
-import { notFound } from "next/navigation";
+import { notFound, useRouter } from "next/navigation";
 import { PageHeader } from "@/components/layout/PageHeader";
 import {
   Card,
@@ -44,6 +44,8 @@ export default function JobDetailPage({
   const { t } = useTranslation();
   const [job, setJob] = useState<Job | undefined | null>(null);
   const { profile } = useProfile();
+  const router = useRouter();
+
 
   useEffect(() => {
     if (profile?.id) {
