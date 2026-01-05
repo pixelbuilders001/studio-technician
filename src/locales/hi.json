@@ -1,3 +1,4 @@
+
 {
     "welcome_page": {
         "title": "चलिए शुरू करते हैं",
@@ -12,15 +13,15 @@
         "registration_subtitle": "सत्यापन कोड प्राप्त करने के लिए अपना मोबाइल नंबर दर्ज करें।"
     },
     "login_form": {
-        "login_title": "लॉग इन करें",
+        "login_title": "लॉग इन / साइन अप",
         "mobile_number": "मोबाइल नंबर",
         "send_otp": "कोड भेजें",
         "sending": "भेज रहा है...",
-        "verify_otp_title": "ओटीपी सत्यापित करें",
-        "verify_otp_subtitle": "{0} पर भेजा गया 6-अंकीय कोड दर्ज करें",
+        "verify_otp_title": "कोड सत्यापित करें",
+        "verify_otp_subtitle": "+91 {0} पर भेजा गया 4-अंकीय कोड दर्ज करें",
         "verifying": "सत्यापित हो रहा है...",
         "verify_otp_button": "सत्यापित करें और आगे बढ़ें",
-        "wrong_number": "गलत नंबर?"
+        "wrong_number": "नंबर बदलें"
     },
     "jobs_page": {
         "title": "नौकरियाँ"
@@ -115,6 +116,13 @@
         "repair_completed": "मरम्मत पूरी हुई",
         "completed": "पूरा हुआ"
     },
+    "job_api_status": {
+        "assigned": "सौंपा गया",
+        "accepted": "स्वीकृत",
+        "in-progress": "प्रगति में है",
+        "completed": "पूरा हुआ",
+        "cancelled": "रद्द"
+    },
     "devices": {
         "television": "टेलीविजन",
         "washing_machine": "वॉशिंग मशीन",
@@ -130,7 +138,7 @@
         "job-112": "एसी चालू नहीं हो रहा है।"
     },
     "partner_signup_page": {
-        "title": "पार्टナー बनें",
+        "title": "पार्टनर बनें",
         "subtitle": "कुशल तकनीशियनों के हमारे नेटवर्क में शामिल होने की प्रक्रिया शुरू करने के लिए नीचे दिया गया फॉर्म भरें।"
     },
     "partner_signup_form": {

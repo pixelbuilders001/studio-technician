@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -12,8 +13,9 @@ type JobTabsProps = {
 
 export function JobTabs({ jobs }: JobTabsProps) {
   const { t } = useTranslation();
-  const newJobs = jobs.filter((job) => job.status === "new");
-  const activeJobs = jobs.filter((job) => job.status === "active");
+  
+  const newJobs = jobs.filter((job) => job.status === "assigned");
+  const activeJobs = jobs.filter((job) => job.status === "accepted" || job.status === "in-progress");
   const completedJobs = jobs.filter((job) => job.status === "completed");
 
   const renderJobList = (jobList: Job[], emptyMessage: string) => {

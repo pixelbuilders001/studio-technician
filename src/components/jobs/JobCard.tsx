@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -11,33 +12,31 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Settings, Check, X, AlertCircle, Tv2, Refrigerator, Microwave, AirVent, Smartphone, WashingMachine, Wrench } from "lucide-react";
+import { MapPin, Check, X, Wrench, Tv, Refrigerator, Smartphone, AirVent, WashingMachine } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import React from "react";
 import { useTranslation } from "@/hooks/useTranslation";
 
 const iconMap: { [key: string]: React.ElementType } = {
-  Tv2,
+  LAPTOPS: Wrench,
+  TV: Tv,
   Refrigerator,
-  Microwave,
-  AirVent,
   Smartphone,
-  WashingMachine,
+  "Air Conditioner": AirVent,
+  "Washing Machine": WashingMachine,
 };
 
 export function JobCard({ job }: { job: Job }) {
   const router = useRouter();
   const { toast } = useToast();
-  const { t, language } = useTranslation();
+  const { t } = useTranslation();
 
   const handleAccept = (e: React.MouseEvent) => {
     e.preventDefault();
     toast({
       title: t('job_card.job_accepted_title'),
-      description: `${t('job_card.job_accepted_description')} #${job.id}`,
+      description: `${t('job_card.job_accepted_description')} #${job.order_id}`,
     });
-    // In a real app, this would be an API call.
-    // For now, we just navigate.
     router.push(`/jobs/${job.id}`);
   };
 
@@ -46,28 +45,38 @@ export function JobCard({ job }: { job: Job }) {
     toast({
       title: t('job_card.job_rejected_title'),
       variant: "destructive",
-      description: `${t('job_card.job_rejected_description')} #${job.id}`,
+      description: `${t('job_card.job_rejected_description')} #${job.order_id}`,
     });
-    // In a real app, this would be an API call.
   };
   
-  const DeviceIcon = typeof job.deviceIcon === 'string' ? iconMap[job.deviceIcon] || Wrench : Wrench;
-
+  const DeviceIcon = iconMap[job.categories.name] || Wrench;
 
   const statusBadge = () => {
-    const statusKey = job.activeStatus?.replace(/_/g, ' ');
-    if (job.status === "active" && statusKey) {
-        return <Badge variant="secondary" className="bg-blue-100 text-blue-800">{t(`job_status.${job.activeStatus}`)}</Badge>
+    const statusKey = job.status?.replace(/_/g, ' ');
+    let variant: "secondary" | "default" = "secondary";
+    let className = "";
+
+    switch(job.status) {
+        case 'assigned':
+            variant = "secondary";
+            className="bg-orange-100 text-orange-800";
+            break;
+        case 'accepted':
+        case 'in-progress':
+            variant = "secondary";
+            className="bg-blue-100 text-blue-800";
+            break;
+        case 'completed':
+            variant = "secondary";
+            className="bg-green-100 text-green-800";
+            break;
     }
-    if (job.status === "completed") {
-        return <Badge variant="secondary" className="bg-green-100 text-green-800">{t('job_status.completed')}</Badge>
+
+    if (statusKey) {
+        return <Badge variant={variant} className={className}>{t(`job_api_status.${job.status}`)}</Badge>
     }
     return null
   }
-
-  const deviceType = language === 'hi' ? t(`devices.${job.deviceType.toLowerCase().replace(' ', '_')}`) : job.deviceType;
-  const problemSummary = language === 'hi' ? t(`problems.${job.id}`) : job.problemSummary;
-
 
   return (
     <Link href={`/jobs/${job.id}`} className="block">
@@ -79,9 +88,9 @@ export function JobCard({ job }: { job: Job }) {
                 <DeviceIcon className="h-7 w-7 text-secondary-foreground" />
               </div>
               <div>
-                <h3 className="font-bold font-headline">{deviceType}</h3>
+                <h3 className="font-bold font-headline">{job.categories.name}</h3>
                 <p className="text-sm text-muted-foreground line-clamp-1">
-                  {problemSummary}
+                  {job.issues.title}
                 </p>
               </div>
             </div>
@@ -92,17 +101,17 @@ export function JobCard({ job }: { job: Job }) {
           <div className="flex items-center justify-between text-sm">
             <div className="flex items-center gap-2 text-muted-foreground">
               <MapPin className="h-4 w-4" />
-              <span>{job.location}</span>
+              <span>{job.pincode}</span>
             </div>
             <div className="font-semibold text-foreground">
-              ₹{job.inspectionCharge}
+              ₹{job.net_inspection_fee}
               <span className="ml-1 font-normal text-muted-foreground">
                 ({t('job_card.inspection_short')})
               </span>
             </div>
           </div>
         </CardContent>
-        {job.status === "new" && (
+        {job.status === "assigned" && (
           <CardFooter className="grid grid-cols-2 gap-3 bg-muted/50 p-2">
             <Button variant="outline" className="w-full bg-card" onClick={handleReject}>
               <X className="mr-2 h-4 w-4" /> {t('job_card.reject')}

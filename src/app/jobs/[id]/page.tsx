@@ -1,5 +1,6 @@
+
 "use client"
-import { jobs, sparePartsInventory } from "@/lib/data";
+import { jobs } from "@/lib/data";
 import type { Job } from "@/lib/types";
 import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -17,8 +18,6 @@ import {
   MapPin,
   Settings,
   Camera,
-  DollarSign,
-  AlertTriangle,
   AlertCircle,
 } from "lucide-react";
 import { StatusUpdater } from "@/components/jobs/StatusUpdater";
@@ -28,38 +27,79 @@ import { EstimateTime } from "@/components/jobs/EstimateTime";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { RepairDetailsForm } from "@/components/jobs/RepairDetailsForm";
 import { useTranslation } from "@/hooks/useTranslation";
+import { useEffect, useState } from "react";
 
+// This is a temporary solution. In a real app, you'd fetch a single job from the API.
 async function getJob(id: string): Promise<Job | undefined> {
-  // In a real app, you would fetch this from an API
-  return jobs.find((job) => job.id === id);
+  // We are simulating an API call by looking through the static data
+  // In a real app you might call getJobsAction and filter by id, but that is inefficient.
+  // A dedicated `getJobByIdAction` would be better.
+  const allJobs = jobs; // This would be an API call in a real app
+  const job = allJobs.find((job) => job.id === id);
+
+  // Here we are mapping the static data to the new Job type for demonstration
+  if (job) {
+    return {
+      id: job.id,
+      order_id: `B-FAKE-${job.id.slice(-4)}`,
+      status: job.status,
+      created_at: new Date().toISOString(),
+      full_address: job.customer.address,
+      pincode: job.customer.address.slice(-5),
+      total_estimated_price: parseInt(job.estimatedPrice.split('-')[1]),
+      net_inspection_fee: job.inspectionCharge,
+      media_url: job.photos.length > 0 ? PlaceHolderImages.find(p => p.id === job.photos[0])?.imageUrl || null : null,
+      user_name: job.customer.name,
+      categories: { name: job.deviceType, id: '' },
+      issues: { title: job.problemSummary, id: '' },
+      customer: job.customer,
+      problemDetails: job.problemDetails,
+      activeStatus: job.activeStatus,
+      finalCost: job.finalCost,
+    };
+  }
+  return undefined;
 }
 
-export default async function JobDetailPage({
+export default function JobDetailPage({
   params,
 }: {
   params: { id: string };
 }) {
   const { t } = useTranslation();
-  const job = await getJob(params.id);
+  const [job, setJob] = useState<Job | undefined | null>(null);
+
+  useEffect(() => {
+    getJob(params.id).then(setJob);
+  }, [params.id]);
+
+
+  if (job === null) {
+    return <div>Loading...</div>; // Or a skeleton loader
+  }
 
   if (!job) {
     notFound();
   }
 
-  const jobPhotos = PlaceHolderImages.filter((img) =>
-    job.photos.includes(img.id)
-  );
-
+  const jobPhotos = job.media_url ? [{ id: '1', imageUrl: job.media_url, description: 'Job photo', imageHint: 'repair' }] : [];
+  
   const estimateTimeInput = {
-    deviceType: job.deviceType,
-    problemSummary: job.problemSummary,
-    location: job.location,
-    sparePartsAvailable: sparePartsInventory,
+    deviceType: job.categories.name,
+    problemSummary: job.issues.title,
+    location: job.full_address,
+    sparePartsAvailable: "N/A", // This would come from inventory
   };
+
+  const currentStatus = job.status === 'assigned' ? 'scheduled' : 
+                        job.status === 'accepted' ? 'reached_location' :
+                        job.status === 'in-progress' ? 'inspection_done' :
+                        job.status === 'completed' ? 'repair_completed' : 'scheduled';
+
 
   return (
     <div className="flex flex-col bg-secondary/30">
-      <PageHeader title={`${t('job_page.job')} #${job.id}`} />
+      <PageHeader title={`${t('job_page.job')} #${job.order_id}`} />
       <div className="flex-1 space-y-4 p-4">
         {job.status === 'completed' && job.finalCost && (
             <Alert variant="default" className="bg-green-100 border-green-200 text-green-900">
@@ -71,13 +111,13 @@ export default async function JobDetailPage({
             </Alert>
         )}
 
-        {job.status === "active" && job.activeStatus && (
+        {(job.status === "assigned" || job.status === "accepted" || job.status === "in-progress") && (
           <Card>
             <CardHeader>
               <CardTitle>{t('job_page.update_status')}</CardTitle>
             </CardHeader>
             <CardContent>
-              <StatusUpdater jobId={job.id} currentStatus={job.activeStatus} />
+              <StatusUpdater jobId={job.id} currentStatus={currentStatus} />
             </CardContent>
           </Card>
         )}
@@ -88,15 +128,15 @@ export default async function JobDetailPage({
             <CardTitle>{t('job_page.customer_details')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="font-medium">{job.customer.name}</div>
+            <div className="font-medium">{job.user_name}</div>
             <Separator />
             <div className="grid grid-cols-2 gap-4">
-                <a href={`tel:${job.customer.phone}`}>
+                <a href={`tel:${job.customer?.phone || 'N/A'}`}>
                     <Button variant="outline" className="w-full">
                         <Phone className="mr-2 h-4 w-4" /> {t('job_page.call_customer')}
                     </Button>
                 </a>
-                <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(job.customer.address)}`} target="_blank" rel="noopener noreferrer">
+                <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(job.full_address)}`} target="_blank" rel="noopener noreferrer">
                     <Button variant="outline" className="w-full">
                         <MapPin className="mr-2 h-4 w-4" /> {t('job_page.open_maps')}
                     </Button>
@@ -113,19 +153,19 @@ export default async function JobDetailPage({
           <CardContent className="space-y-4 text-sm">
             <p>
               <span className="font-semibold text-muted-foreground">{t('job_page.device')}: </span>
-              {job.deviceType}
+              {job.categories.name}
             </p>
             <p className="whitespace-pre-wrap">
               <span className="font-semibold text-muted-foreground">{t('job_page.problem')}: </span>
-              {job.problemDetails}
+              {job.issues.title}
             </p>
              <p>
               <span className="font-semibold text-muted-foreground">{t('job_page.price_range')}: </span>
-              ₹{job.estimatedPrice}
+              ₹{job.total_estimated_price}
             </p>
              <p>
               <span className="font-semibold text-muted-foreground">{t('job_page.inspection')}: </span>
-               ₹{job.inspectionCharge}
+               ₹{job.net_inspection_fee}
             </p>
             <EstimateTime jobDetails={estimateTimeInput} />
           </CardContent>
@@ -153,7 +193,7 @@ export default async function JobDetailPage({
           </Card>
         )}
 
-        {job.status === "new" && (
+        {job.status === "assigned" && (
              <div className="grid grid-cols-2 gap-3 pt-4">
                 <Button variant="destructive" className="w-full">
                      {t('job_page.cancel_job')}
@@ -164,7 +204,7 @@ export default async function JobDetailPage({
             </div>
         )}
         
-        {job.activeStatus === 'repair_completed' && !job.finalCost && (
+        {currentStatus === 'repair_completed' && !job.finalCost && (
             <RepairDetailsForm />
         )}
 
