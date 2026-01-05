@@ -1,3 +1,4 @@
+
 import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
@@ -23,7 +24,7 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
       {
-        protocol: 'https,
+        protocol: 'https',
         hostname: 'picsum.photos',
         port: '',
         pathname: '/**',
@@ -41,9 +42,6 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       }
     ],
-  },
-  devIndicators: {
-    buildActivity: false,
   },
   // CAUTION: This is an experimental feature.
   // Note that the cloud IDE domains are temporary and will change.
