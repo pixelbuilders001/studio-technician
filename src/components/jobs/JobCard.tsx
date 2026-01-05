@@ -25,16 +25,16 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { MapPin, Check, X, Wrench, Tv, Refrigerator, Smartphone, AirVent, WashingMachine, Info, IndianRupee } from "lucide-react";
+import { MapPin, Check, X, Wrench, Tv, Refrigerator, Smartphone, AirVent, WashingMachine, Info, IndianRupee, Phone } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import React, { useTransition } from "react";
 import { useTranslation } from "@/hooks/useTranslation";
 import { format } from 'date-fns';
 import { Separator } from "../ui/separator";
-import { cn } from "@/lib/utils";
 import { useProfile } from "@/hooks/useProfile";
 import { updateJobStatusAction } from "@/app/actions";
 import { Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const iconMap: { [key: string]: React.ElementType } = {
   LAPTOPS: Wrench,
@@ -82,7 +82,12 @@ export function JobCard({ job }: { job: Job }) {
                 description: `${t(status === 'accepted' ? 'job_card.job_accepted_description' : 'job_card.job_rejected_description')} #${job.order_id}`,
                 variant: status === 'rejected' ? 'destructive' : 'default',
             });
+            
+            if (status === 'accepted') {
+              router.push('/jobs?tab=active');
+            }
             router.refresh();
+            
         } catch (error: any) {
             toast({
                 title: "Update Failed",
@@ -157,12 +162,12 @@ export function JobCard({ job }: { job: Job }) {
             <InfoRow icon={IndianRupee} label="Inspection Fee" value={`₹${job.net_inspection_fee}`} />
         </CardContent>
 
-        {(job.media_url || job.mobile_number) && <Separator/>}
+        <Separator/>
 
         <div className="p-4 flex items-center justify-between">
              <div>
                 <p className="font-semibold text-sm">{job.user_name}</p>
-                {job.mobile_number && <p className="text-sm text-muted-foreground">{formatPhoneNumber(job.mobile_number)}</p>}
+                 {job.mobile_number && <p className="text-sm text-muted-foreground flex items-center gap-1"><Phone size={12}/> {formatPhoneNumber(job.mobile_number)}</p>}
             </div>
             {job.media_url && (
                 <Dialog>

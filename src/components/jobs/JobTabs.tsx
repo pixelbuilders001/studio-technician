@@ -6,14 +6,18 @@ import type { Job } from "@/lib/types";
 import { JobCard } from "./JobCard";
 import { ScrollArea } from "../ui/scroll-area";
 import { useTranslation } from "@/hooks/useTranslation";
+import { useRouter } from "next/navigation";
 
 type JobTabsProps = {
   jobs: Job[];
+  activeTab: 'new' | 'active' | 'completed';
+  onTabChange: (tab: 'new' | 'active' | 'completed') => void;
 };
 
-export function JobTabs({ jobs }: JobTabsProps) {
+export function JobTabs({ jobs, activeTab, onTabChange }: JobTabsProps) {
   const { t } = useTranslation();
-  
+  const router = useRouter();
+
   const newJobs = jobs.filter((job) => job.status === "assigned");
   const activeJobs = jobs.filter((job) => job.status === "accepted" || job.status === "in-progress");
   const completedJobs = jobs.filter((job) => job.status === "completed");
@@ -35,8 +39,12 @@ export function JobTabs({ jobs }: JobTabsProps) {
     );
   };
 
+  const handleTabChange = (value: string) => {
+    onTabChange(value as 'new' | 'active' | 'completed');
+  }
+
   return (
-    <Tabs defaultValue="new" className="flex flex-1 flex-col">
+    <Tabs value={activeTab} onValueChange={handleTabChange} className="flex flex-1 flex-col">
       <div className="p-2 pb-0">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="new">{t('job_tabs.new')} ({newJobs.length})</TabsTrigger>
