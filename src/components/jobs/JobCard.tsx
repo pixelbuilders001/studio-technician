@@ -14,7 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { MapPin, Check, X, Wrench, Tv, Refrigerator, Smartphone, AirVent, WashingMachine, Calendar, User, ShoppingCart, Tag, Camera, Info, Circle, Phone } from "lucide-react";
+import { MapPin, Check, X, Wrench, Tv, Refrigerator, Smartphone, AirVent, WashingMachine, Calendar, User, ShoppingCart, Tag, Camera, Info, Circle, Phone, IndianRupee } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import React from "react";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -92,7 +92,7 @@ export function JobCard({ job }: { job: Job }) {
   }
 
   const handleCardClick = () => {
-    // router.push(`/jobs/${job.id}`);
+    router.push(`/jobs/${job.id}`);
   };
 
   const formatPhoneNumber = (phone: string) => {
@@ -124,6 +124,7 @@ export function JobCard({ job }: { job: Job }) {
         
         <CardContent className="p-4 pt-0 space-y-3 text-sm">
             <InfoRow icon={Info} value={job.issues.title} />
+            <InfoRow icon={IndianRupee} value={`Inspection Fee: ₹${job.net_inspection_fee}`} />
             <InfoRow icon={MapPin} value={job.full_address} />
             <p className="text-sm text-muted-foreground ml-7">{format(new Date(job.created_at), 'MMM dd · h:mm a')}</p>
         </CardContent>
