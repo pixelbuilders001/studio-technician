@@ -1,0 +1,22 @@
+{
+  "placeholderImages": [
+    {
+      "id": "job-photo-1",
+      "description": "Broken screen of a smartphone.",
+      "imageUrl": "https://images.unsplash.com/photo-1583413230540-ddf9068c9d2d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxicm9rZW4lMjBzY3JlZW58ZW58MHx8fHwxNzY3MDA0NjU5fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "broken screen"
+    },
+    {
+      "id": "job-photo-2",
+      "description": "Leaking washing machine.",
+      "imageUrl": "https://images.unsplash.com/photo-1744726099103-af5a68710923?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxsZWFraW5nJTIwbWFjaGluZXxlbnwwfHx8fDE3NjcwNjkxMjZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "leaking machine"
+    },
+    {
+      "id": "job-photo-3",
+      "description": "TV with no picture.",
+      "imageUrl": "https://images.unsplash.com/photo-1600877841824-76c464fd9cf7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxicm9rZW4lMjB0dnxlbnwwfHx8fDE3NjcwNjkxMjV8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "broken tv"
+    }
+  ]
+}
