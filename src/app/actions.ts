@@ -70,6 +70,7 @@ type Technician = {
   name: string;
   mobile: string;
   selfie_url?: string;
+  primary_skill?: string;
 };
 
 type LoginResponse = {

@@ -10,6 +10,7 @@ type BasicProfile = {
     name: string;
     mobile: string;
     selfie_url?: string;
+    primary_skill?: string;
 };
 
 export const useProfile = () => {
@@ -28,6 +29,7 @@ export const useProfile = () => {
                     const initialData: Technician = {
                         ...basicProfile,
                         avatarUrl: basicProfile.selfie_url || `https://picsum.photos/seed/${basicProfile.id}/200/200`,
+                        primary_skill: basicProfile.primary_skill || '',
                         // Set defaults for stats while they are loading
                         serviceCategories: [],
                         other_skills: [],

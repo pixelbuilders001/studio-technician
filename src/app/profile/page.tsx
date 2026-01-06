@@ -89,7 +89,7 @@ export default function ProfilePage() {
     localStorage.removeItem('technicianProfile');
   };
 
-  const skills = [...(profile?.serviceCategories || []), ...(profile?.other_skills || [])];
+  const skills = [...(profile?.primary_skill ? [profile.primary_skill] : []), ...(profile?.other_skills || [])];
 
   return (
     <div className="flex flex-col bg-secondary/30 min-h-screen">

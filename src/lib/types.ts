@@ -45,6 +45,7 @@ export type Technician = {
   mobile: string;
   avatarUrl: string;
   selfie_url?: string;
+  primary_skill: string;
   serviceCategories: string[];
   other_skills: string[];
   service_area: string;
@@ -56,4 +57,3 @@ export type Technician = {
   average_rating: number;
   total_ratings: number;
 };
-
