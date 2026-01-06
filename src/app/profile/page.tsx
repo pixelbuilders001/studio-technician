@@ -11,6 +11,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { LanguageSelector } from '@/components/common/LanguageSelector';
 import { useProfile } from '@/hooks/useProfile';
 import { Skeleton } from '@/components/ui/skeleton';
+import { cn } from '@/lib/utils';
 
 const ProfileInfoItem = ({ icon: Icon, label, value, isLoading }: { icon: React.ElementType, label: string, value?: string | React.ReactNode, isLoading: boolean }) => {
     if (isLoading) {
@@ -65,25 +66,15 @@ const EarningsStat = ({ label, value, isLoading }: { label: string, value: numbe
     )
 };
 
-const ProfileStat = ({ icon: Icon, label, value, isLoading }: { icon: React.ElementType, label: string, value: number, isLoading: boolean }) => {
+const ProfileStat = ({ icon: Icon, label, value, isLoading, className }: { icon: React.ElementType, label: string, value: number, isLoading: boolean, className?: string }) => {
     if (isLoading) {
-        return (
-            <div className="flex items-center gap-3">
-                <Skeleton className="h-8 w-8 rounded-full" />
-                <div className="space-y-1">
-                    <Skeleton className="h-4 w-16" />
-                    <Skeleton className="h-5 w-8" />
-                </div>
-            </div>
-        );
+        return <Skeleton className="h-24 w-full rounded-lg" />;
     }
     return (
-         <div className="flex items-center gap-3">
-            <Icon className="h-8 w-8 text-muted-foreground" />
-            <div>
-                <p className="text-sm text-muted-foreground">{label}</p>
-                <p className="font-bold text-lg">{value}</p>
-            </div>
+         <div className={cn("flex flex-col items-center justify-center space-y-1 rounded-lg p-3 text-white", className)}>
+            <Icon className="h-7 w-7" />
+            <p className="text-sm font-medium">{label}</p>
+            <p className="text-2xl font-bold">{value}</p>
         </div>
     )
 }
@@ -101,21 +92,21 @@ export default function ProfilePage() {
   const skills = [...(profile?.serviceCategories || []), ...(profile?.other_skills || [])];
 
   return (
-    <div className="flex flex-col">
-      <header className="flex h-14 items-center border-b bg-background px-4 justify-between">
+    <div className="flex flex-col bg-secondary/30 min-h-screen">
+      <header className="flex h-14 items-center border-b bg-background px-4 justify-between sticky top-0 z-10">
         <h1 className="text-xl font-bold font-headline">{t('profile_page.title')}</h1>
         <LanguageSelector />
       </header>
       
-      <div className="flex-1 space-y-6 p-4">
+      <div className="flex-1 space-y-4 p-4">
         <Card>
             <CardContent className="pt-6">
                 <div className="flex flex-col items-center text-center">
                     {loading && !profile ? (
-                        <div className='flex flex-col items-center space-y-4'>
+                        <div className='flex flex-col items-center space-y-3'>
                             <Skeleton className="h-24 w-24 rounded-full" />
-                            <Skeleton className="h-8 w-40" />
-                            <Skeleton className="h-5 w-32" />
+                            <Skeleton className="h-7 w-32" />
+                            <Skeleton className="h-5 w-40" />
                         </div>
                     ) : profile && (
                         <>
@@ -125,14 +116,14 @@ export default function ProfilePage() {
                                     alt={profile.name}
                                     width={96}
                                     height={96}
-                                    className="rounded-full object-cover border-4 border-background"
+                                    className="rounded-full object-cover border-4 border-background shadow-md"
                                     data-ai-hint="person portrait"
                                 />
                             </div>
-                            <h2 className="mt-4 text-2xl font-bold font-headline">{profile.name}</h2>
-                            <p className="text-muted-foreground">{t('profile_page.technician_id')}: {profile.id.substring(0, 8).toUpperCase()}</p>
-                            {loading ? <Skeleton className="h-5 w-24 mt-1" /> : (profile.average_rating > 0 &&
-                                <div className="flex items-center gap-1 mt-1 text-sm text-muted-foreground">
+                            <h2 className="mt-3 text-2xl font-bold font-headline">{profile.name}</h2>
+                            <p className="text-muted-foreground text-sm">{t('profile_page.technician_id')}: {profile.id.substring(0, 8).toUpperCase()}</p>
+                            {loading ? <Skeleton className="h-5 w-24 mt-2" /> : (profile.average_rating > 0 &&
+                                <div className="flex items-center gap-1 mt-2 text-sm text-muted-foreground">
                                     <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
                                     <span className="font-bold text-foreground">{profile.average_rating.toFixed(1)}</span>
                                     ({profile.total_ratings} ratings)
@@ -153,12 +144,12 @@ export default function ProfilePage() {
         
         <Card>
             <CardHeader>
-                <CardTitle className="text-base">Job Statistics</CardTitle>
+                <CardTitle className="text-base font-semibold">Job Statistics</CardTitle>
             </CardHeader>
-            <CardContent className="grid grid-cols-2 gap-x-4 gap-y-6">
-                <ProfileStat icon={Briefcase} label="Assigned" value={profile?.total_jobs_assigned ?? 0} isLoading={loading} />
-                <ProfileStat icon={CheckCircle} label="Completed" value={profile?.total_jobs_completed ?? 0} isLoading={loading} />
-                <ProfileStat icon={XCircle} label="Cancelled" value={profile?.total_jobs_cancelled ?? 0} isLoading={loading} />
+            <CardContent className="grid grid-cols-3 gap-3">
+                <ProfileStat icon={Briefcase} label="Assigned" value={profile?.total_jobs_assigned ?? 0} isLoading={loading} className="bg-blue-400" />
+                <ProfileStat icon={CheckCircle} label="Completed" value={profile?.total_jobs_completed ?? 0} isLoading={loading} className="bg-green-500" />
+                <ProfileStat icon={XCircle} label="Cancelled" value={profile?.total_jobs_cancelled ?? 0} isLoading={loading} className="bg-red-500" />
             </CardContent>
         </Card>
 
@@ -173,7 +164,7 @@ export default function ProfilePage() {
                     label={t('profile_page.service_categories')} 
                     value={
                         <div className="flex flex-wrap gap-2 pt-1">
-                            {skills.map(cat => <Badge key={cat} variant="secondary">{cat}</Badge>)}
+                            {skills.map(cat => <Badge key={cat} variant="secondary">{cat.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</Badge>)}
                         </div>
                     }
                     isLoading={loading} 
@@ -182,8 +173,8 @@ export default function ProfilePage() {
         </Card>
 
         <Link href="/" className='w-full' onClick={handleLogout}>
-            <Button variant="destructive" className="w-full">
-                <LogOut className="mr-2 h-4 w-4" /> {t('profile_page.logout')}
+            <Button variant="destructive" className="w-full h-12 text-base">
+                <LogOut className="mr-2 h-5 w-5" /> {t('profile_page.logout')}
             </Button>
         </Link>
       </div>
