@@ -115,7 +115,7 @@ export default function JobDetailPage({
   }
 
   if (!job) {
-    // This case will be handled by the redirect, but as a fallback.
+    // This case is handled by the redirect in useEffect, but as a fallback.
     notFound();
   }
 
