@@ -51,7 +51,12 @@ const formSchema = z.object({
   selfie: z.any().refine(file => file instanceof File, "A selfie is required."),
 });
 
-export function PartnerSignupForm() {
+type PartnerSignupFormProps = {
+  pincode: string;
+  city: string;
+}
+
+export function PartnerSignupForm({ pincode, city }: PartnerSignupFormProps) {
   const router = useRouter();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
@@ -83,6 +88,10 @@ export function PartnerSignupForm() {
         }
       }
     });
+
+    formData.append('pincode', pincode);
+    formData.append('city', city);
+
 
     const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/create-technician`;
     const apikey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;

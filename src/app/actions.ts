@@ -144,3 +144,56 @@ export async function getJobsAction(technicianId: string) {
     throw new Error(error.message || "An unexpected error occurred while fetching jobs.");
   }
 }
+
+
+export async function verifyPincodeAction(pincode: string): Promise<{ serviceable: boolean; city?: string; error?: string }> {
+    if (!pincode || pincode.length !== 6) {
+        return { serviceable: false, error: "Invalid pincode." };
+    }
+
+    try {
+        // 1. Fetch district from pincode
+        const pincodeRes = await fetch(`https://api.postalpincode.in/pincode/${pincode}`);
+        if (!pincodeRes.ok) {
+            throw new Error("Could not verify pincode. Please try again.");
+        }
+        const pincodeData = await pincodeRes.json();
+        
+        if (pincodeData[0].Status !== "Success") {
+            throw new Error("Invalid pincode.");
+        }
+        
+        const district = pincodeData[0].PostOffice[0].District;
+        
+        if (!district) {
+            throw new Error("Could not determine city from pincode.");
+        }
+
+        // 2. Check if district is in serviceable_cities
+        const supabaseUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/serviceable_cities?city_name=eq.${encodeURIComponent(district)}&select=city_name`;
+        const apikey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+        if (!supabaseUrl || !apikey) {
+            throw new Error("Server configuration error.");
+        }
+
+        const serviceableRes = await fetch(supabaseUrl, {
+            headers: { 'apikey': apikey, 'Authorization': `Bearer ${apikey}` },
+        });
+
+        if (!serviceableRes.ok) {
+            throw new Error("Failed to check serviceability.");
+        }
+
+        const serviceableData = await serviceableRes.json();
+
+        if (serviceableData.length > 0) {
+            return { serviceable: true, city: district };
+        } else {
+            return { serviceable: false, error: `Sorry, we are not currently serving in ${district}.` };
+        }
+
+    } catch (error: any) {
+        return { serviceable: false, error: error.message || "An unexpected error occurred." };
+    }
+}
