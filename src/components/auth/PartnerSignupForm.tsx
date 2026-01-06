@@ -16,7 +16,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Loader2, PartyPopper } from "lucide-react";
+import { Loader2, PartyPopper, X } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -27,6 +27,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "../ui/textarea";
+import { Badge } from "../ui/badge";
 
 const serviceCategories = [
     { id: "tv_repair", label: "TV Repair" },
@@ -44,6 +45,7 @@ const formSchema = z.object({
   aadhaar_number: z.string().length(12, { message: "Aadhaar number must be 12 digits."}),
   current_address: z.string().min(10, { message: "Please enter your full address." }),
   primary_skill: z.string().min(1, { message: "Please select your primary skill."}),
+  other_skills: z.array(z.string()).max(2, "You can select up to 2 other skills.").optional(),
   total_experience: z.coerce.number().min(0, "Experience can't be negative.").max(50, "Experience seems too high."),
   aadhaar_front: z.any().refine(file => file instanceof File, "Aadhaar front photo is required."),
   aadhaar_back: z.any().refine(file => file instanceof File, "Aadhaar back photo is required."),
@@ -70,9 +72,13 @@ export function PartnerSignupForm({ pincode, city }: PartnerSignupFormProps) {
       aadhaar_number: "",
       current_address: "",
       primary_skill: "",
+      other_skills: [],
       total_experience: 0,
     },
   });
+
+  const watchPrimarySkill = form.watch("primary_skill");
+  const watchOtherSkills = form.watch("other_skills") || [];
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
@@ -80,7 +86,9 @@ export function PartnerSignupForm({ pincode, city }: PartnerSignupFormProps) {
     const formData = new FormData();
     Object.entries(values).forEach(([key, value]) => {
       if (value !== null && value !== undefined) {
-        if (value instanceof File) {
+        if (key === 'other_skills' && Array.isArray(value)) {
+            formData.append(key, JSON.stringify(value));
+        } else if (value instanceof File) {
           formData.append(key, value);
         } else {
           formData.append(key, String(value));
@@ -141,6 +149,19 @@ export function PartnerSignupForm({ pincode, city }: PartnerSignupFormProps) {
         setIsLoading(false);
     }
   }
+
+  const handleOtherSkillSelect = (skillId: string) => {
+    const currentSkills = form.getValues("other_skills") || [];
+    if (currentSkills.length < 2 && !currentSkills.includes(skillId) && skillId !== watchPrimarySkill) {
+      form.setValue("other_skills", [...currentSkills, skillId]);
+    }
+  };
+
+  const handleRemoveOtherSkill = (skillId: string) => {
+    const currentSkills = form.getValues("other_skills") || [];
+    form.setValue("other_skills", currentSkills.filter(s => s !== skillId));
+  };
+
 
   if (isSubmitted) {
       return (
@@ -243,6 +264,45 @@ export function PartnerSignupForm({ pincode, city }: PartnerSignupFormProps) {
             </FormItem>
           )}
         />
+        <FormField
+            control={form.control}
+            name="other_skills"
+            render={() => (
+                <FormItem>
+                    <FormLabel>Other Skills (up to 2)</FormLabel>
+                    <Select onValueChange={handleOtherSkillSelect} value="">
+                        <FormControl>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select other skills" />
+                            </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                            {serviceCategories
+                                .filter(cat => cat.id !== watchPrimarySkill && !watchOtherSkills.includes(cat.id))
+                                .map(cat => (
+                                    <SelectItem key={cat.id} value={cat.id} disabled={watchOtherSkills.length >= 2}>
+                                        {cat.label}
+                                    </SelectItem>
+                                ))}
+                        </SelectContent>
+                    </Select>
+                    <div className="flex flex-wrap gap-2 pt-2">
+                        {watchOtherSkills.map(skillId => {
+                            const skill = serviceCategories.find(s => s.id === skillId);
+                            return (
+                                <Badge key={skillId} variant="secondary" className="flex items-center gap-1">
+                                    {skill?.label}
+                                    <button type="button" onClick={() => handleRemoveOtherSkill(skillId)} className="rounded-full hover:bg-muted-foreground/20">
+                                        <X className="h-3 w-3" />
+                                    </button>
+                                </Badge>
+                            );
+                        })}
+                    </div>
+                    <FormMessage />
+                </FormItem>
+            )}
+        />
          <FormField
           control={form.control}
           name="total_experience"
@@ -259,7 +319,7 @@ export function PartnerSignupForm({ pincode, city }: PartnerSignupFormProps) {
         <FormField
             control={form.control}
             name="aadhaar_front"
-            render={({ field: { onChange, onBlur, name, ref } }) => (
+            render={({ field: { onChange, onBlur, name } }) => (
                 <FormItem>
                     <FormLabel>Aadhaar Card (Front)</FormLabel>
                     <FormControl>
@@ -269,7 +329,6 @@ export function PartnerSignupForm({ pincode, city }: PartnerSignupFormProps) {
                             onChange={(e) => onChange(e.target.files?.[0])}
                             onBlur={onBlur}
                             name={name}
-                            ref={ref}
                         />
                     </FormControl>
                     <FormMessage />
@@ -279,7 +338,7 @@ export function PartnerSignupForm({ pincode, city }: PartnerSignupFormProps) {
         <FormField
             control={form.control}
             name="aadhaar_back"
-            render={({ field: { onChange, onBlur, name, ref } }) => (
+            render={({ field: { onChange, onBlur, name } }) => (
                 <FormItem>
                     <FormLabel>Aadhaar Card (Back)</FormLabel>
                     <FormControl>
@@ -289,7 +348,6 @@ export function PartnerSignupForm({ pincode, city }: PartnerSignupFormProps) {
                             onChange={(e) => onChange(e.target.files?.[0])}
                             onBlur={onBlur}
                             name={name}
-                            ref={ref}
                         />
                     </FormControl>
                     <FormMessage />
@@ -299,7 +357,7 @@ export function PartnerSignupForm({ pincode, city }: PartnerSignupFormProps) {
         <FormField
             control={form.control}
             name="selfie"
-            render={({ field: { onChange, onBlur, name, ref } }) => (
+            render={({ field: { onChange, onBlur, name } }) => (
                 <FormItem>
                     <FormLabel>Your Selfie</FormLabel>
                     <FormControl>
@@ -309,7 +367,6 @@ export function PartnerSignupForm({ pincode, city }: PartnerSignupFormProps) {
                             onChange={(e) => onChange(e.target.files?.[0])}
                             onBlur={onBlur}
                             name={name}
-                            ref={ref}
                         />
                     </FormControl>
                     <FormMessage />
@@ -325,3 +382,5 @@ export function PartnerSignupForm({ pincode, city }: PartnerSignupFormProps) {
     </Form>
   );
 }
+
+    
