@@ -69,6 +69,7 @@ type Technician = {
   id: string;
   name: string;
   mobile: string;
+  selfie_url?: string;
 };
 
 type LoginResponse = {

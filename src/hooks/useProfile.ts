@@ -7,13 +7,13 @@ type TechnicianProfile = {
     id: string;
     name: string;
     mobile: string;
+    selfie_url?: string;
 };
 
 const staticProfile = {
     serviceCategories: ['TV', 'Washing Machine', 'Refrigerator', 'AC', 'Mobile'],
     areaCovered: 'Anytown',
     totalJobs: 134,
-    avatarUrl: 'https://picsum.photos/seed/tech/200/200',
     lifetimeEarnings: 254200,
     todaysEarnings: 1800,
 };
@@ -36,8 +36,9 @@ export const useProfile = () => {
     }, []);
 
     const combinedProfile = profile ? {
-        ...profile,
-        ...staticProfile
+        ...staticProfile, // load static data first
+        ...profile, // override with dynamic data
+        avatarUrl: profile.selfie_url || 'https://picsum.photos/seed/tech/200/200' // map selfie_url to avatarUrl, with fallback
     } : null;
 
     return { profile: combinedProfile, loading };
