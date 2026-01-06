@@ -33,6 +33,8 @@ export const useProfile = () => {
                         other_skills: [],
                         service_area: 'Loading...',
                         total_jobs_completed: 0,
+                        total_jobs_assigned: 0,
+                        total_jobs_cancelled: 0,
                         lifetime_earnings: 0,
                         today_earnings: 0,
                         average_rating: 0,

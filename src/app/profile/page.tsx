@@ -2,11 +2,11 @@
 "use client"
 import Image from 'next/image';
 import Link from 'next/link';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { User, Phone, Map, Tag, Briefcase, LogOut, Star } from 'lucide-react';
+import { User, Phone, Map, Tag, Briefcase, LogOut, Star, CheckCircle, XCircle } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { LanguageSelector } from '@/components/common/LanguageSelector';
 import { useProfile } from '@/hooks/useProfile';
@@ -64,6 +64,29 @@ const EarningsStat = ({ label, value, isLoading }: { label: string, value: numbe
         </div>
     )
 };
+
+const ProfileStat = ({ icon: Icon, label, value, isLoading }: { icon: React.ElementType, label: string, value: number, isLoading: boolean }) => {
+    if (isLoading) {
+        return (
+            <div className="flex items-center gap-3">
+                <Skeleton className="h-8 w-8 rounded-full" />
+                <div className="space-y-1">
+                    <Skeleton className="h-4 w-16" />
+                    <Skeleton className="h-5 w-8" />
+                </div>
+            </div>
+        );
+    }
+    return (
+         <div className="flex items-center gap-3">
+            <Icon className="h-8 w-8 text-muted-foreground" />
+            <div>
+                <p className="text-sm text-muted-foreground">{label}</p>
+                <p className="font-bold text-lg">{value}</p>
+            </div>
+        </div>
+    )
+}
 
 
 export default function ProfilePage() {
@@ -127,6 +150,17 @@ export default function ProfilePage() {
                <EarningsStat label={t('profile_page.lifetime_earnings')} value={profile?.lifetime_earnings ?? 0} isLoading={loading} />
             </CardContent>
         </Card>
+        
+        <Card>
+            <CardHeader>
+                <CardTitle className="text-base">Job Statistics</CardTitle>
+            </CardHeader>
+            <CardContent className="grid grid-cols-2 gap-x-4 gap-y-6">
+                <ProfileStat icon={Briefcase} label="Assigned" value={profile?.total_jobs_assigned ?? 0} isLoading={loading} />
+                <ProfileStat icon={CheckCircle} label="Completed" value={profile?.total_jobs_completed ?? 0} isLoading={loading} />
+                <ProfileStat icon={XCircle} label="Cancelled" value={profile?.total_jobs_cancelled ?? 0} isLoading={loading} />
+            </CardContent>
+        </Card>
 
         <Card>
             <CardContent className="space-y-4 pt-6">
@@ -144,8 +178,6 @@ export default function ProfilePage() {
                     }
                     isLoading={loading} 
                 />
-                <Separator />
-                <ProfileInfoItem icon={Briefcase} label={t('profile_page.total_jobs_completed')} value={`${profile?.total_jobs_completed ?? 0}`} isLoading={loading} />
             </CardContent>
         </Card>
 

@@ -49,8 +49,11 @@ export type Technician = {
   other_skills: string[];
   service_area: string;
   total_jobs_completed: number;
+  total_jobs_assigned: number;
+  total_jobs_cancelled: number;
   lifetime_earnings: number;
   today_earnings: number;
   average_rating: number;
   total_ratings: number;
 };
+
