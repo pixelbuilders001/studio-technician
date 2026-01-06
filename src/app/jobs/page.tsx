@@ -1,4 +1,5 @@
 
+
 "use client"
 import { JobTabs } from "@/components/jobs/JobTabs";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -31,7 +32,7 @@ function JobsPageContent() {
   const router = useRouter();
   const tab = searchParams.get('tab') || 'new';
 
-  const handleTabChange = (newTab: 'new' | 'active' | 'completed') => {
+  const handleTabChange = (newTab: 'new' | 'ongoing' | 'completed') => {
     router.push(`/jobs?tab=${newTab}`);
   }
 
@@ -66,7 +67,7 @@ function JobsPageContent() {
       ) : (
         <JobTabs 
           jobs={jobs} 
-          activeTab={tab as 'new' | 'active' | 'completed'} 
+          activeTab={tab as 'new' | 'ongoing' | 'completed'} 
           onTabChange={handleTabChange} 
         />
       )}

@@ -28,10 +28,10 @@
     },
     "job_tabs": {
         "new": "नया",
-        "active": "सक्रिय",
+        "ongoing": "चालू",
         "completed": "पूरा हुआ",
         "no_new_jobs": "कोई नई नौकरी उपलब्ध नहीं है।",
-        "no_active_jobs": "आपके पास कोई सक्रिय नौकरी नहीं है।",
+        "no_ongoing_jobs": "आपके पास कोई चालू नौकरी नहीं है।",
         "no_completed_jobs": "अभी तक कोई नौकरी पूरी नहीं हुई है।"
     },
     "job_card": {
@@ -39,7 +39,7 @@
         "reject": "अस्वीकार",
         "accept": "स्वीकार",
         "job_accepted_title": "नौकरी स्वीकृत",
-        "job_accepted_description": "नौकरी को सक्रिय नौकरियों में ले जाया गया है।",
+        "job_accepted_description": "नौकरी को चालू नौकरियों में ले जाया गया है।",
         "job_rejected_title": "नौकरी अस्वीकृत",
         "job_rejected_description": "आपने नौकरी अस्वीकार कर दी है",
         "address": "पता",
@@ -121,6 +121,7 @@
     "job_api_status": {
         "assigned": "सौंपा गया",
         "accepted": "स्वीकृत",
+        "on_the_way": "रास्ते में",
         "in-progress": "प्रगति में है",
         "completed": "पूरा हुआ",
         "cancelled": "रद्द"

@@ -28,10 +28,10 @@
     },
     "job_tabs": {
         "new": "New",
-        "active": "Active",
+        "ongoing": "Ongoing",
         "completed": "Completed",
         "no_new_jobs": "No new jobs available.",
-        "no_active_jobs": "You have no active jobs.",
+        "no_ongoing_jobs": "You have no ongoing jobs.",
         "no_completed_jobs": "No jobs completed yet."
     },
     "job_card": {
@@ -39,7 +39,7 @@
         "reject": "Reject",
         "accept": "Accept",
         "job_accepted_title": "Job Accepted",
-        "job_accepted_description": "Job has been moved to Active Jobs.",
+        "job_accepted_description": "Job has been moved to Ongoing Jobs.",
         "job_rejected_title": "Job Rejected",
         "job_rejected_description": "You have rejected job",
         "address": "Address",
@@ -121,6 +121,7 @@
     "job_api_status": {
         "assigned": "Assigned",
         "accepted": "Accepted",
+        "on_the_way": "On the way",
         "in-progress": "In Progress",
         "completed": "Completed",
         "cancelled": "Cancelled"

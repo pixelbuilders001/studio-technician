@@ -1,5 +1,6 @@
 
-export type JobStatus = 'assigned' | 'accepted' | 'in-progress' | 'completed' | 'cancelled';
+
+export type JobStatus = 'assigned' | 'accepted' | 'on_the_way' | 'in-progress' | 'completed' | 'cancelled';
 export type ActiveJobStatus = 'scheduled' | 'reached_location' | 'inspection_done' | 'repair_in_progress' | 'repair_completed';
 
 // This represents the data structure from your API

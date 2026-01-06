@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useRouter } from "next/navigation";
@@ -84,7 +85,7 @@ export function JobCard({ job }: { job: Job }) {
             });
             
             if (status === 'accepted') {
-              router.push('/jobs?tab=active');
+              router.push('/jobs?tab=ongoing');
             }
             router.refresh();
             
@@ -101,7 +102,6 @@ export function JobCard({ job }: { job: Job }) {
   const DeviceIcon = iconMap[job.categories.name] || Wrench;
 
   const statusBadge = () => {
-    const statusKey = job.status?.replace(/_/g, ' ');
     let className = "";
 
     switch(job.status) {
@@ -109,8 +109,13 @@ export function JobCard({ job }: { job: Job }) {
             className="bg-orange-100 text-orange-800 border-orange-200 hover:bg-orange-100/80";
             break;
         case 'accepted':
-        case 'in-progress':
             className="bg-blue-100 text-blue-800 border-blue-200";
+            break;
+        case 'on_the_way':
+            className="bg-cyan-100 text-cyan-800 border-cyan-200";
+            break;
+        case 'in-progress':
+            className="bg-purple-100 text-purple-800 border-purple-200";
             break;
         case 'completed':
             className="bg-green-100 text-green-800 border-green-200";
@@ -119,7 +124,7 @@ export function JobCard({ job }: { job: Job }) {
             className="bg-gray-100 text-gray-800 border-gray-200";
     }
 
-    if (statusKey) {
+    if (job.status) {
         return <Badge variant="outline" className={cn("capitalize", className)}>{t(`job_api_status.${job.status}`)}</Badge>
     }
     return null
@@ -133,7 +138,7 @@ export function JobCard({ job }: { job: Job }) {
   }
 
   return (
-      <Card className="overflow-hidden transition-all shadow-md" >
+      <Card className="overflow-hidden transition-all shadow-md" onClick={() => router.push(`/jobs/${job.id}`)}>
          <CardHeader className="flex-row items-start justify-between gap-4 p-4">
              <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-secondary">
@@ -168,7 +173,7 @@ export function JobCard({ job }: { job: Job }) {
             {job.media_url && (
                 <Dialog>
                     <DialogTrigger asChild>
-                        <div className="relative h-12 w-12 rounded-md overflow-hidden cursor-pointer flex-shrink-0">
+                        <div className="relative h-12 w-12 rounded-md overflow-hidden cursor-pointer flex-shrink-0" onClick={(e) => e.stopPropagation()}>
                             <Image src={job.media_url} alt="Job photo" fill className="object-cover"/>
                         </div>
                     </DialogTrigger>
@@ -190,12 +195,12 @@ export function JobCard({ job }: { job: Job }) {
             <>
               <AlertDialog>
                   <AlertDialogTrigger asChild>
-                      <Button variant="outline" className="w-full bg-card" disabled={isPending}>
+                      <Button variant="outline" className="w-full bg-card" disabled={isPending} onClick={(e) => e.stopPropagation()}>
                           {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <X className="mr-2 h-4 w-4" />}
                           {t('job_card.reject')}
                       </Button>
                   </AlertDialogTrigger>
-                  <AlertDialogContent>
+                  <AlertDialogContent onClick={(e) => e.stopPropagation()}>
                       <AlertDialogHeader>
                       <AlertDialogTitle>Are you sure you want to reject this job?</AlertDialogTitle>
                       <AlertDialogDescription>
@@ -210,13 +215,13 @@ export function JobCard({ job }: { job: Job }) {
                       </AlertDialogFooter>
                   </AlertDialogContent>
               </AlertDialog>
-              <Button className="w-full" onClick={() => handleStatusUpdate('accepted')} disabled={isPending}>
+              <Button className="w-full" onClick={(e) => { e.stopPropagation(); handleStatusUpdate('accepted'); }} disabled={isPending}>
                 {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Check className="mr-2 h-4 w-4" />}
                 {t('job_card.accept')}
               </Button>
             </>
           ) : (
-            <div className="col-span-2 grid grid-cols-2 gap-3">
+            <div className="col-span-2 grid grid-cols-2 gap-3" onClick={(e) => e.stopPropagation()}>
               <Button variant="outline" className="w-full" asChild>
                 <a href={`tel:${job.mobile_number}`}><Phone className="mr-2 h-4 w-4" /> Call</a>
               </Button>

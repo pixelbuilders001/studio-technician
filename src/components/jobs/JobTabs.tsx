@@ -10,8 +10,8 @@ import { useRouter } from "next/navigation";
 
 type JobTabsProps = {
   jobs: Job[];
-  activeTab: 'new' | 'active' | 'completed';
-  onTabChange: (tab: 'new' | 'active' | 'completed') => void;
+  activeTab: 'new' | 'ongoing' | 'completed';
+  onTabChange: (tab: 'new' | 'ongoing' | 'completed') => void;
 };
 
 export function JobTabs({ jobs, activeTab, onTabChange }: JobTabsProps) {
@@ -19,7 +19,7 @@ export function JobTabs({ jobs, activeTab, onTabChange }: JobTabsProps) {
   const router = useRouter();
 
   const newJobs = jobs.filter((job) => job.status === "assigned");
-  const activeJobs = jobs.filter((job) => job.status === "accepted" || job.status === "in-progress");
+  const ongoingJobs = jobs.filter((job) => ["accepted", "on_the_way", "in-progress"].includes(job.status));
   const completedJobs = jobs.filter((job) => job.status === "completed");
 
   const renderJobList = (jobList: Job[], emptyMessage: string) => {
@@ -40,7 +40,7 @@ export function JobTabs({ jobs, activeTab, onTabChange }: JobTabsProps) {
   };
 
   const handleTabChange = (value: string) => {
-    onTabChange(value as 'new' | 'active' | 'completed');
+    onTabChange(value as 'new' | 'ongoing' | 'completed');
   }
 
   return (
@@ -48,7 +48,7 @@ export function JobTabs({ jobs, activeTab, onTabChange }: JobTabsProps) {
       <div className="p-2 pb-0">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="new">{t('job_tabs.new')} ({newJobs.length})</TabsTrigger>
-          <TabsTrigger value="active">{t('job_tabs.active')} ({activeJobs.length})</TabsTrigger>
+          <TabsTrigger value="ongoing">{t('job_tabs.ongoing')} ({ongoingJobs.length})</TabsTrigger>
           <TabsTrigger value="completed">{t('job_tabs.completed')} ({completedJobs.length})</TabsTrigger>
         </TabsList>
       </div>
@@ -56,8 +56,8 @@ export function JobTabs({ jobs, activeTab, onTabChange }: JobTabsProps) {
         <TabsContent value="new">
           {renderJobList(newJobs, t('job_tabs.no_new_jobs'))}
         </TabsContent>
-        <TabsContent value="active">
-          {renderJobList(activeJobs, t('job_tabs.no_active_jobs'))}
+        <TabsContent value="ongoing">
+          {renderJobList(ongoingJobs, t('job_tabs.no_ongoing_jobs'))}
         </TabsContent>
         <TabsContent value="completed">
           {renderJobList(completedJobs, t('job_tabs.no_completed_jobs'))}
