@@ -23,10 +23,11 @@ function JobsSkeleton() {
 
 function JobsPageContent() {
   const { t } = useTranslation();
-  const { profile, loading: profileLoading } = useProfile();
+  const { profile } = useProfile(); // Keep for header, but not for fetching logic
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [technicianId, setTechnicianId] = useState<string | null>(null);
 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -36,15 +37,36 @@ function JobsPageContent() {
     router.push(`/jobs?tab=${newTab}`);
   }
 
+  // Effect 1: Get Technician ID from localStorage, runs only once.
   useEffect(() => {
-    const fetchJobs = async () => {
-      if (!profile?.id) {
-        setLoading(false);
-        return;
-      }
+    const storedProfile = localStorage.getItem('technicianProfile');
+    if (storedProfile) {
       try {
-        setLoading(true);
-        const fetchedJobs = await getJobsAction(profile.id);
+        const parsedProfile = JSON.parse(storedProfile);
+        if (parsedProfile.id) {
+          setTechnicianId(parsedProfile.id);
+        } else {
+           setLoading(false);
+        }
+      } catch (e) {
+        console.error("Failed to parse technician profile from storage", e);
+        setLoading(false);
+      }
+    } else {
+        setLoading(false);
+    }
+  }, []); // Empty dependency array ensures this runs only once
+
+  // Effect 2: Fetch jobs, runs only when technicianId changes.
+  useEffect(() => {
+    if (!technicianId) {
+      return;
+    }
+
+    const fetchJobs = async () => {
+      setLoading(true);
+      try {
+        const fetchedJobs = await getJobsAction(technicianId);
         setJobs(fetchedJobs);
         setError(null);
       } catch (e: any) {
@@ -55,7 +77,7 @@ function JobsPageContent() {
     };
 
     fetchJobs();
-  }, [profile?.id]);
+  }, [technicianId]); // This will run exactly once when technicianId is set.
 
   return (
     <div className="flex h-full flex-col">
@@ -63,7 +85,7 @@ function JobsPageContent() {
         <h1 className="text-xl font-bold font-headline">{t('jobs_page.title')}</h1>
         {profile && <span className="text-sm font-medium">Welcome, {profile.name.split(' ')[0]}</span>}
       </header>
-      {profileLoading || loading ? (
+      {loading ? (
         <JobsSkeleton />
       ) : error ? (
         <div className="flex h-64 items-center justify-center text-destructive">{error}</div>
