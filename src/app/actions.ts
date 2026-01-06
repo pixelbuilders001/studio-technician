@@ -225,6 +225,7 @@ export async function getTechnicianStatsAction(technicianId: string) {
     }
 
     const data = await response.json();
+    console.log("the job",data)
 
     if (data && data.length > 0) {
       return data[0]; // Return the first object in the array

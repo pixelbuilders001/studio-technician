@@ -50,9 +50,16 @@ function JobsPageContent() {
           setLoading(false);
         }
       };
-      fetchJobs();
+      // Only fetch jobs if the list is empty to prevent re-fetching on profile update
+      if(jobs.length === 0) {
+        fetchJobs();
+      }
     }
-  }, [profile?.id]);
+     // If there's no profile and we're not loading, stop the loading spinner.
+    if (!profile && !profileLoading) {
+      setLoading(false);
+    }
+  }, [profile, profileLoading]);
 
   return (
     <div className="flex h-full flex-col">
