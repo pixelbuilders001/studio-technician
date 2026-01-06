@@ -202,7 +202,7 @@ export async function getTechnicianStatsAction(technicianId: string) {
   if (!technicianId) {
     throw new Error("Technician ID is required.");
   }
-  const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/technician-stats?technician_id=${technicianId}`;
+  const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/technician_stats?technician_id=eq.${technicianId}&select=*`;
   const apikey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!url || !apikey) {
@@ -214,7 +214,7 @@ export async function getTechnicianStatsAction(technicianId: string) {
     const response = await fetch(url, {
       headers: {
         'apikey': apikey,
-        'Authorization': `Bearer ${apikey}`, // Using anon key as bearer token, adjust if different auth is needed
+        'Authorization': `Bearer ${apikey}`,
       },
     });
 
@@ -224,7 +224,12 @@ export async function getTechnicianStatsAction(technicianId: string) {
     }
 
     const data = await response.json();
-    return data.stats; // Assuming the API returns { stats: { ... } }
+
+    if (data && data.length > 0) {
+      return data[0]; // Return the first object in the array
+    }
+    
+    return null; // Return null if no stats found
   } catch (error: any) {
     console.error('Get technician stats API error:', error);
     throw new Error(error.message || "An unexpected error occurred while fetching technician stats.");
