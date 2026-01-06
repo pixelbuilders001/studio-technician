@@ -43,7 +43,8 @@
         "job_rejected_title": "नौकरी अस्वीकृत",
         "job_rejected_description": "आपने नौकरी अस्वीकार कर दी है",
         "address": "पता",
-        "booked_on": "बुक किया गया"
+        "booked_on": "बुक किया गया",
+        "view_details": "विवरण देखें"
     },
     "profile_page": {
         "title": "प्रोफ़ाइल",

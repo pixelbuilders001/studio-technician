@@ -43,7 +43,8 @@
         "job_rejected_title": "Job Rejected",
         "job_rejected_description": "You have rejected job",
         "address": "Address",
-        "booked_on": "Booked On"
+        "booked_on": "Booked On",
+        "view_details": "View Details"
     },
     "profile_page": {
         "title": "Profile",
