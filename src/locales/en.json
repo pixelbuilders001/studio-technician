@@ -70,6 +70,7 @@
         "final_amount_to_collect": "Final amount to collect:",
         "remind_customer": "Remind customer about payment via Cash/UPI. Admin commission will be auto-deducted.",
         "update_status": "Update Status",
+        "current_status": "Current Status",
         "customer_details": "Customer Details",
         "call_customer": "Call Customer",
         "open_maps": "Open Maps",
@@ -108,15 +109,12 @@
         "toast_title": "Status Updated",
         "toast_description": "Job status is now:",
         "toast_error_title": "Update Failed",
-        "toast_error_description": "Could not update the job status."
-    },
-    "job_status": {
-        "scheduled": "Scheduled",
-        "reached_location": "Reached Location",
-        "inspection_done": "Inspection Done",
-        "repair_in_progress": "Repair In Progress",
-        "repair_completed": "Repair Completed",
-        "completed": "Completed"
+        "toast_error_description": "Could not update the job status.",
+        "accept_job": "Accept Job",
+        "start_travel": "Start Travel",
+        "start_repair": "Start Repair / Inspection",
+        "complete_job": "Complete Job",
+        "complete_job_note": "After collecting payment, add repair details to complete the job."
     },
     "job_api_status": {
         "assigned": "Assigned",
@@ -124,7 +122,8 @@
         "on_the_way": "On the way",
         "in-progress": "In Progress",
         "completed": "Completed",
-        "cancelled": "Cancelled"
+        "cancelled": "Cancelled",
+        "rejected": "Rejected"
     },
     "devices": {
         "television": "Television",

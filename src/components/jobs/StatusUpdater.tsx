@@ -1,29 +1,53 @@
 
 "use client";
 
-import type { ActiveJobStatus } from "@/lib/types";
-import { Check, Circle, Loader2 } from "lucide-react";
+import type { JobStatus } from "@/lib/types";
+import { Check, Circle, Loader2, Navigation, Wrench, CheckCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTransition } from "react";
 import { updateJobStatusAction } from "@/app/actions";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useProfile } from "@/hooks/useProfile";
-
-const statuses: { id: ActiveJobStatus; labelKey: string }[] = [
-  { id: "scheduled", labelKey: "scheduled" },
-  { id: "reached_location", labelKey: "reached_location" },
-  { id: "inspection_done", labelKey: "inspection_done" },
-  { id: "repair_in_progress", labelKey: "repair_in_progress" },
-  { id: "repair_completed", labelKey: "repair_completed" },
-];
+import { Button } from "../ui/button";
 
 type StatusUpdaterProps = {
   jobId: string;
   orderId: string;
-  currentStatus: ActiveJobStatus;
+  currentStatus: JobStatus;
 };
+
+type StatusConfig = {
+    [key in JobStatus]?: {
+        nextStatus: JobStatus;
+        buttonTextKey: string;
+        buttonIcon: React.ElementType;
+    }
+}
+
+const statusFlow: StatusConfig = {
+    'assigned': {
+        nextStatus: 'accepted',
+        buttonTextKey: 'accept_job',
+        buttonIcon: Check,
+    },
+    'accepted': {
+        nextStatus: 'on_the_way',
+        buttonTextKey: 'start_travel',
+        buttonIcon: Navigation,
+    },
+    'on_the_way': {
+        nextStatus: 'in-progress',
+        buttonTextKey: 'start_repair',
+        buttonIcon: Wrench,
+    },
+    'in-progress': {
+        nextStatus: 'completed',
+        buttonTextKey: 'complete_job',
+        buttonIcon: CheckCircle,
+    }
+}
 
 export function StatusUpdater({ jobId, orderId, currentStatus }: StatusUpdaterProps) {
   const [isPending, startTransition] = useTransition();
@@ -31,9 +55,8 @@ export function StatusUpdater({ jobId, orderId, currentStatus }: StatusUpdaterPr
   const { profile } = useProfile();
   const { toast } = useToast();
   const { t } = useTranslation();
-  const currentIndex = statuses.findIndex((s) => s.id === currentStatus);
 
-  const handleUpdateStatus = (statusId: ActiveJobStatus) => {
+  const handleUpdateStatus = (newStatus: JobStatus) => {
     if (!profile) {
       toast({ title: "Error", description: "Technician profile not found.", variant: "destructive" });
       return;
@@ -42,68 +65,51 @@ export function StatusUpdater({ jobId, orderId, currentStatus }: StatusUpdaterPr
       try {
         await updateJobStatusAction({
             booking_id: jobId,
-            // @ts-ignore // we know this is a valid status
-            status: statusId,
-            note: `Technician ${profile.name} updated status to ${statusId}`,
+            status: newStatus,
+            note: `Technician ${profile.name} updated status to ${newStatus}`,
             order_id: orderId,
         });
         toast({
           title: t('status_updater.toast_title'),
-          description: `${t('status_updater.toast_description')} ${t(`job_status.${statusId}`)}`,
+          description: `${t('status_updater.toast_description')} ${t(`job_api_status.${newStatus}`)}`,
         });
         router.refresh();
-      } catch (error) {
+      } catch (error: any) {
         toast({
           variant: "destructive",
           title: t('status_updater.toast_error_title'),
-          description: t('status_updater.toast_error_description'),
+          description: error.message || t('status_updater.toast_error_description'),
         });
       }
     });
   };
 
-  return (
-    <div className="relative">
-      {isPending && (
-        <div className="absolute inset-0 z-10 flex items-center justify-center bg-card/80">
-          <Loader2 className="h-6 w-6 animate-spin text-primary" />
-        </div>
-      )}
-      <ul className="space-y-4">
-        {statuses.map((status, index) => {
-          const isCompleted = index < currentIndex;
-          const isCurrent = index === currentIndex;
-          const isClickable = index === currentIndex + 1;
-          const label = t(`job_status.${status.labelKey}`);
+  const nextAction = statusFlow[currentStatus];
+  const ButtonIcon = nextAction?.buttonIcon;
 
-          return (
-            <li key={status.id} className="flex items-center gap-4">
-              <div
-                className={cn(
-                  "flex h-8 w-8 items-center justify-center rounded-full",
-                  isCompleted ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground",
-                  isCurrent && "bg-primary/80 text-primary-foreground ring-4 ring-primary/20",
-                )}
-              >
-                {isCompleted ? <Check className="h-5 w-5" /> : <Circle className="h-5 w-5" />}
-              </div>
-              <button
-                onClick={() => handleUpdateStatus(status.id)}
-                disabled={!isClickable || isPending}
-                className={cn(
-                  "flex-1 text-left font-medium",
-                  isCompleted && "text-muted-foreground line-through",
-                  isCurrent && "font-bold text-primary",
-                  !isClickable && "cursor-not-allowed",
-                  isClickable && "hover:text-primary",
-                )}
-              >
-                {label}
-              </button>
-            </li>
-          );
-        })}
-      </ul>
+  return (
+    <div className="space-y-4">
+        <div className="flex items-center gap-3">
+            <span className="text-sm font-medium text-muted-foreground">{t('job_page.current_status')}:</span>
+            <span className="font-bold text-primary">{t(`job_api_status.${currentStatus}`)}</span>
+        </div>
+      
+      {nextAction && ButtonIcon && (
+          <Button 
+            onClick={() => handleUpdateStatus(nextAction.nextStatus)}
+            disabled={isPending}
+            className="w-full h-12 text-lg"
+          >
+            {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ButtonIcon className="mr-2 h-5 w-5" />}
+            {t(`status_updater.${nextAction.buttonTextKey}`)}
+          </Button>
+      )}
+
+      {currentStatus === 'in-progress' && (
+        <p className="text-xs text-center text-muted-foreground pt-2">
+            {t('status_updater.complete_job_note')}
+        </p>
+      )}
     </div>
   );
 }

@@ -1,7 +1,6 @@
 
 
-export type JobStatus = 'assigned' | 'accepted' | 'on_the_way' | 'in-progress' | 'completed' | 'cancelled';
-export type ActiveJobStatus = 'scheduled' | 'reached_location' | 'inspection_done' | 'repair_in_progress' | 'repair_completed';
+export type JobStatus = 'assigned' | 'accepted' | 'on_the_way' | 'in-progress' | 'completed' | 'cancelled' | 'rejected';
 
 // This represents the data structure from your API
 export type Job = {
@@ -27,12 +26,6 @@ export type Job = {
   };
   // The fields below are from the old static data structure and might need to be integrated
   // or removed depending on your final API structure.
-  activeStatus?: ActiveJobStatus;
-  customer?: {
-    name: string;
-    phone: string;
-    address: string;
-  };
   problemDetails?: string;
   finalCost?: number;
   spareParts?: string;

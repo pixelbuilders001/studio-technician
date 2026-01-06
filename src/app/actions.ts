@@ -19,7 +19,7 @@ export async function estimateTimeAction(input: EstimateCompletionTimeInput) {
 
 type UpdateStatusPayload = {
     booking_id: string;
-    status: 'accepted' | 'rejected' | 'in-progress' | 'completed' | 'cancelled';
+    status: 'accepted' | 'rejected' | 'on_the_way' | 'in-progress' | 'completed' | 'cancelled';
     note: string;
     order_id: string;
 };

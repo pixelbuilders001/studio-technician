@@ -70,6 +70,7 @@
         "final_amount_to_collect": "अंतिम राशि एकत्र करने के लिए:",
         "remind_customer": "ग्राहक को नकद/यूपीआई के माध्यम से भुगतान के बारे में याद दिलाएं। व्यवस्थापक कमीशन स्वतः काट लिया जाएगा।",
         "update_status": "स्थिति अपडेट करें",
+        "current_status": "वर्तमान स्थिति",
         "customer_details": "ग्राहक विवरण",
         "call_customer": "ग्राहक को बुलाओ",
         "open_maps": "नक्शे खोलो",
@@ -108,15 +109,12 @@
         "toast_title": "स्थिति अपडेट की गई",
         "toast_description": "नौकरी की स्थिति अब है:",
         "toast_error_title": "अपडेट विफल",
-        "toast_error_description": "नौकरी की स्थिति को अपडेट नहीं किया जा सका।"
-    },
-    "job_status": {
-        "scheduled": "अनुसूचित",
-        "reached_location": "स्थान पर पहुंचा",
-        "inspection_done": "निरीक्षण किया गया",
-        "repair_in_progress": "मरम्मत प्रगति पर है",
-        "repair_completed": "मरम्मत पूरी हुई",
-        "completed": "पूरा हुआ"
+        "toast_error_description": "नौकरी की स्थिति को अपडेट नहीं किया जा सका।",
+        "accept_job": "नौकरी स्वीकार करें",
+        "start_travel": "यात्रा शुरू करें",
+        "start_repair": "मरम्मत / निरीक्षण शुरू करें",
+        "complete_job": "नौकरी पूरी करें",
+        "complete_job_note": "भुगतान एकत्र करने के बाद, नौकरी पूरी करने के लिए मरम्मत विवरण जोड़ें।"
     },
     "job_api_status": {
         "assigned": "सौंपा गया",
@@ -124,7 +122,8 @@
         "on_the_way": "रास्ते में",
         "in-progress": "प्रगति में है",
         "completed": "पूरा हुआ",
-        "cancelled": "रद्द"
+        "cancelled": "रद्द",
+        "rejected": "अस्वीकृत"
     },
     "devices": {
         "television": "टेलीविजन",

@@ -18,6 +18,7 @@ import {
   Settings,
   Camera,
   AlertCircle,
+  XCircle,
 } from "lucide-react";
 import { StatusUpdater } from "@/components/jobs/StatusUpdater";
 import Image from "next/image";
@@ -26,9 +27,22 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { RepairDetailsForm } from "@/components/jobs/RepairDetailsForm";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useEffect, useState } from "react";
-import { getJobsAction } from "@/app/actions";
+import { getJobsAction, updateJobStatusAction } from "@/app/actions";
 import { useProfile } from "@/hooks/useProfile";
 import LoadingJobDetail from "./loading";
+import { useToast } from "@/hooks/use-toast";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Loader2 } from "lucide-react";
 
 async function getJob(id: string, technicianId: string): Promise<Job | undefined> {
   const allJobs = await getJobsAction(technicianId);
@@ -45,13 +59,54 @@ export default function JobDetailPage({
   const [job, setJob] = useState<Job | undefined | null>(null);
   const { profile } = useProfile();
   const router = useRouter();
+  const { toast } = useToast();
+  const [isCancelling, setIsCancelling] = useState(false);
 
 
   useEffect(() => {
     if (profile?.id) {
-      getJob(params.id, profile.id).then(setJob);
+      getJob(params.id, profile.id).then(job => {
+        if (!job) {
+            // If job is not found, maybe it was cancelled or completed
+            // and the list on the previous page is stale.
+            toast({
+                title: "Job not found",
+                description: "It might have been updated. Refreshing job list.",
+                variant: "destructive"
+            });
+            router.push('/jobs');
+        } else {
+            setJob(job);
+        }
+      });
     }
-  }, [params.id, profile?.id]);
+  }, [params.id, profile?.id, router, toast]);
+
+  const handleCancelJob = async () => {
+      if (!job || !profile) return;
+      setIsCancelling(true);
+      try {
+          await updateJobStatusAction({
+              booking_id: job.id,
+              status: 'cancelled',
+              note: 'Cancelled by technician',
+              order_id: job.order_id
+          });
+          toast({
+              title: "Job Cancelled",
+              description: `Job #${job.order_id} has been cancelled.`
+          });
+          router.push('/jobs');
+      } catch (error: any) {
+          toast({
+              title: "Cancellation Failed",
+              description: error.message || "Could not cancel the job.",
+              variant: "destructive"
+          });
+      } finally {
+          setIsCancelling(false);
+      }
+  }
 
 
   if (job === null) {
@@ -71,14 +126,11 @@ export default function JobDetailPage({
     sparePartsAvailable: "N/A", // This would come from inventory
   };
 
-  const currentStatus = job.status === 'assigned' ? 'scheduled' : 
-                        job.status === 'accepted' ? 'reached_location' :
-                        job.status === 'in-progress' ? 'inspection_done' :
-                        job.status === 'completed' ? 'repair_completed' : 'scheduled';
+  const isJobActive = !['completed', 'cancelled', 'rejected'].includes(job.status);
 
 
   return (
-    <div className="flex flex-col bg-secondary/30">
+    <div className="flex flex-col bg-secondary/30 min-h-screen">
       <PageHeader title={`${t('job_page.job')} #${job.order_id}`} />
       <div className="flex-1 space-y-4 p-4">
         {job.status === 'completed' && job.finalCost && (
@@ -91,13 +143,13 @@ export default function JobDetailPage({
             </Alert>
         )}
 
-        {(job.status === "assigned" || job.status === "accepted" || job.status === "in-progress") && (
+        {isJobActive && (
           <Card>
             <CardHeader>
               <CardTitle>{t('job_page.update_status')}</CardTitle>
             </CardHeader>
             <CardContent>
-              <StatusUpdater jobId={job.id} orderId={job.order_id} currentStatus={currentStatus} />
+              <StatusUpdater jobId={job.id} orderId={job.order_id} currentStatus={job.status} />
             </CardContent>
           </Card>
         )}
@@ -174,20 +226,29 @@ export default function JobDetailPage({
         )}
 
         {job.status === "assigned" && (
-             <div className="grid grid-cols-2 gap-3 pt-4">
-                <Button variant="destructive" className="w-full">
-                     {t('job_page.cancel_job')}
-                </Button>
-                <Button className="w-full" onClick={() => {
-                  // This is a mock action, in real app would call API
-                  router.refresh();
-                }}>
-                    {t('job_page.start_job')}
-                </Button>
-            </div>
+            <AlertDialog>
+                <AlertDialogTrigger asChild>
+                    <Button variant="destructive" className="w-full" disabled={isCancelling}>
+                        {isCancelling ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <XCircle className="mr-2 h-4 w-4" />}
+                         {t('job_page.cancel_job')}
+                    </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Are you sure you want to cancel?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This will permanently cancel the job and remove it from your list. This action cannot be undone.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Back</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleCancelJob}>Confirm Cancel</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         )}
         
-        {currentStatus === 'repair_completed' && !job.finalCost && (
+        {job.status === 'in-progress' && !job.finalCost && (
             <RepairDetailsForm />
         )}
 
