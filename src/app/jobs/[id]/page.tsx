@@ -27,7 +27,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { RepairDetailsForm } from "@/components/jobs/RepairDetailsForm";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useEffect, useState } from "react";
-import { getJobsAction, updateJobStatusAction } from "@/app/actions";
+import { getJobByIdAction, updateJobStatusAction } from "@/app/actions";
 import { useProfile } from "@/hooks/useProfile";
 import LoadingJobDetail from "./loading";
 import { useToast } from "@/hooks/use-toast";
@@ -44,11 +44,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Loader2 } from "lucide-react";
 
-async function getJob(id: string, technicianId: string): Promise<Job | undefined> {
-  const allJobs = await getJobsAction(technicianId);
-  const job = allJobs.find((job: Job) => job.id === id);
-  return job;
-}
 
 export default function JobDetailPage({
   params,
@@ -65,19 +60,25 @@ export default function JobDetailPage({
 
   useEffect(() => {
     if (profile?.id) {
-      getJob(params.id, profile.id).then(job => {
-        if (!job) {
-            // If job is not found, maybe it was cancelled or completed
-            // and the list on the previous page is stale.
+      getJobByIdAction(params.id, profile.id).then(fetchedJob => {
+        if (!fetchedJob) {
             toast({
                 title: "Job not found",
-                description: "It might have been updated. Refreshing job list.",
+                description: "The job may have been cancelled or reassigned.",
                 variant: "destructive"
             });
             router.push('/jobs');
         } else {
-            setJob(job);
+            setJob(fetchedJob);
         }
+      }).catch(error => {
+          console.error("Failed to fetch job", error);
+          toast({
+              title: "Error",
+              description: "Could not load job details. Please try again.",
+              variant: "destructive"
+          });
+          router.push('/jobs');
       });
     }
   }, [params.id, profile?.id, router, toast]);
@@ -114,6 +115,7 @@ export default function JobDetailPage({
   }
 
   if (!job) {
+    // This case will be handled by the redirect, but as a fallback.
     notFound();
   }
 
