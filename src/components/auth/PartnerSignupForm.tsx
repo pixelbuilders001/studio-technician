@@ -15,7 +15,6 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  FormDescription,
 } from "@/components/ui/form";
 import { Loader2, PartyPopper } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -219,4 +218,110 @@ export function PartnerSignupForm({ pincode, city }: PartnerSignupFormProps) {
                 <Textarea placeholder="Enter your full current address" {...field} />
               </FormControl>
               <FormMessage />
-            </Ite...
+            </FormItem>
+          )}
+        />
+         <FormField
+          control={form.control}
+          name="primary_skill"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Primary Skill</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                    <SelectTrigger>
+                        <SelectValue placeholder="Select your main service category" />
+                    </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                        {serviceCategories.map(cat => (
+                            <SelectItem key={cat.id} value={cat.id}>{cat.label}</SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+         <FormField
+          control={form.control}
+          name="total_experience"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Total Experience (in years)</FormLabel>
+              <FormControl>
+                <Input type="number" placeholder="e.g., 5" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+            control={form.control}
+            name="aadhaar_front"
+            render={({ field: { onChange, onBlur, name, ref } }) => (
+                <FormItem>
+                    <FormLabel>Aadhaar Card (Front)</FormLabel>
+                    <FormControl>
+                        <Input 
+                            type="file" 
+                            accept="image/*"
+                            onChange={(e) => onChange(e.target.files?.[0])}
+                            onBlur={onBlur}
+                            name={name}
+                            ref={ref}
+                        />
+                    </FormControl>
+                    <FormMessage />
+                </FormItem>
+            )}
+        />
+        <FormField
+            control={form.control}
+            name="aadhaar_back"
+            render={({ field: { onChange, onBlur, name, ref } }) => (
+                <FormItem>
+                    <FormLabel>Aadhaar Card (Back)</FormLabel>
+                    <FormControl>
+                        <Input 
+                            type="file" 
+                            accept="image/*"
+                            onChange={(e) => onChange(e.target.files?.[0])}
+                            onBlur={onBlur}
+                            name={name}
+                            ref={ref}
+                        />
+                    </FormControl>
+                    <FormMessage />
+                </FormItem>
+            )}
+        />
+        <FormField
+            control={form.control}
+            name="selfie"
+            render={({ field: { onChange, onBlur, name, ref } }) => (
+                <FormItem>
+                    <FormLabel>Your Selfie</FormLabel>
+                    <FormControl>
+                        <Input 
+                            type="file" 
+                            accept="image/*"
+                            onChange={(e) => onChange(e.target.files?.[0])}
+                            onBlur={onBlur}
+                            name={name}
+                            ref={ref}
+                        />
+                    </FormControl>
+                    <FormMessage />
+                </FormItem>
+            )}
+        />
+
+        <Button type="submit" className="w-full h-12 text-lg" disabled={isLoading}>
+          {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          {isLoading ? t('partner_signup_form.submitting') : t('partner_signup_form.submit_application')}
+        </Button>
+      </form>
+    </Form>
+  );
+}
