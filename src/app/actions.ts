@@ -236,3 +236,56 @@ export async function getTechnicianStatsAction(technicianId: string) {
     throw new Error(error.message || "An unexpected error occurred while fetching technician stats.");
   }
 }
+
+export type TechnicianStats = {
+  id: string;
+  technician_id: string;
+  total_jobs_completed: number;
+  total_jobs_assigned: number;
+  total_jobs_cancelled: number;
+  today_earnings: number;
+  lifetime_earnings: number;
+  average_rating: number;
+  total_ratings: number;
+  service_area?: string;
+  created_at?: string;
+  updated_at?: string;
+  other_skills?: string[];
+};
+
+export async function getTechnicianStats(technicianId: string): Promise<TechnicianStats | null> {
+  if (!technicianId) {
+    throw new Error("Technician ID is required.");
+  }
+  const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/technician_stats?technician_id=eq.${technicianId}`;
+  const apikey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!url || !apikey) {
+    console.error("Supabase URL or anon key is not defined in environment variables.");
+    throw new Error("Server configuration error.");
+  }
+
+  try {
+    const response = await fetch(url, {
+      headers: {
+        'apikey': apikey,
+        // 'Authorization': `Bearer ${apikey}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `API Error: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+   
+    if (data && data.length > 0) {
+      return data[0];
+    }
+    return null;
+  } catch (error: any) {
+    console.error('Get technician stats API error:', error);
+    return null;
+  }
+}

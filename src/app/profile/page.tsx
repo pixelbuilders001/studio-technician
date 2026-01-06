@@ -1,4 +1,3 @@
-
 "use client"
 import Image from 'next/image';
 import Link from 'next/link';
@@ -9,87 +8,51 @@ import { Separator } from '@/components/ui/separator';
 import { User, Phone, Map, Tag, Briefcase, LogOut, Star, CheckCircle, XCircle } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { LanguageSelector } from '@/components/common/LanguageSelector';
-import { useProfile } from '@/hooks/useProfile';
 import { Skeleton } from '@/components/ui/skeleton';
-import { cn } from '@/lib/utils';
-
-const ProfileInfoItem = ({ icon: Icon, label, value, isLoading }: { icon: React.ElementType, label: string, value?: string | React.ReactNode, isLoading: boolean }) => {
-    if (isLoading) {
-        return (
-            <div className="flex items-start gap-4">
-                <Skeleton className="h-5 w-5 rounded-full mt-1" />
-                <div className="space-y-2 w-full">
-                    <Skeleton className="h-4 w-24" />
-                    <Skeleton className="h-5 w-32" />
-                </div>
-            </div>
-        )
-    }
-
-    if (!value || (Array.isArray(value) && value.length === 0)) {
-        return null;
-    }
-
-    return (
-        <div className="flex items-start gap-4">
-            <Icon className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-1" />
-            <div>
-                <p className="text-sm text-muted-foreground">{label}</p>
-                <div className="font-medium">{value}</div>
-            </div>
-        </div>
-    );
-}
-
-const EarningsStat = ({ label, value, isLoading }: { label: string, value: number, isLoading: boolean }) => {
-    const formattedValue = new Intl.NumberFormat('en-IN', {
-        style: 'currency',
-        currency: 'INR',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-    }).format(value);
-
-    if (isLoading) {
-        return (
-            <div className="flex flex-col items-center space-y-2">
-                <Skeleton className="h-4 w-20" />
-                <Skeleton className="h-8 w-28" />
-            </div>
-        )
-    }
-
-    return (
-        <div className="flex flex-col items-center">
-            <p className="text-sm text-muted-foreground">{label}</p>
-            <p className="text-2xl font-bold">{formattedValue}</p>
-        </div>
-    )
-};
-
-const ProfileStat = ({ icon: Icon, label, value, isLoading, className }: { icon: React.ElementType, label: string, value: number, isLoading: boolean, className?: string }) => {
-    if (isLoading) {
-        return <Skeleton className="h-24 w-full rounded-lg" />;
-    }
-    return (
-         <div className={cn("flex flex-col items-center justify-center space-y-1 rounded-lg p-3 text-white", className)}>
-            <Icon className="h-7 w-7" />
-            <p className="text-sm font-medium">{label}</p>
-            <p className="text-2xl font-bold">{value}</p>
-        </div>
-    )
-}
-
+import { useEffect, useState } from 'react';
+import { getTechnicianStats } from '@/app/actions';
 
 export default function ProfilePage() {
   const { t } = useTranslation();
-  const { profile, loading } = useProfile();
-  
+  const [profile, setProfile] = useState<any>(null);
+  const [stats, setStats] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Get profile from localStorage directly
+    const storedProfile = typeof window !== 'undefined' ? localStorage.getItem('technicianProfile') : null;
+    if (storedProfile) {
+      const parsedProfile = JSON.parse(storedProfile);
+      setProfile(parsedProfile);
+      // Fetch stats from API
+      getTechnicianStats(parsedProfile.id).then((data) => {
+        setStats(data);
+        setLoading(false);
+      });
+    } else {
+      setLoading(false);
+    }
+  }, []);
+
   const handleLogout = () => {
     localStorage.removeItem('authToken');
     localStorage.removeItem('technicianProfile');
   };
 
-  const skills = [...(profile?.primary_skill ? [profile.primary_skill] : []), ...(profile?.other_skills || [])];
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <Skeleton className="h-24 w-24 rounded-full mb-4" />
+        <Skeleton className="h-7 w-32 mb-2" />
+        <Skeleton className="h-5 w-40 mb-2" />
+        <Skeleton className="h-5 w-40 mb-2" />
+      </div>
+    );
+  }
+
+  if (!profile || !stats) {
+    return <div className="p-8 text-center text-destructive">No profile data found.</div>;
+  }
 
   return (
     <div className="flex flex-col bg-secondary/30 min-h-screen">
@@ -102,43 +65,49 @@ export default function ProfilePage() {
         <Card>
             <CardContent className="pt-6">
                 <div className="flex flex-col items-center text-center">
-                    {loading && !profile ? (
-                        <div className='flex flex-col items-center space-y-3'>
-                            <Skeleton className="h-24 w-24 rounded-full" />
-                            <Skeleton className="h-7 w-32" />
-                            <Skeleton className="h-5 w-40" />
+                    <div className="relative h-24 w-24">
+                        <Image
+                            src={profile.selfie_url || 'https://picsum.photos/seed/tech/200/200'}
+                            alt={profile.name}
+                            width={96}
+                            height={96}
+                            className="rounded-full object-cover border-4 border-background shadow-md"
+                            data-ai-hint="person portrait"
+                        />
+                    </div>
+                    <h2 className="mt-3 text-2xl font-bold font-headline">{profile.name}</h2>
+                    <p className="text-muted-foreground text-sm">{t('profile_page.technician_id')}: {profile.id.substring(0, 8).toUpperCase()}</p>
+                    {stats.average_rating && stats.average_rating > 0 &&
+                        <div className="flex items-center gap-1 mt-2 text-sm text-muted-foreground">
+                            <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
+                            <span className="font-bold text-foreground">{stats.average_rating.toFixed(1)}</span>
+                            ({stats.total_ratings} ratings)
                         </div>
-                    ) : profile && (
-                        <>
-                             <div className="relative h-24 w-24">
-                                <Image
-                                    src={profile.avatarUrl}
-                                    alt={profile.name}
-                                    width={96}
-                                    height={96}
-                                    className="rounded-full object-cover border-4 border-background shadow-md"
-                                    data-ai-hint="person portrait"
-                                />
-                            </div>
-                            <h2 className="mt-3 text-2xl font-bold font-headline">{profile.name}</h2>
-                            <p className="text-muted-foreground text-sm">{t('profile_page.technician_id')}: {profile.id.substring(0, 8).toUpperCase()}</p>
-                            {loading ? <Skeleton className="h-5 w-24 mt-2" /> : (profile.average_rating > 0 &&
-                                <div className="flex items-center gap-1 mt-2 text-sm text-muted-foreground">
-                                    <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
-                                    <span className="font-bold text-foreground">{profile.average_rating.toFixed(1)}</span>
-                                    ({profile.total_ratings} ratings)
-                                </div>
-                            )}
-                        </>
-                    )}
+                    }
                 </div>
             </CardContent>
         </Card>
 
         <Card>
             <CardContent className="flex justify-around pt-6 text-center">
-               <EarningsStat label={t('profile_page.todays_earnings')} value={profile?.today_earnings ?? 0} isLoading={loading} />
-               <EarningsStat label={t('profile_page.lifetime_earnings')} value={profile?.lifetime_earnings ?? 0} isLoading={loading} />
+               <div className="flex flex-col items-center">
+                  <p className="text-sm text-muted-foreground">{t('profile_page.todays_earnings')}</p>
+                  <p className="text-2xl font-bold">{new Intl.NumberFormat('en-IN', {
+                      style: 'currency',
+                      currency: 'INR',
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0,
+                  }).format(stats.today_earnings ?? 0)}</p>
+               </div>
+               <div className="flex flex-col items-center">
+                  <p className="text-sm text-muted-foreground">{t('profile_page.lifetime_earnings')}</p>
+                  <p className="text-2xl font-bold">{new Intl.NumberFormat('en-IN', {
+                      style: 'currency',
+                      currency: 'INR',
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0,
+                  }).format(stats.lifetime_earnings ?? 0)}</p>
+               </div>
             </CardContent>
         </Card>
         
@@ -147,28 +116,114 @@ export default function ProfilePage() {
                 <CardTitle className="text-base font-semibold">Job Statistics</CardTitle>
             </CardHeader>
             <CardContent className="grid grid-cols-3 gap-3">
-                <ProfileStat icon={Briefcase} label="Assigned" value={profile?.total_jobs_assigned ?? 0} isLoading={loading} className="bg-blue-400" />
-                <ProfileStat icon={CheckCircle} label="Completed" value={profile?.total_jobs_completed ?? 0} isLoading={loading} className="bg-green-500" />
-                <ProfileStat icon={XCircle} label="Cancelled" value={profile?.total_jobs_cancelled ?? 0} isLoading={loading} className="bg-red-500" />
+                <div className="flex flex-col items-center justify-center space-y-1 rounded-lg p-3 text-white bg-blue-400">
+                    <Briefcase className="h-7 w-7" />
+                    <p className="text-sm font-medium">Assigned</p>
+                    <p className="text-2xl font-bold">{stats.total_jobs_assigned ?? 0}</p>
+                </div>
+                <div className="flex flex-col items-center justify-center space-y-1 rounded-lg p-3 text-white bg-green-500">
+                    <CheckCircle className="h-7 w-7" />
+                    <p className="text-sm font-medium">Completed</p>
+                    <p className="text-2xl font-bold">{stats.total_jobs_completed ?? 0}</p>
+                </div>
+                <div className="flex flex-col items-center justify-center space-y-1 rounded-lg p-3 text-white bg-red-500">
+                    <XCircle className="h-7 w-7" />
+                    <p className="text-sm font-medium">Cancelled</p>
+                    <p className="text-2xl font-bold">{stats.total_jobs_cancelled ?? 0}</p>
+                </div>
             </CardContent>
         </Card>
 
         <Card>
+            <CardHeader>
+                <CardTitle className="text-base font-semibold">Profile Details</CardTitle>
+            </CardHeader>
             <CardContent className="space-y-4 pt-6">
-                <ProfileInfoItem icon={Phone} label={t('profile_page.phone_number')} value={profile?.mobile} isLoading={loading && !profile} />
+                <div className="flex items-start gap-4">
+                    <Phone className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-1" />
+                    <div>
+                        <p className="text-sm text-muted-foreground">{t('profile_page.phone_number')}</p>
+                        <div className="font-medium">{profile.mobile}</div>
+                    </div>
+                </div>
                 <Separator />
-                <ProfileInfoItem icon={Map} label={t('profile_page.service_area')} value={profile?.service_area} isLoading={loading} />
+                <div className="flex items-start gap-4">
+                    <Map className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-1" />
+                    <div>
+                        <p className="text-sm text-muted-foreground">{t('profile_page.service_area')}</p>
+                        <div className="font-medium">{stats.service_area}</div>
+                    </div>
+                </div>
                 <Separator />
-                 <ProfileInfoItem 
-                    icon={Tag} 
-                    label={t('profile_page.service_categories')} 
-                    value={
+                <div className="flex items-start gap-4">
+                    <Tag className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-1" />
+                    <div>
+                        <p className="text-sm text-muted-foreground">{t('profile_page.service_categories')}</p>
                         <div className="flex flex-wrap gap-2 pt-1">
-                            {skills.map(cat => <Badge key={cat} variant="secondary">{cat.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</Badge>)}
+                            {stats.other_skills && stats.other_skills.length > 0 ? stats.other_skills.map((cat: string) => <Badge key={cat} variant="secondary">{cat.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}</Badge>) : <span className="text-muted-foreground">No skills listed</span>}
                         </div>
-                    }
-                    isLoading={loading} 
-                />
+                    </div>
+                </div>
+                <Separator />
+                <div className="flex items-start gap-4">
+                    <Tag className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-1" />
+                    <div>
+                        <p className="text-sm text-muted-foreground">Primary Skill</p>
+                        <div className="font-medium">{profile.primary_skill || '-'}</div>
+                    </div>
+                </div>
+                <Separator />
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex items-start gap-4">
+                      <Briefcase className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-1" />
+                      <div>
+                          <p className="text-sm text-muted-foreground">Total Assigned</p>
+                          <div className="font-medium">{stats.total_jobs_assigned?.toString()}</div>
+                      </div>
+                  </div>
+                  <div className="flex items-start gap-4">
+                      <CheckCircle className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-1" />
+                      <div>
+                          <p className="text-sm text-muted-foreground">Total Completed</p>
+                          <div className="font-medium">{stats.total_jobs_completed?.toString()}</div>
+                      </div>
+                  </div>
+                  <div className="flex items-start gap-4">
+                      <XCircle className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-1" />
+                      <div>
+                          <p className="text-sm text-muted-foreground">Total Cancelled</p>
+                          <div className="font-medium">{stats.total_jobs_cancelled?.toString()}</div>
+                      </div>
+                  </div>
+                  <div className="flex items-start gap-4">
+                      <Star className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-1" />
+                      <div>
+                          <p className="text-sm text-muted-foreground">Average Rating</p>
+                          <div className="font-medium">{stats.average_rating?.toFixed(1)}</div>
+                      </div>
+                  </div>
+                  <div className="flex items-start gap-4">
+                      <User className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-1" />
+                      <div>
+                          <p className="text-sm text-muted-foreground">Total Ratings</p>
+                          <div className="font-medium">{stats.total_ratings?.toString()}</div>
+                      </div>
+                  </div>
+                  <div className="flex items-start gap-4">
+                      <Tag className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-1" />
+                      <div>
+                          <p className="text-sm text-muted-foreground">Today Earnings</p>
+                          <div className="font-medium">{stats.today_earnings?.toString()}</div>
+                      </div>
+                  </div>
+                  <div className="flex items-start gap-4">
+                      <Tag className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-1" />
+                      <div>
+                          <p className="text-sm text-muted-foreground">Lifetime Earnings</p>
+                          <div className="font-medium">{stats.lifetime_earnings?.toString()}</div>
+                      </div>
+                  </div>
+                </div>
             </CardContent>
         </Card>
 
