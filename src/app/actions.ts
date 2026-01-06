@@ -22,6 +22,9 @@ type UpdateStatusPayload = {
     status: 'accepted' | 'rejected' | 'on_the_way' | 'in-progress' | 'completed' | 'cancelled';
     note: string;
     order_id: string;
+    final_cost?: number;
+    spare_parts_used?: string;
+    technician_notes?: string;
 };
 
 export async function updateJobStatusAction(payload: UpdateStatusPayload) {

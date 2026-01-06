@@ -3,7 +3,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import type { Job } from "@/lib/types";
+import type { Job, JobStatus } from "@/lib/types";
 import Image from "next/image";
 import {
   Card,
@@ -26,9 +26,9 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { MapPin, Check, X, Wrench, Tv, Refrigerator, Smartphone, AirVent, WashingMachine, Info, IndianRupee, Phone, Navigation, ArrowRight } from "lucide-react";
+import { MapPin, Check, X, Wrench, Tv, Refrigerator, Smartphone, AirVent, WashingMachine, Info, IndianRupee, Phone, Navigation, CheckCircle, ArrowRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import React, { useTransition } from "react";
+import React, { useState, useTransition } from "react";
 import { useTranslation } from "@/hooks/useTranslation";
 import { format } from 'date-fns';
 import { Separator } from "../ui/separator";
@@ -36,6 +36,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { updateJobStatusAction } from "@/app/actions";
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { RepairDetailsForm } from "./RepairDetailsForm";
 
 const iconMap: { [key: string]: React.ElementType } = {
   LAPTOPS: Wrench,
@@ -56,6 +57,32 @@ const InfoRow = ({ icon: Icon, value, label }: { icon: React.ElementType, value:
     </div>
 );
 
+type StatusConfig = {
+    [key in JobStatus]?: {
+        nextStatus: JobStatus;
+        buttonTextKey: string;
+        buttonIcon: React.ElementType;
+    }
+}
+
+const statusFlow: StatusConfig = {
+    'accepted': {
+        nextStatus: 'on_the_way',
+        buttonTextKey: 'start_travel',
+        buttonIcon: Navigation,
+    },
+    'on_the_way': {
+        nextStatus: 'in-progress',
+        buttonTextKey: 'start_repair',
+        buttonIcon: Wrench,
+    },
+    'in-progress': {
+        nextStatus: 'completed',
+        buttonTextKey: 'complete_job',
+        buttonIcon: CheckCircle,
+    }
+}
+
 
 export function JobCard({ job }: { job: Job }) {
   const router = useRouter();
@@ -63,8 +90,9 @@ export function JobCard({ job }: { job: Job }) {
   const { t } = useTranslation();
   const { profile } = useProfile();
   const [isPending, startTransition] = useTransition();
+  const [isRepairFormOpen, setIsRepairFormOpen] = useState(false);
 
-  const handleStatusUpdate = (status: 'accepted' | 'rejected') => {
+  const handleStatusUpdate = (status: JobStatus) => {
     if (!profile) {
         toast({ title: "Error", description: "Technician profile not found.", variant: "destructive" });
         return;
@@ -75,18 +103,14 @@ export function JobCard({ job }: { job: Job }) {
             await updateJobStatusAction({
                 booking_id: job.id,
                 status: status,
-                note: `Technician ${profile.name} has ${status} the job.`,
+                note: `Technician ${profile.name} has updated the job to ${status}.`,
                 order_id: job.order_id,
             });
             toast({
-                title: status === 'accepted' ? t('job_card.job_accepted_title') : t('job_card.job_rejected_title'),
-                description: `${t(status === 'accepted' ? 'job_card.job_accepted_description' : 'job_card.job_rejected_description')} #${job.order_id}`,
-                variant: status === 'rejected' ? 'destructive' : 'default',
+                title: t('status_updater.toast_title'),
+                description: `${t('status_updater.toast_description')} ${t(`job_api_status.${status}`)}`,
             });
             
-            if (status === 'accepted') {
-              router.push('/jobs?tab=ongoing');
-            }
             router.refresh();
             
         } catch (error: any) {
@@ -120,6 +144,10 @@ export function JobCard({ job }: { job: Job }) {
         case 'completed':
             className="bg-green-100 text-green-800 border-green-200";
             break;
+        case 'cancelled':
+        case 'rejected':
+            className="bg-red-100 text-red-800 border-red-200";
+            break;
         default:
             className="bg-gray-100 text-gray-800 border-gray-200";
     }
@@ -134,8 +162,12 @@ export function JobCard({ job }: { job: Job }) {
     if (!phone || phone.length < 10) return phone;
     const countryCode = phone.length > 10 ? phone.slice(0, -10) : '91';
     const number = phone.slice(-10);
-    return `${countryCode}XXXXXX${number.slice(-2)}`;
+    return `+${countryCode}XXXXXX${number.slice(-2)}`;
   }
+
+  const nextAction = statusFlow[job.status];
+  const NextActionIcon = nextAction?.buttonIcon;
+
 
   return (
       <Card className="overflow-hidden transition-all shadow-md">
@@ -236,9 +268,30 @@ export function JobCard({ job }: { job: Job }) {
                       <Navigation className="mr-1 h-4 w-4" /> Navigate
                     </Button>
                 )}
-                 <Button size="sm" className="w-full text-xs" onClick={() => router.push(`/jobs/${job.id}`)}>
-                    {t('job_card.view_details')} <ArrowRight className="ml-1 h-4 w-4" />
-                </Button>
+                
+                {nextAction && NextActionIcon && job.status !== 'in-progress' && (
+                    <Button size="sm" className="w-full text-xs" onClick={() => handleStatusUpdate(nextAction.nextStatus)} disabled={isPending}>
+                        {isPending ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <NextActionIcon className="mr-1 h-4 w-4" />}
+                        {t(`status_updater.${nextAction.buttonTextKey}`)}
+                    </Button>
+                )}
+
+                {job.status === 'in-progress' && (
+                    <RepairDetailsForm 
+                      job={job}
+                      onFormSubmit={() => router.refresh()}
+                    >
+                        <Button size="sm" className="w-full text-xs" disabled={isPending}>
+                            {isPending ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <CheckCircle className="mr-1 h-4 w-4" />}
+                            {t(`status_updater.complete_job`)}
+                        </Button>
+                    </RepairDetailsForm>
+                )}
+
+                {/* Fallback for completed/cancelled jobs */}
+                {job.status === 'completed' && <Button size="sm" disabled className="w-full text-xs col-start-3"><CheckCircle className="mr-1"/> Completed</Button>}
+                {job.status === 'cancelled' && <Button size="sm" disabled variant="destructive" className="w-full text-xs col-start-3"><X className="mr-1"/> Cancelled</Button>}
+                {job.status === 'rejected' && <Button size="sm" disabled variant="destructive" className="w-full text-xs col-start-3"><X className="mr-1"/> Rejected</Button>}
             </div>
           )}
         </CardFooter>

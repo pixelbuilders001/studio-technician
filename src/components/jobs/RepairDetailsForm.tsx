@@ -26,6 +26,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "@/hooks/useTranslation";
+import { type Job } from "@/lib/types";
+import { Loader2 } from "lucide-react";
+import { updateJobStatusAction } from "@/app/actions";
 
 const repairDetailsSchema = z.object({
   finalCost: z.coerce.number().positive({ message: "Please enter a valid cost." }),
@@ -33,8 +36,15 @@ const repairDetailsSchema = z.object({
   notes: z.string().optional(),
 });
 
-export function RepairDetailsForm() {
-  const [open, setOpen] = useState(true);
+type RepairDetailsFormProps = {
+    job: Job;
+    children: React.ReactNode;
+    onFormSubmit: () => void;
+}
+
+export function RepairDetailsForm({ job, children, onFormSubmit }: RepairDetailsFormProps) {
+  const [open, setOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const { t } = useTranslation();
 
@@ -47,21 +57,41 @@ export function RepairDetailsForm() {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof repairDetailsSchema>) => {
-    console.log("Repair Details Submitted:", values);
-    // Here you would typically call a server action to save the data.
-    toast({
-      title: t('repair_details_form.toast_title'),
-      description: `${t('repair_details_form.toast_description')} ₹${values.finalCost}.`,
-    });
-    setOpen(false);
-    // In a real app, this would trigger a re-render with the completion screen.
+  const onSubmit = async (values: z.infer<typeof repairDetailsSchema>) => {
+    setIsLoading(true);
+    try {
+        await updateJobStatusAction({
+            booking_id: job.id,
+            status: 'completed',
+            note: `Completed. Final Cost: ${values.finalCost}. Parts: ${values.spareParts}. Notes: ${values.notes}`,
+            order_id: job.order_id,
+            final_cost: values.finalCost,
+            spare_parts_used: values.spareParts,
+            technician_notes: values.notes,
+        });
+
+        toast({
+            title: t('repair_details_form.toast_title'),
+            description: `${t('repair_details_form.toast_description')} ₹${values.finalCost}.`,
+        });
+
+        setOpen(false);
+        onFormSubmit();
+    } catch (error: any) {
+        toast({
+            title: "Update Failed",
+            description: error.message || "Could not complete the job.",
+            variant: "destructive",
+        })
+    } finally {
+        setIsLoading(false);
+    }
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="w-full">{t('repair_details_form.trigger_button')}</Button>
+        {children}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
@@ -112,7 +142,10 @@ export function RepairDetailsForm() {
               <DialogClose asChild>
                 <Button type="button" variant="outline">{t('repair_details_form.cancel_button')}</Button>
               </DialogClose>
-              <Button type="submit">{t('repair_details_form.confirm_button')}</Button>
+              <Button type="submit" disabled={isLoading}>
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {t('repair_details_form.confirm_button')}
+              </Button>
             </DialogFooter>
           </form>
         </Form>
