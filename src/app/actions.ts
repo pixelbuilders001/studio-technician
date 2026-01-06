@@ -197,3 +197,36 @@ export async function verifyPincodeAction(pincode: string): Promise<{ serviceabl
         return { serviceable: false, error: error.message || "An unexpected error occurred." };
     }
 }
+
+export async function getTechnicianStatsAction(technicianId: string) {
+  if (!technicianId) {
+    throw new Error("Technician ID is required.");
+  }
+  const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/technician-stats?technician_id=${technicianId}`;
+  const apikey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!url || !apikey) {
+    console.error("Supabase URL or anon key is not defined in environment variables.");
+    throw new Error("Server configuration error.");
+  }
+
+  try {
+    const response = await fetch(url, {
+      headers: {
+        'apikey': apikey,
+        'Authorization': `Bearer ${apikey}`, // Using anon key as bearer token, adjust if different auth is needed
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `API Error: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data.stats; // Assuming the API returns { stats: { ... } }
+  } catch (error: any) {
+    console.error('Get technician stats API error:', error);
+    throw new Error(error.message || "An unexpected error occurred while fetching technician stats.");
+  }
+}

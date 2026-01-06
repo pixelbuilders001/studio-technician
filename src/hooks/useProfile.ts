@@ -2,44 +2,63 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import type { Technician } from '@/lib/types';
+import { getTechnicianStatsAction } from '@/app/actions';
 
-type TechnicianProfile = {
+type BasicProfile = {
     id: string;
     name: string;
     mobile: string;
     selfie_url?: string;
 };
 
-const staticProfile = {
-    serviceCategories: ['TV', 'Washing Machine', 'Refrigerator', 'AC', 'Mobile'],
-    areaCovered: 'Anytown',
-    totalJobs: 134,
-    lifetimeEarnings: 254200,
-    todaysEarnings: 1800,
-};
-
 export const useProfile = () => {
-    const [profile, setProfile] = useState<TechnicianProfile | null>(null);
+    const [profile, setProfile] = useState<Technician | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        try {
-            const storedProfile = localStorage.getItem('technicianProfile');
-            if (storedProfile) {
-                setProfile(JSON.parse(storedProfile));
+        const fetchProfileData = async () => {
+            setLoading(true);
+            try {
+                const storedProfileString = localStorage.getItem('technicianProfile');
+                if (storedProfileString) {
+                    const basicProfile: BasicProfile = JSON.parse(storedProfileString);
+                    
+                    // Set initial profile from localStorage
+                    const initialData: Technician = {
+                        ...basicProfile,
+                        avatarUrl: basicProfile.selfie_url || `https://picsum.photos/seed/${basicProfile.id}/200/200`,
+                        // Set defaults for stats while they are loading
+                        serviceCategories: [],
+                        other_skills: [],
+                        service_area: 'Loading...',
+                        total_jobs_completed: 0,
+                        lifetime_earnings: 0,
+                        today_earnings: 0,
+                        average_rating: 0,
+                        total_ratings: 0,
+                    };
+                    setProfile(initialData);
+
+                    // Fetch detailed stats from API
+                    const stats = await getTechnicianStatsAction(basicProfile.id);
+                    
+                    // Merge stats with profile data
+                    setProfile(prevProfile => ({
+                        ...prevProfile!,
+                        ...stats,
+                    }));
+
+                }
+            } catch (error) {
+                console.error("Failed to fetch technician profile", error);
+            } finally {
+                setLoading(false);
             }
-        } catch (error) {
-            console.error("Failed to parse technician profile from localStorage", error);
-        } finally {
-            setLoading(false);
-        }
+        };
+
+        fetchProfileData();
     }, []);
 
-    const combinedProfile = profile ? {
-        ...staticProfile, // load static data first
-        ...profile, // override with dynamic data
-        avatarUrl: profile.selfie_url || 'https://picsum.photos/seed/tech/200/200' // map selfie_url to avatarUrl, with fallback
-    } : null;
-
-    return { profile: combinedProfile, loading };
+    return { profile, loading };
 };
