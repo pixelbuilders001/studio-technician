@@ -62,48 +62,8 @@ export async function updateJobStatusAction(payload: UpdateStatusPayload) {
   }
 }
 
-type InspectionDetailsPayload = {
-    booking_id: string;
-    technician_id: string;
-    findings: string;
-    inspection_fee: number;
-    issue_image_url?: string;
-}
-
-async function uploadFileAndGetUrl(file: File): Promise<string> {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const apikey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-    if (!supabaseUrl || !apikey) {
-        throw new Error("Server configuration error for file upload.");
-    }
-    
-    const filePath = `public/inspection-images/${new Date().getTime()}-${file.name}`;
-    const uploadUrl = `${supabaseUrl}/storage/v1/object/${filePath}`;
-
-    const uploadResponse = await fetch(uploadUrl, {
-        method: 'POST',
-        headers: {
-            'apikey': apikey,
-            'Authorization': `Bearer ${apikey}`,
-            'Content-Type': file.type,
-        },
-        body: file,
-    });
-
-    if (!uploadResponse.ok) {
-        const errorText = await uploadResponse.text();
-        throw new Error(`Failed to upload file: ${errorText}`);
-    }
-    
-    // Construct the public URL
-    const publicUrl = `${supabaseUrl}/storage/v1/object/public/${filePath}`;
-    return publicUrl;
-}
-
-
 export async function saveInspectionDetailsAction(formData: FormData) {
-    const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/inspection_reports`;
+    const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/inspection-submit`;
     const apikey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
     if (!url || !apikey) {
@@ -111,44 +71,28 @@ export async function saveInspectionDetailsAction(formData: FormData) {
     }
     
     try {
-        const booking_id = formData.get('booking_id') as string;
-        const technician_id = formData.get('technician_id') as string;
-        const inspection_fee = Number(formData.get('inspection_fee'));
-        const findings = formData.get('findings') as string;
-        const issue_image = formData.get('issue_image') as File | null;
-        
-        let issue_image_url: string | undefined = undefined;
-
-        if (issue_image && issue_image.size > 0) {
-            issue_image_url = await uploadFileAndGetUrl(issue_image);
-        }
-
-        const payload: InspectionDetailsPayload = {
-            booking_id,
-            technician_id,
-            findings,
-            inspection_fee,
-            issue_image_url,
-        };
-
         const response = await fetch(url, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
                 'apikey': apikey,
-                'Authorization': `Bearer ${apikey}`,
-                'Prefer': 'return=minimal',
+                // No 'Content-Type' header needed, browser sets it for FormData
             },
-            body: JSON.stringify(payload)
+            body: formData
         });
-
-        if (response.status !== 201) {
+        
+        if (!response.ok) {
             const errorText = await response.text();
-            throw new Error(`Failed to save inspection details: ${errorText}`);
+            // Try to parse as JSON, but fall back to text
+            try {
+                const errorJson = JSON.parse(errorText);
+                throw new Error(errorJson.error || `Failed to save inspection details: ${errorText}`);
+            } catch {
+                throw new Error(`Failed to save inspection details: ${errorText}`);
+            }
         }
         
         revalidatePath('/jobs');
-        return { success: true };
+        return await response.json();
 
     } catch (e: any) {
         console.error("saveInspectionDetailsAction error:", e);

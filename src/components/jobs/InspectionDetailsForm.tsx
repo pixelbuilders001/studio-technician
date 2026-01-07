@@ -28,8 +28,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "@/hooks/useTranslation";
 import { type Job } from "@/lib/types";
-import { Loader2, Camera } from "lucide-react";
-import { saveInspectionDetailsAction, updateJobStatusAction, getIssuesForCategoryAction } from "@/app/actions";
+import { Loader2 } from "lucide-react";
+import { saveInspectionDetailsAction, getIssuesForCategoryAction } from "@/app/actions";
 import { Checkbox } from "../ui/checkbox";
 import { Skeleton } from "../ui/skeleton";
 
@@ -112,17 +112,10 @@ export function InspectionDetailsForm({ job, technicianId, children, onFormSubmi
             formData.append('issue_image', values.issue_image[0]);
         }
 
-        await saveInspectionDetailsAction(formData);
-
-        await updateJobStatusAction({
-            booking_id: job.id,
-            order_id: job.order_id,
-            status: 'inspection_completed',
-            note: `Inspection completed. Findings: ${allFindings.join(', ')}`
-        });
+        const result = await saveInspectionDetailsAction(formData);
 
         toast({
-            title: t('inspection_details_form.toast_title_success'),
+            title: result.message || t('inspection_details_form.toast_title_success'),
             description: t('inspection_details_form.toast_description_success'),
         });
 
@@ -167,6 +160,7 @@ export function InspectionDetailsForm({ job, technicianId, children, onFormSubmi
                     </div>
                   ) : (
                     <>
+                      <div className="max-h-32 overflow-y-auto space-y-2">
                       {issues.map((item) => (
                         <FormField
                           key={item.id}
@@ -200,6 +194,7 @@ export function InspectionDetailsForm({ job, technicianId, children, onFormSubmi
                           }}
                         />
                       ))}
+                      </div>
                       <FormMessage />
                     </>
                   )}
@@ -224,11 +219,11 @@ export function InspectionDetailsForm({ job, technicianId, children, onFormSubmi
             <FormField
               control={form.control}
               name="issue_image"
-              render={({ field }) => (
+              render={({ field: { onChange, value, ...rest } }) => (
                 <FormItem>
                     <FormLabel>{t('inspection_details_form.upload_photo_label')}</FormLabel>
                     <FormControl>
-                        <Input type="file" accept="image/*" capture="environment" onChange={(e) => field.onChange(e.target.files)} />
+                        <Input type="file" accept="image/*" capture="environment" onChange={(e) => onChange(e.target.files)} {...rest} />
                     </FormControl>
                     <FormMessage/>
                 </FormItem>
@@ -264,5 +259,4 @@ export function InspectionDetailsForm({ job, technicianId, children, onFormSubmi
     </Dialog>
   );
 }
-
     
