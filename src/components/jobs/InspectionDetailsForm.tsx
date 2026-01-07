@@ -1,7 +1,8 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -28,7 +29,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "@/hooks/useTranslation";
 import { type Job } from "@/lib/types";
-import { Loader2, X } from "lucide-react";
+import { Loader2, X, Camera } from "lucide-react";
 import { saveInspectionDetailsAction, getIssuesForCategoryAction } from "@/app/actions";
 import {
   Select,
@@ -67,6 +68,8 @@ export function InspectionDetailsForm({ job, technicianId, children, onFormSubmi
   const [isLoading, setIsLoading] = useState(false);
   const [issues, setIssues] = useState<Issue[]>([]);
   const [isFetchingIssues, setIsFetchingIssues] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const { t } = useTranslation();
 
@@ -76,6 +79,7 @@ export function InspectionDetailsForm({ job, technicianId, children, onFormSubmi
       selected_issues: [],
       other_findings: "",
       inspection_fee: job.net_inspection_fee,
+      issue_image: null,
     },
   });
 
@@ -101,7 +105,17 @@ export function InspectionDetailsForm({ job, technicianId, children, onFormSubmi
       };
       fetchIssues();
     }
-  }, [open, job.categories.id, toast]);
+     // Reset form and preview on close
+    if (!open) {
+      form.reset({
+        selected_issues: [],
+        other_findings: "",
+        inspection_fee: job.net_inspection_fee,
+        issue_image: null
+      });
+      setImagePreview(null);
+    }
+  }, [open, job.categories.id, job.net_inspection_fee, toast, form]);
 
   const onSubmit = async (values: z.infer<typeof inspectionDetailsSchema>) => {
     setIsLoading(true);
@@ -155,6 +169,26 @@ export function InspectionDetailsForm({ job, technicianId, children, onFormSubmi
       currentIssues.filter((issue) => issue !== issueTitle)
     );
   };
+  
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      if (file) {
+          form.setValue('issue_image', file);
+          const reader = new FileReader();
+          reader.onloadend = () => {
+              setImagePreview(reader.result as string);
+          };
+          reader.readAsDataURL(file);
+      }
+  };
+
+  const handleRemoveImage = () => {
+      form.setValue('issue_image', null);
+      setImagePreview(null);
+      if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+      }
+  }
 
 
   return (
@@ -193,7 +227,7 @@ export function InspectionDetailsForm({ job, technicianId, children, onFormSubmi
                         </SelectContent>
                     </Select>
                    )}
-                   <div className="flex flex-wrap gap-2 pt-2">
+                   <div className="flex flex-wrap gap-2 pt-2 min-h-[24px]">
                         {selectedIssues.map(issue => (
                             <Badge key={issue} variant="secondary" className="flex items-center gap-1">
                                 {issue}
@@ -221,20 +255,49 @@ export function InspectionDetailsForm({ job, technicianId, children, onFormSubmi
                 </FormItem>
               )}
             />
-
-            <FormField
-              control={form.control}
-              name="issue_image"
-              render={({ field: { onChange, value, ...rest } }) => (
-                <FormItem>
-                    <FormLabel>{t('inspection_details_form.upload_photo_label')}</FormLabel>
-                    <FormControl>
-                        <Input type="file" accept="image/*" capture="environment" onChange={(e) => onChange(e.target.files?.[0])} {...rest} />
-                    </FormControl>
-                    <FormMessage/>
-                </FormItem>
-              )}
+            
+             <FormField
+                control={form.control}
+                name="issue_image"
+                render={() => (
+                    <FormItem>
+                        <FormLabel>{t('inspection_details_form.upload_photo_label')}</FormLabel>
+                        <div className="flex items-center gap-4">
+                            {imagePreview ? (
+                                <div className="relative w-20 h-20 rounded-md overflow-hidden border">
+                                    <Image src={imagePreview} alt="Issue preview" layout="fill" objectFit="cover" />
+                                     <Button
+                                        type="button"
+                                        variant="destructive"
+                                        size="icon"
+                                        className="absolute top-0 right-0 h-6 w-6"
+                                        onClick={handleRemoveImage}
+                                    >
+                                        <X className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                            ) : (
+                                <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
+                                    <Camera className="mr-2 h-4 w-4" />
+                                    Take Photo
+                                </Button>
+                            )}
+                        </div>
+                        <FormControl>
+                           <Input 
+                                type="file" 
+                                accept="image/*" 
+                                capture="environment" 
+                                ref={fileInputRef}
+                                className="hidden"
+                                onChange={handleFileChange} 
+                            />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
             />
+
 
             <FormField
               control={form.control}
@@ -265,4 +328,3 @@ export function InspectionDetailsForm({ job, technicianId, children, onFormSubmi
     </Dialog>
   );
 }
-    
