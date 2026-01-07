@@ -133,10 +133,11 @@
         "toast_error_description": "Could not update the job status.",
         "accept_job": "Accept Job",
         "start_travel": "Start Travel",
-        "start_repair": "Inspect",
+        "start_repair": "Start Repair",
         "start_inspection": "Start Inspection",
         "inspection_done": "Inspection Done",
         "share_quote": "Share Quote",
+        "quote_sent": "Quote Sent",
         "complete_job": "Complete Job",
         "complete_job_note": "After collecting payment, add repair details to complete the job."
     },
@@ -192,5 +193,3 @@
         "aadhar_back": "Aadhar Card (Back Photo)"
     }
 }
-
-    

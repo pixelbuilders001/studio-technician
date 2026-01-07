@@ -78,6 +78,11 @@ const statusFlow: StatusConfig = {
         buttonTextKey: 'start_inspection',
         buttonIcon: Wrench,
     },
+    'quotation_approved': {
+        nextStatus: 'repair_started',
+        buttonTextKey: 'start_repair',
+        buttonIcon: Wrench,
+    },
     'repair_started': {
         nextStatus: 'repair_completed',
         buttonTextKey: 'complete_job',
@@ -261,6 +266,13 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
                     {t('status_updater.share_quote')}
                 </Button>
             </ShareQuoteForm>
+        );
+    } else if (job.status === 'quotation_shared') {
+        mainActionButton = (
+            <Button size="sm" className="w-full text-xs" disabled>
+                <Check className="mr-1 h-4 w-4" />
+                {t('status_updater.quote_sent')}
+            </Button>
         );
     }
 
