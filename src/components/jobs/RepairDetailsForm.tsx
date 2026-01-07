@@ -69,11 +69,6 @@ export function RepairDetailsForm({ job, children, onFormSubmit, totalAmount }: 
         setFinalAmount(values.finalCost);
         setOpen(false); // Close this dialog
         setIsPaymentOpen(true); // Open the payment dialog
-        
-        toast({
-            title: t('repair_details_form.toast_title'),
-            description: `${t('repair_details_form.toast_description')} ₹${values.finalCost}.`,
-        });
 
     } catch (error: any) {
         toast({
