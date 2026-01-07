@@ -62,7 +62,7 @@ export function RepairDetailsForm({ job, children, onFormSubmit }: RepairDetails
     try {
         await updateJobStatusAction({
             booking_id: job.id,
-            status: 'completed',
+            status: 'repair_completed',
             note: `Completed. Final Cost: ${values.finalCost}. Parts: ${values.spareParts}. Notes: ${values.notes}`,
             order_id: job.order_id,
             final_cost: values.finalCost,

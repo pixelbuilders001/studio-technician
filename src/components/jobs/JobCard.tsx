@@ -83,11 +83,6 @@ const statusFlow: StatusConfig = {
         buttonTextKey: 'start_repair',
         buttonIcon: Wrench,
     },
-    'repair_started': {
-        nextStatus: 'repair_completed',
-        buttonTextKey: 'complete_job',
-        buttonIcon: CheckCircle,
-    }
 }
 
 
@@ -274,7 +269,20 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
                 {t('status_updater.quote_sent')}
             </Button>
         );
+    } else if (job.status === 'repair_started') {
+        mainActionButton = (
+             <RepairDetailsForm
+                job={job}
+                onFormSubmit={onJobsUpdate}
+             >
+                <Button size="sm" className="w-full text-xs" disabled={isPending}>
+                    {isPending ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <CheckCircle className="mr-1 h-4 w-4" />}
+                    {t('status_updater.complete_job')}
+                </Button>
+            </RepairDetailsForm>
+        );
     }
+
 
     return (
         <div className="col-span-2 grid grid-cols-3 gap-2">
