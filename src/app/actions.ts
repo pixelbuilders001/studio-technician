@@ -70,6 +70,19 @@ export async function saveInspectionDetailsAction(formData: FormData) {
         throw new Error("Server configuration error.");
     }
     
+    // The key for the image file must be 'issue_image' as expected by the form
+    // but we will rename it to 'issue_image_url' if needed for the API.
+    // Let's assume the function expects 'issue_image' for the file itself.
+    // If it expects 'issue_image_url', we'd change it here.
+    // The user said the key is `issue_image_url`. Let's correct it.
+    if (formData.has('issue_image')) {
+        const imageFile = formData.get('issue_image');
+        formData.delete('issue_image');
+        if (imageFile) {
+            formData.append('issue_image_url', imageFile);
+        }
+    }
+
     try {
         const response = await fetch(url, {
             method: 'POST',
@@ -432,6 +445,4 @@ export async function getIssuesForCategoryAction(categoryId: string) {
         throw new Error(error.message || "An unexpected error occurred while fetching issues.");
     }
 }
-    
-
     
