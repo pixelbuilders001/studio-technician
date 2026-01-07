@@ -42,6 +42,7 @@ export async function updateJobStatusAction(payload: UpdateStatusPayload) {
       headers: {
         'Content-Type': 'application/json',
         'apikey': apikey,
+        'Authorization': `Bearer ${apikey}`,
       },
       body: JSON.stringify(payload),
     });
@@ -69,33 +70,18 @@ export async function saveInspectionDetailsAction(formData: FormData) {
     if (!url || !apikey) {
         throw new Error("Server configuration error.");
     }
-    
-    // The key for the image file must be 'issue_image' as expected by the form
-    // but we will rename it to 'issue_image_url' if needed for the API.
-    // Let's assume the function expects 'issue_image' for the file itself.
-    // If it expects 'issue_image_url', we'd change it here.
-    // The user said the key is `issue_image_url`. Let's correct it.
-    if (formData.has('issue_image')) {
-        const imageFile = formData.get('issue_image');
-        formData.delete('issue_image');
-        if (imageFile) {
-            formData.append('issue_image_url', imageFile);
-        }
-    }
 
     try {
         const response = await fetch(url, {
             method: 'POST',
             headers: {
                 'apikey': apikey,
-                // No 'Content-Type' header needed, browser sets it for FormData
             },
             body: formData
         });
         
         if (!response.ok) {
             const errorText = await response.text();
-            // Try to parse as JSON, but fall back to text
             try {
                 const errorJson = JSON.parse(errorText);
                 throw new Error(errorJson.error || `Failed to save inspection details: ${errorText}`);
@@ -192,6 +178,7 @@ export async function technicianLoginAction(payload: LoginPayload): Promise<Logi
       headers: {
         'Content-Type': 'application/json',
         'apikey': apikey,
+        'Authorization': `Bearer ${apikey}`,
       },
       body: JSON.stringify({
         mobile: payload.mobile,
@@ -396,7 +383,7 @@ export async function getTechnicianStats(technicianId: string): Promise<Technici
     const response = await fetch(url, {
       headers: {
         'apikey': apikey,
-        // 'Authorization': `Bearer ${apikey}`,
+        'Authorization': `Bearer ${apikey}`,
       },
     });
 
@@ -446,3 +433,70 @@ export async function getIssuesForCategoryAction(categoryId: string) {
     }
 }
     
+export async function sendCompletionCodeAction(bookingId: string) {
+  const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/send-completion-code`;
+  const apikey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!url || !apikey) {
+    throw new Error("Server configuration error.");
+  }
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': apikey,
+        'Authorization': `Bearer ${apikey}`,
+      },
+      body: JSON.stringify({ booking_id: bookingId }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || `API Error: ${response.statusText}`);
+    }
+    
+    return await response.json();
+  } catch (error: any) {
+    console.error("sendCompletionCodeAction error:", error);
+    throw new Error(error.message);
+  }
+}
+
+
+export async function verifyCompletionCodeAction(payload: { booking_id: string; code: string }) {
+  // This is a placeholder for the actual verification API call.
+  // Replace with your actual Supabase function endpoint for verification.
+  const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/verify-completion-code`;
+  const apikey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+   if (!url || !apikey) {
+    throw new Error("Server configuration error.");
+  }
+
+  try {
+     const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': apikey,
+        'Authorization': `Bearer ${apikey}`,
+      },
+      body: JSON.stringify(payload),
+    });
+     if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Invalid verification code.");
+    }
+
+    const data = await response.json();
+    if(data.success) {
+      return { success: true };
+    }
+    throw new Error(data.error || "Verification failed.");
+
+  } catch(e: any) {
+    console.error("verifyCompletionCodeAction error", e);
+    throw new Error(e.message);
+  }
+}

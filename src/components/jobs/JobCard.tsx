@@ -275,7 +275,6 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
              <RepairDetailsForm
                 job={job}
                 onFormSubmit={onJobsUpdate}
-                totalAmount={job.total_estimated_price}
              >
                 <Button size="sm" className="w-full text-xs" disabled={isPending}>
                     {isPending ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <CheckCircle className="mr-1 h-4 w-4" />}
@@ -367,4 +366,3 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
       </Card>
   );
 }
-

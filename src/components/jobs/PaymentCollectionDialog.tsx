@@ -12,11 +12,9 @@ import {
   DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog";
-import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "@/hooks/useTranslation";
 import { type Job } from "@/lib/types";
 import { Loader2 } from "lucide-react";
-import { updateJobStatusAction } from "@/app/actions";
 
 type PaymentCollectionDialogProps = {
   job: Job;
@@ -34,33 +32,14 @@ export function PaymentCollectionDialog({
   onPaymentSuccess,
 }: PaymentCollectionDialogProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
   const { t } = useTranslation();
 
   const handleCashPayment = async () => {
     setIsLoading(true);
     try {
-      await updateJobStatusAction({
-        booking_id: job.id,
-        status: 'repair_completed',
-        note: `Payment of ₹${totalAmount} collected in cash.`,
-        order_id: job.order_id,
-        final_cost: totalAmount,
-      });
-
-      toast({
-        title: t('payment_collection_dialog.toast_title_success'),
-        description: t('payment_collection_dialog.toast_description_success'),
-      });
-
-      onPaymentSuccess();
-      onOpenChange(false);
+      await onPaymentSuccess();
     } catch (error: any) {
-      toast({
-        title: t('payment_collection_dialog.toast_title_error'),
-        description: error.message || t('payment_collection_dialog.toast_description_error'),
-        variant: "destructive",
-      });
+      // The parent component will show the toast on error
     } finally {
       setIsLoading(false);
     }

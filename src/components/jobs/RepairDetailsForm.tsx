@@ -29,8 +29,9 @@ import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "@/hooks/useTranslation";
 import { type Job } from "@/lib/types";
 import { Loader2 } from "lucide-react";
-import { updateJobStatusAction } from "@/app/actions";
+import { updateJobStatusAction, sendCompletionCodeAction } from "@/app/actions";
 import { PaymentCollectionDialog } from "./PaymentCollectionDialog";
+import { CompletionCodeDialog } from "./CompletionCodeDialog";
 
 const repairDetailsSchema = z.object({
   finalCost: z.coerce.number().positive({ message: "Please enter a valid cost." }),
@@ -42,13 +43,13 @@ type RepairDetailsFormProps = {
     job: Job;
     children: React.ReactNode;
     onFormSubmit: () => void;
-    totalAmount: number;
 }
 
-export function RepairDetailsForm({ job, children, onFormSubmit, totalAmount }: RepairDetailsFormProps) {
-  const [open, setOpen] = useState(false);
-  const [isPaymentOpen, setIsPaymentOpen] = useState(false);
-  const [finalAmount, setFinalAmount] = useState(totalAmount);
+export function RepairDetailsForm({ job, children, onFormSubmit }: RepairDetailsFormProps) {
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [paymentOpen, setPaymentOpen] = useState(false);
+  const [codeSent, setCodeSent] = useState(false);
+  const [codeOpen, setCodeOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const { t } = useTranslation();
@@ -56,108 +57,164 @@ export function RepairDetailsForm({ job, children, onFormSubmit, totalAmount }: 
   const form = useForm<z.infer<typeof repairDetailsSchema>>({
     resolver: zodResolver(repairDetailsSchema),
     defaultValues: {
-      finalCost: totalAmount,
+      finalCost: job.total_estimated_price,
       spareParts: "",
       notes: "",
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof repairDetailsSchema>) => {
+  const handleSendCode = async () => {
     setIsLoading(true);
     try {
-        // Here, we don't update the status. We just prepare for payment.
-        setFinalAmount(values.finalCost);
-        setOpen(false); // Close this dialog
-        setIsPaymentOpen(true); // Open the payment dialog
-
+      await sendCompletionCodeAction(job.id);
+      toast({
+        title: "Code Sent",
+        description: "A 4-digit completion code has been sent to the customer.",
+      });
+      setCodeSent(true);
     } catch (error: any) {
-        toast({
-            title: "Error",
-            description: error.message || "Could not save details.",
-            variant: "destructive",
-        })
+      toast({
+        title: "Error",
+        description: error.message || "Could not send completion code.",
+        variant: "destructive",
+      });
     } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
   };
 
-  const handlePaymentSuccess = () => {
-    setIsPaymentOpen(false);
-    onFormSubmit();
+  const onCodeVerified = () => {
+      setCodeOpen(false);
+      setPaymentOpen(true);
+  }
+
+  const onPaymentSuccess = async () => {
+    const values = form.getValues();
+    try {
+        await updateJobStatusAction({
+            booking_id: job.id,
+            status: 'repair_completed',
+            note: `Payment of ₹${values.finalCost} collected. Notes: ${values.notes}`,
+            order_id: job.order_id,
+            final_cost: values.finalCost,
+            spare_parts_used: values.spareParts,
+        });
+
+        toast({
+            title: t('payment_collection_dialog.toast_title_success'),
+            description: t('payment_collection_dialog.toast_description_success'),
+        });
+        
+        setPaymentOpen(false);
+        onFormSubmit();
+
+    } catch(error: any) {
+         toast({
+            title: "Update Failed",
+            description: error.message || "Could not complete the job.",
+            variant: "destructive",
+        });
+    }
+  };
+
+  const handleOpenChange = (isOpen: boolean) => {
+    if (!isOpen) {
+      // Reset everything when main dialog is closed
+      setCodeSent(false);
+      form.reset({
+          finalCost: job.total_estimated_price,
+          spareParts: "",
+          notes: "",
+      });
+    }
+    setDetailsOpen(isOpen);
   }
 
   return (
     <>
-        <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
-            {children}
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-            <DialogTitle>{t('repair_details_form.title')}</DialogTitle>
-            </DialogHeader>
-            <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
-                <FormField
-                control={form.control}
-                name="finalCost"
-                render={({ field }) => (
-                    <FormItem>
-                    <FormLabel>{t('repair_details_form.final_cost_label')}</FormLabel>
-                    <FormControl>
-                        <Input type="number" placeholder={t('repair_details_form.final_cost_placeholder')} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                    </FormItem>
-                )}
-                />
-                <FormField
-                control={form.control}
-                name="spareParts"
-                render={({ field }) => (
-                    <FormItem>
-                    <FormLabel>{t('repair_details_form.spare_parts_label')}</FormLabel>
-                    <FormControl>
-                        <Input placeholder={t('repair_details_form.spare_parts_placeholder')} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                    </FormItem>
-                )}
-                />
-                <FormField
-                control={form.control}
-                name="notes"
-                render={({ field }) => (
-                    <FormItem>
-                    <FormLabel>{t('repair_details_form.notes_label')}</FormLabel>
-                    <FormControl>
-                        <Textarea placeholder={t('repair_details_form.notes_placeholder')} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                    </FormItem>
-                )}
-                />
-                <DialogFooter className="pt-4">
-                <DialogClose asChild>
-                    <Button type="button" variant="outline">{t('repair_details_form.cancel_button')}</Button>
-                </DialogClose>
-                <Button type="submit" disabled={isLoading}>
-                    {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    {t('repair_details_form.proceed_to_payment')}
-                </Button>
-                </DialogFooter>
-            </form>
-            </Form>
-        </DialogContent>
+        <Dialog open={detailsOpen} onOpenChange={handleOpenChange}>
+            <DialogTrigger asChild>
+                {children}
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                <DialogTitle>{t('repair_details_form.title')}</DialogTitle>
+                </DialogHeader>
+                <Form {...form}>
+                <form onSubmit={form.handleSubmit(() => {})} className="space-y-4 py-4">
+                    <FormField
+                    control={form.control}
+                    name="finalCost"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>{t('repair_details_form.final_cost_label')}</FormLabel>
+                        <FormControl>
+                            <Input type="number" placeholder={t('repair_details_form.final_cost_placeholder')} {...field} />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+                    <FormField
+                    control={form.control}
+                    name="spareParts"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>{t('repair_details_form.spare_parts_label')}</FormLabel>
+                        <FormControl>
+                            <Input placeholder={t('repair_details_form.spare_parts_placeholder')} {...field} />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+                    <FormField
+                    control={form.control}
+                    name="notes"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>{t('repair_details_form.notes_label')}</FormLabel>
+                        <FormControl>
+                            <Textarea placeholder={t('repair_details_form.notes_placeholder')} {...field} />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+                    <DialogFooter className="pt-4">
+                    <DialogClose asChild>
+                        <Button type="button" variant="outline">{t('repair_details_form.cancel_button')}</Button>
+                    </DialogClose>
+                    {!codeSent ? (
+                        <Button onClick={handleSendCode} disabled={isLoading}>
+                            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            Send Completion Code
+                        </Button>
+                    ) : (
+                        <Button onClick={() => setCodeOpen(true)}>
+                            Enter Code
+                        </Button>
+                    )}
+                    </DialogFooter>
+                </form>
+                </Form>
+            </DialogContent>
         </Dialog>
+        
+        <CompletionCodeDialog
+            bookingId={job.id}
+            open={codeOpen}
+            onOpenChange={setCodeOpen}
+            onVerificationSuccess={onCodeVerified}
+        />
+        
         <PaymentCollectionDialog
             job={job}
-            totalAmount={finalAmount}
-            open={isPaymentOpen}
-            onOpenChange={setIsPaymentOpen}
-            onPaymentSuccess={handlePaymentSuccess}
+            totalAmount={form.watch('finalCost')}
+            open={paymentOpen}
+            onOpenChange={setPaymentOpen}
+            onPaymentSuccess={onPaymentSuccess}
         />
     </>
   );
 }
-
