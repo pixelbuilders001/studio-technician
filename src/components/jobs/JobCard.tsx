@@ -26,7 +26,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { MapPin, Check, X, Wrench, Tv, Refrigerator, Smartphone, AirVent, WashingMachine, Info, IndianRupee, Phone, Navigation, CheckCircle, ArrowRight } from "lucide-react";
+import { MapPin, Check, X, Wrench, Tv, Refrigerator, Smartphone, AirVent, WashingMachine, Info, IndianRupee, Phone, Navigation, CheckCircle, ArrowRight, HandCoins } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import React, { useState, useTransition } from "react";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -37,6 +37,7 @@ import { updateJobStatusAction } from "@/app/actions";
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { RepairDetailsForm } from "./RepairDetailsForm";
+import { EarningSheet } from "./EarningSheet";
 
 const iconMap: { [key: string]: React.ElementType } = {
   LAPTOPS: Wrench,
@@ -252,6 +253,15 @@ export function JobCard({ job }: { job: Job }) {
                 {t('job_card.accept')}
               </Button>
             </>
+          ) : job.status === "completed" ? (
+            <div className="col-span-2">
+                <EarningSheet job={job}>
+                    <Button variant="secondary" className="w-full">
+                        <HandCoins className="mr-2 h-4 w-4" />
+                        See Earning
+                    </Button>
+                </EarningSheet>
+            </div>
           ) : (
             <div className="col-span-2 grid grid-cols-3 gap-2">
               <Button variant="outline" size="sm" className="w-full text-xs" asChild>
@@ -287,9 +297,7 @@ export function JobCard({ job }: { job: Job }) {
                         </Button>
                     </RepairDetailsForm>
                 )}
-
-                {/* Fallback for completed/cancelled jobs */}
-                {job.status === 'completed' && <Button size="sm" disabled className="w-full text-xs col-start-3"><CheckCircle className="mr-1"/> Completed</Button>}
+                
                 {job.status === 'cancelled' && <Button size="sm" disabled variant="destructive" className="w-full text-xs col-start-3"><X className="mr-1"/> Cancelled</Button>}
                 {job.status === 'rejected' && <Button size="sm" disabled variant="destructive" className="w-full text-xs col-start-3"><X className="mr-1"/> Rejected</Button>}
             </div>
