@@ -19,6 +19,8 @@ import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 
 type CompletionCodeDialogProps = {
   bookingId: string;
+  technicianId: string;
+  earningAmount: number;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onVerificationSuccess: () => void;
@@ -26,6 +28,8 @@ type CompletionCodeDialogProps = {
 
 export function CompletionCodeDialog({
   bookingId,
+  technicianId,
+  earningAmount,
   open,
   onOpenChange,
   onVerificationSuccess,
@@ -43,7 +47,12 @@ export function CompletionCodeDialog({
     setIsLoading(true);
     setError(null);
     try {
-      await verifyCompletionCodeAction({ booking_id: bookingId, code });
+      await verifyCompletionCodeAction({
+        booking_id: bookingId,
+        code,
+        technician_id: technicianId,
+        earning_amount: earningAmount,
+      });
       toast({
         title: "Code Verified!",
         description: "Please proceed to collect payment.",
@@ -106,3 +115,5 @@ export function CompletionCodeDialog({
     </Dialog>
   );
 }
+
+    

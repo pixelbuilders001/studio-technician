@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import { useRouter } from "next/navigation";
@@ -98,6 +97,9 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [repairDetails, setRepairDetails] = useState<RepairDetails | null>(null);
 
+  const finalCost = repairDetails?.finalCost || job.total_estimated_price;
+  const platformFeePercentage = 20; // Assuming 20% platform fee
+  const technicianPayout = finalCost - ((finalCost * platformFeePercentage) / 100);
 
   const handleStatusUpdate = (status: JobStatus) => {
     if (!technicianId) {
@@ -141,7 +143,7 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
   }
 
   const onPaymentSuccess = async () => {
-    if (!repairDetails) {
+    if (!repairDetails || !technicianId) {
         toast({ title: "Error", description: "Repair details are missing.", variant: "destructive" });
         return;
     }
@@ -235,6 +237,14 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
 
 
   const renderFooter = () => {
+    if (!technicianId) {
+      return (
+        <div className="col-span-2 text-center text-muted-foreground text-sm">
+          Loading...
+        </div>
+      );
+    }
+    
     if (job.status === 'assigned') {
         return (
              <>
@@ -291,7 +301,7 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
                 {t(`status_updater.${nextAction.buttonTextKey}`)}
             </Button>
         );
-    } else if (job.status === 'inspection_started' && technicianId) {
+    } else if (job.status === 'inspection_started') {
         mainActionButton = (
              <InspectionDetailsForm
                 job={job}
@@ -425,21 +435,29 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
         </CardFooter>
 
       </Card>
-
-      <CompletionCodeDialog
-          bookingId={job.id}
-          open={codeOpen}
-          onOpenChange={setCodeOpen}
-          onVerificationSuccess={onCodeVerified}
-      />
       
-      <PaymentCollectionDialog
-          job={job}
-          totalAmount={repairDetails?.finalCost || 0}
-          open={paymentOpen}
-          onOpenChange={setPaymentOpen}
-          onPaymentSuccess={onPaymentSuccess}
-      />
+      {technicianId && (
+        <>
+          <CompletionCodeDialog
+              bookingId={job.id}
+              technicianId={technicianId}
+              earningAmount={technicianPayout}
+              open={codeOpen}
+              onOpenChange={setCodeOpen}
+              onVerificationSuccess={onCodeVerified}
+          />
+          
+          <PaymentCollectionDialog
+              job={job}
+              totalAmount={repairDetails?.finalCost || 0}
+              open={paymentOpen}
+              onOpenChange={setPaymentOpen}
+              onPaymentSuccess={onPaymentSuccess}
+          />
+        </>
+      )}
     </>
   );
 }
+
+    

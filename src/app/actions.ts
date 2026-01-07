@@ -464,10 +464,14 @@ export async function sendCompletionCodeAction(bookingId: string) {
   }
 }
 
+type VerifyCodePayload = {
+  booking_id: string;
+  code: string;
+  technician_id: string;
+  earning_amount: number;
+}
 
-export async function verifyCompletionCodeAction(payload: { booking_id: string; code: string }) {
-  // This is a placeholder for the actual verification API call.
-  // Replace with your actual Supabase function endpoint for verification.
+export async function verifyCompletionCodeAction(payload: VerifyCodePayload) {
   const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/verify-completion-code`;
   const apikey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
    if (!url || !apikey) {
@@ -482,7 +486,12 @@ export async function verifyCompletionCodeAction(payload: { booking_id: string; 
         'apikey': apikey,
         'Authorization': `Bearer ${apikey}`,
       },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        booking_id: payload.booking_id,
+        secret_code: payload.code,
+        technician_id: payload.technician_id,
+        earning_amount: payload.earning_amount,
+      }),
     });
      if (!response.ok) {
       const errorData = await response.json();
@@ -500,3 +509,5 @@ export async function verifyCompletionCodeAction(payload: { booking_id: string; 
     throw new Error(e.message);
   }
 }
+
+    
