@@ -113,7 +113,7 @@
         "toast_error_description": "Could not update the job status.",
         "accept_job": "Accept Job",
         "start_travel": "Start Travel",
-        "start_repair": "Start Repair / Inspection",
+        "start_repair": "Inspect",
         "complete_job": "Complete Job",
         "complete_job_note": "After collecting payment, add repair details to complete the job."
     },
