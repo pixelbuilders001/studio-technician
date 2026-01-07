@@ -15,7 +15,6 @@ import { Loader2 } from "lucide-react";
 import { OtpInput } from "@/components/auth/OtpInput";
 import { useToast } from "@/hooks/use-toast";
 import { verifyCompletionCodeAction } from "@/app/actions";
-import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 
 type CompletionCodeDialogProps = {
   bookingId: string;
@@ -59,7 +58,7 @@ export function CompletionCodeDialog({
       });
       onVerificationSuccess();
     } catch (e: any) {
-      setError(e.message || "An unexpected error occurred.");
+      setError("Invalid code. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -82,17 +81,14 @@ export function CompletionCodeDialog({
         <DialogHeader>
           <DialogTitle className="text-center">Enter Completion Code</DialogTitle>
         </DialogHeader>
-        <div className="flex flex-col items-center space-y-4 py-4">
-          <p className="text-center text-sm text-muted-foreground">
+        <div className="flex flex-col items-center space-y-2 py-4">
+          <p className="text-center text-sm text-muted-foreground pb-2">
             Ask the customer for the 4-digit code sent to their mobile number.
           </p>
           <OtpInput length={4} value={code} onChange={setCode} />
 
           {error && (
-            <Alert variant="destructive" className="w-full">
-                <AlertTitle>Verification Failed</AlertTitle>
-                <AlertDescription>{error}</AlertDescription>
-            </Alert>
+            <p className="text-sm text-destructive pt-1">{error}</p>
           )}
 
         </div>
