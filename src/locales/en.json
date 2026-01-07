@@ -103,8 +103,9 @@
         "notes_placeholder": "Any additional notes about the repair...",
         "cancel_button": "Cancel",
         "confirm_button": "Confirm Completion",
+        "proceed_to_payment": "Proceed to Payment",
         "toast_title": "Repair Details Saved",
-        "toast_description": "Final cost recorded as"
+        "toast_description": "Final cost confirmed as"
     },
     "inspection_details_form": {
         "title": "Inspection Details",
@@ -125,6 +126,16 @@
         "submit_button": "Share Quote",
         "toast_title_success": "Quote Shared",
         "toast_description_success": "The quote has been shared with the customer: ₹"
+    },
+    "payment_collection_dialog": {
+        "title": "Collect Payment",
+        "total_due": "Total Amount Due",
+        "scan_to_pay": "Scan QR to pay with any UPI app",
+        "paid_by_cash": "Paid by Cash",
+        "toast_title_success": "Payment Complete",
+        "toast_description_success": "Job has been marked as completed.",
+        "toast_title_error": "Payment Failed",
+        "toast_description_error": "Could not update status. Please try again."
     },
     "status_updater": {
         "toast_title": "Status Updated",
@@ -193,3 +204,4 @@
         "aadhar_back": "Aadhar Card (Back Photo)"
     }
 }
+

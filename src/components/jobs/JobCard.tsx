@@ -91,7 +91,6 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
   const { toast } = useToast();
   const { t } = useTranslation();
   const [isPending, startTransition] = useTransition();
-  const [isRepairFormOpen, setIsRepairFormOpen] = useState(false);
 
   const handleStatusUpdate = (status: JobStatus) => {
     if (!technicianId) {
@@ -146,8 +145,10 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
             break;
         case 'inspection_completed':
         case 'quotation_shared':
-        case 'quotation_approved':
             className="bg-yellow-100 text-yellow-800 border-yellow-200";
+            break;
+        case 'quotation_approved':
+            className="bg-teal-100 text-teal-800 border-teal-200";
             break;
         case 'completed':
         case 'repair_completed':
@@ -274,6 +275,7 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
              <RepairDetailsForm
                 job={job}
                 onFormSubmit={onJobsUpdate}
+                totalAmount={job.total_estimated_price}
              >
                 <Button size="sm" className="w-full text-xs" disabled={isPending}>
                     {isPending ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <CheckCircle className="mr-1 h-4 w-4" />}
@@ -365,3 +367,4 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
       </Card>
   );
 }
+

@@ -103,8 +103,9 @@
         "notes_placeholder": "मरम्मत के बारे में कोई अतिरिक्त नोट्स...",
         "cancel_button": "रद्द करें",
         "confirm_button": "पूर्णता की पुष्टि करें",
+        "proceed_to_payment": "भुगतान के लिए आगे बढ़ें",
         "toast_title": "मरम्मत विवरण सहेजा गया",
-        "toast_description": "अंतिम लागत के रूप में दर्ज की गई"
+        "toast_description": "अंतिम लागत के रूप में पुष्टि की गई"
     },
     "inspection_details_form": {
         "title": "निरीक्षण विवरण",
@@ -125,6 +126,16 @@
         "submit_button": "कोटेशन साझा करें",
         "toast_title_success": "कोटेशन साझा किया गया",
         "toast_description_success": "कोटेशन ग्राहक के साथ साझा किया गया है: ₹"
+    },
+    "payment_collection_dialog": {
+        "title": "भुगतान एकत्र करें",
+        "total_due": "कुल देय राशि",
+        "scan_to_pay": "किसी भी UPI ऐप से भुगतान करने के लिए QR स्कैन करें",
+        "paid_by_cash": "नकद द्वारा भुगतान किया गया",
+        "toast_title_success": "भुगतान पूरा हुआ",
+        "toast_description_success": "नौकरी को पूर्ण के रूप में चिह्नित किया गया है।",
+        "toast_title_error": "भुगतान विफल",
+        "toast_description_error": "स्थिति को अपडेट नहीं किया जा सका। कृपया पुनः प्रयास करें।"
     },
     "status_updater": {
         "toast_title": "स्थिति अपडेट की गई",
@@ -193,3 +204,4 @@
         "aadhar_back": "आधार कार्ड (पिछला फोटो)"
     }
 }
+
