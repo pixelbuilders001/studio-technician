@@ -79,6 +79,12 @@ function JobsPageContent() {
     fetchJobs();
   }, [technicianId]); // This will run exactly once when technicianId is set.
 
+  const refreshJobs = () => {
+     if (technicianId) {
+      getJobsAction(technicianId).then(setJobs);
+    }
+  }
+
   return (
     <div className="flex h-full flex-col">
       <header className="flex h-14 items-center justify-between border-b bg-background px-4">
@@ -93,7 +99,9 @@ function JobsPageContent() {
         <JobTabs 
           jobs={jobs} 
           activeTab={tab as 'new' | 'ongoing' | 'completed'} 
-          onTabChange={handleTabChange} 
+          onTabChange={handleTabChange}
+          technicianId={technicianId}
+          onJobsUpdate={refreshJobs}
         />
       )}
     </div>

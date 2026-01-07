@@ -32,7 +32,6 @@ import React, { useState, useTransition } from "react";
 import { useTranslation } from "@/hooks/useTranslation";
 import { format } from 'date-fns';
 import { Separator } from "../ui/separator";
-import { useProfile } from "@/hooks/useProfile";
 import { updateJobStatusAction } from "@/app/actions";
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -87,16 +86,15 @@ const statusFlow: StatusConfig = {
 }
 
 
-export function JobCard({ job }: { job: Job }) {
+export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technicianId: string | null, onJobsUpdate: () => void }) {
   const router = useRouter();
   const { toast } = useToast();
   const { t } = useTranslation();
-  const { profile } = useProfile();
   const [isPending, startTransition] = useTransition();
   const [isRepairFormOpen, setIsRepairFormOpen] = useState(false);
 
   const handleStatusUpdate = (status: JobStatus) => {
-    if (!profile) {
+    if (!technicianId) {
         toast({ title: "Error", description: "Technician profile not found.", variant: "destructive" });
         return;
     }
@@ -106,15 +104,14 @@ export function JobCard({ job }: { job: Job }) {
             await updateJobStatusAction({
                 booking_id: job.id,
                 status: status,
-                note: `Technician ${profile.name} has updated the job to ${status}.`,
+                note: `Technician has updated the job to ${status}.`,
                 order_id: job.order_id,
             });
             toast({
                 title: t('status_updater.toast_title'),
                 description: `${t('status_updater.toast_description')} ${t(`job_api_status.${status}`)}`,
             });
-            
-            router.refresh();
+            onJobsUpdate();
             
         } catch (error: any) {
             toast({
@@ -240,12 +237,12 @@ export function JobCard({ job }: { job: Job }) {
                 {t(`status_updater.${nextAction.buttonTextKey}`)}
             </Button>
         );
-    } else if (job.status === 'inspection_started' && profile) {
+    } else if (job.status === 'inspection_started' && technicianId) {
         mainActionButton = (
              <InspectionDetailsForm
                 job={job}
-                technicianId={profile.id}
-                onFormSubmit={() => router.refresh()}
+                technicianId={technicianId}
+                onFormSubmit={onJobsUpdate}
              >
                 <Button size="sm" className="w-full text-xs" disabled={isPending}>
                     {isPending ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <FileText className="mr-1 h-4 w-4" />}
@@ -257,7 +254,7 @@ export function JobCard({ job }: { job: Job }) {
         mainActionButton = (
             <ShareQuoteForm
                 job={job}
-                onFormSubmit={() => router.refresh()}
+                onFormSubmit={onJobsUpdate}
             >
                 <Button size="sm" className="w-full text-xs" disabled={isPending}>
                     {isPending ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <Share2 className="mr-1 h-4 w-4" />}
@@ -348,5 +345,3 @@ export function JobCard({ job }: { job: Job }) {
       </Card>
   );
 }
-
-    

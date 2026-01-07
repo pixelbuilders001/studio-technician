@@ -70,7 +70,7 @@ type InspectionDetailsPayload = {
 }
 
 export async function saveInspectionDetailsAction(payload: InspectionDetailsPayload) {
-    const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/inspections`;
+    const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/inspection_reports`;
     const apikey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
     if (!url || !apikey) {

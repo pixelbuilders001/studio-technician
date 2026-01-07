@@ -12,9 +12,11 @@ type JobTabsProps = {
   jobs: Job[];
   activeTab: 'new' | 'ongoing' | 'completed';
   onTabChange: (tab: 'new' | 'ongoing' | 'completed') => void;
+  technicianId: string | null;
+  onJobsUpdate: () => void;
 };
 
-export function JobTabs({ jobs, activeTab, onTabChange }: JobTabsProps) {
+export function JobTabs({ jobs, activeTab, onTabChange, technicianId, onJobsUpdate }: JobTabsProps) {
   const { t } = useTranslation();
   const router = useRouter();
 
@@ -51,7 +53,7 @@ export function JobTabs({ jobs, activeTab, onTabChange }: JobTabsProps) {
     return (
       <div className="space-y-3 p-4">
         {jobList.map((job) => (
-          <JobCard key={job.id} job={job} />
+          <JobCard key={job.id} job={job} technicianId={technicianId} onJobsUpdate={onJobsUpdate} />
         ))}
       </div>
     );
@@ -84,5 +86,3 @@ export function JobTabs({ jobs, activeTab, onTabChange }: JobTabsProps) {
     </Tabs>
   );
 }
-
-    
