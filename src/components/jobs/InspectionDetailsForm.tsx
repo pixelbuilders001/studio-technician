@@ -30,7 +30,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "@/hooks/useTranslation";
 import { type Job } from "@/lib/types";
 import { Loader2, X, Camera } from "lucide-react";
-import { saveInspectionDetailsAction, getIssuesForCategoryAction } from "@/app/actions";
+import { saveInspectionDetailsAction, getIssuesForCategoryAction, updateJobStatusAction } from "@/app/actions";
 import {
   Select,
   SelectContent,
@@ -132,13 +132,21 @@ export function InspectionDetailsForm({ job, technicianId, children, onFormSubmi
         formData.append('findings', JSON.stringify(allFindings));
 
         if (values.issue_image) {
-            formData.append('issue_image', values.issue_image);
+            formData.append('issue_image_url', values.issue_image);
         }
 
-        const result = await saveInspectionDetailsAction(formData);
+        await saveInspectionDetailsAction(formData);
+
+        // Now, update the job status
+        await updateJobStatusAction({
+            booking_id: job.id,
+            order_id: job.order_id,
+            status: 'inspection_completed',
+            note: 'Technician has completed the inspection.'
+        });
 
         toast({
-            title: result.message || t('inspection_details_form.toast_title_success'),
+            title: t('inspection_details_form.toast_title_success'),
             description: t('inspection_details_form.toast_description_success'),
         });
 
