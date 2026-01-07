@@ -150,7 +150,9 @@
         "share_quote": "Share Quote",
         "quote_sent": "Quote Sent",
         "complete_job": "Complete Job",
-        "complete_job_note": "After collecting payment, add repair details to complete the job."
+        "complete_job_note": "After collecting payment, add repair details to complete the job.",
+        "send_code": "Send Completion Code",
+        "enter_code": "Enter Code"
     },
     "job_api_status": {
         "assigned": "Assigned",
@@ -167,7 +169,8 @@
         "quotation_rejected": "Quote Rejected",
         "repair_started": "Repair Started",
         "repair_completed": "Repair Completed",
-        "closed_no_repair": "Closed (No Repair)"
+        "closed_no_repair": "Closed (No Repair)",
+        "code_sent": "Code Sent"
     },
     "devices": {
         "television": "Television",
@@ -204,5 +207,3 @@
         "aadhar_back": "Aadhar Card (Back Photo)"
     }
 }
-
-    

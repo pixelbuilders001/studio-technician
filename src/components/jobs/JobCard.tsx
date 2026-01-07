@@ -147,6 +147,9 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
         case 'quotation_shared':
             className="bg-yellow-100 text-yellow-800 border-yellow-200";
             break;
+        case 'code_sent':
+            className="bg-indigo-100 text-indigo-800 border-indigo-200";
+            break;
         case 'quotation_approved':
             className="bg-teal-100 text-teal-800 border-teal-200";
             break;
@@ -270,7 +273,7 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
                 {t('status_updater.quote_sent')}
             </Button>
         );
-    } else if (job.status === 'repair_started') {
+    } else if (job.status === 'repair_started' || job.status === 'code_sent') {
         mainActionButton = (
              <RepairDetailsForm
                 job={job}
@@ -278,7 +281,7 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
              >
                 <Button size="sm" className="w-full text-xs" disabled={isPending}>
                     {isPending ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <CheckCircle className="mr-1 h-4 w-4" />}
-                    {t('status_updater.complete_job')}
+                    {job.status === 'code_sent' ? t('status_updater.enter_code') : t('status_updater.complete_job')}
                 </Button>
             </RepairDetailsForm>
         );

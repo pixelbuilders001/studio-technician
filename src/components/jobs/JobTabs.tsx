@@ -29,7 +29,8 @@ export function JobTabs({ jobs, activeTab, onTabChange, technicianId, onJobsUpda
     "quotation_shared",
     "quotation_approved",
     "repair_started",
-    "in-progress" // Keep for backward compatibility
+    "in-progress",// Keep for backward compatibility
+    "code_sent"
   ].includes(job.status));
   
   const completedJobs = jobs.filter((job) => [

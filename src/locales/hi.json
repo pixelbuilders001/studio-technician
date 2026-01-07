@@ -150,7 +150,9 @@
         "share_quote": "कोटेशन साझा करें",
         "quote_sent": "कोटेशन भेजा गया",
         "complete_job": "नौकरी पूरी करें",
-        "complete_job_note": "भुगतान एकत्र करने के बाद, नौकरी पूरी करने के लिए मरम्मत विवरण जोड़ें।"
+        "complete_job_note": "भुगतान एकत्र करने के बाद, नौकरी पूरी करने के लिए मरम्मत विवरण जोड़ें।",
+        "send_code": "समापन कोड भेजें",
+        "enter_code": "कोड दर्ज करें"
     },
     "job_api_status": {
         "assigned": "सौंपा गया",
@@ -167,7 +169,8 @@
         "quotation_rejected": "कोटेशन अस्वीकृत",
         "repair_started": "मरम्मत शुरू",
         "repair_completed": "मरम्मत पूरी",
-        "closed_no_repair": "बंद (कोई मरम्मत नहीं)"
+        "closed_no_repair": "बंद (कोई मरम्मत नहीं)",
+        "code_sent": "कोड भेजा गया"
     },
     "devices": {
         "television": "टेलीविजन",
@@ -204,5 +207,3 @@
         "aadhar_back": "आधार कार्ड (पिछला फोटो)"
     }
 }
-
-    

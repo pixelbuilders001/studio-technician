@@ -48,7 +48,7 @@ type RepairDetailsFormProps = {
 export function RepairDetailsForm({ job, children, onFormSubmit }: RepairDetailsFormProps) {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [paymentOpen, setPaymentOpen] = useState(false);
-  const [codeSent, setCodeSent] = useState(false);
+  const [codeSent, setCodeSent] = useState(job.status === 'code_sent');
   const [codeOpen, setCodeOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -66,12 +66,24 @@ export function RepairDetailsForm({ job, children, onFormSubmit }: RepairDetails
   const handleSendCode = async () => {
     setIsLoading(true);
     try {
+      // 1. Send the code to the customer
       await sendCompletionCodeAction(job.id);
+      
+      // 2. Update job status to 'code_sent'
+      await updateJobStatusAction({
+        booking_id: job.id,
+        order_id: job.order_id,
+        status: 'code_sent',
+        note: 'Completion code sent to customer.'
+      });
+
       toast({
         title: "Code Sent",
         description: "A 4-digit completion code has been sent to the customer.",
       });
+
       setCodeSent(true);
+      onFormSubmit(); // Refresh the job list in the background
     } catch (error: any) {
       toast({
         title: "Error",
@@ -106,6 +118,7 @@ export function RepairDetailsForm({ job, children, onFormSubmit }: RepairDetails
         });
         
         setPaymentOpen(false);
+        setDetailsOpen(false);
         onFormSubmit();
 
     } catch(error: any) {
@@ -119,8 +132,8 @@ export function RepairDetailsForm({ job, children, onFormSubmit }: RepairDetails
 
   const handleOpenChange = (isOpen: boolean) => {
     if (!isOpen) {
-      // Reset everything when main dialog is closed
-      setCodeSent(false);
+      // Reset only if not in the middle of the flow
+      setCodeSent(job.status === 'code_sent');
       form.reset({
           finalCost: job.total_estimated_price,
           spareParts: "",
@@ -188,11 +201,11 @@ export function RepairDetailsForm({ job, children, onFormSubmit }: RepairDetails
                     {!codeSent ? (
                         <Button onClick={handleSendCode} disabled={isLoading}>
                             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            Send Completion Code
+                            {t('status_updater.send_code')}
                         </Button>
                     ) : (
                         <Button onClick={() => setCodeOpen(true)}>
-                            Enter Code
+                            {t('status_updater.enter_code')}
                         </Button>
                     )}
                     </DialogFooter>
