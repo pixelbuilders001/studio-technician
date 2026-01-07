@@ -67,9 +67,42 @@ type InspectionDetailsPayload = {
     technician_id: string;
     findings: string;
     inspection_fee: number;
+    issue_image_url?: string;
 }
 
-export async function saveInspectionDetailsAction(payload: InspectionDetailsPayload) {
+async function uploadFileAndGetUrl(file: File): Promise<string> {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const apikey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!supabaseUrl || !apikey) {
+        throw new Error("Server configuration error for file upload.");
+    }
+    
+    const filePath = `public/inspection-images/${new Date().getTime()}-${file.name}`;
+    const uploadUrl = `${supabaseUrl}/storage/v1/object/${filePath}`;
+
+    const uploadResponse = await fetch(uploadUrl, {
+        method: 'POST',
+        headers: {
+            'apikey': apikey,
+            'Authorization': `Bearer ${apikey}`,
+            'Content-Type': file.type,
+        },
+        body: file,
+    });
+
+    if (!uploadResponse.ok) {
+        const errorText = await uploadResponse.text();
+        throw new Error(`Failed to upload file: ${errorText}`);
+    }
+    
+    // Construct the public URL
+    const publicUrl = `${supabaseUrl}/storage/v1/object/public/${filePath}`;
+    return publicUrl;
+}
+
+
+export async function saveInspectionDetailsAction(formData: FormData) {
     const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/inspection_reports`;
     const apikey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
@@ -78,6 +111,26 @@ export async function saveInspectionDetailsAction(payload: InspectionDetailsPayl
     }
     
     try {
+        const booking_id = formData.get('booking_id') as string;
+        const technician_id = formData.get('technician_id') as string;
+        const inspection_fee = Number(formData.get('inspection_fee'));
+        const findings = formData.get('findings') as string;
+        const issue_image = formData.get('issue_image') as File | null;
+        
+        let issue_image_url: string | undefined = undefined;
+
+        if (issue_image && issue_image.size > 0) {
+            issue_image_url = await uploadFileAndGetUrl(issue_image);
+        }
+
+        const payload: InspectionDetailsPayload = {
+            booking_id,
+            technician_id,
+            findings,
+            inspection_fee,
+            issue_image_url,
+        };
+
         const response = await fetch(url, {
             method: 'POST',
             headers: {
@@ -406,5 +459,35 @@ export async function getTechnicianStats(technicianId: string): Promise<Technici
     return null;
   }
 }
+
+export async function getIssuesForCategoryAction(categoryId: string) {
+    const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/issues?category_id=eq.${categoryId}&is_active=eq.true&select=id,title,estimated_price`;
+    const apikey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!url || !apikey) {
+        throw new Error("Server configuration error.");
+    }
+
+    try {
+        const response = await fetch(url, {
+            headers: {
+                'apikey': apikey,
+                'Authorization': `Bearer ${apikey}`,
+            },
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || `API Error: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error: any) {
+        console.error('Get issues API error:', error);
+        throw new Error(error.message || "An unexpected error occurred while fetching issues.");
+    }
+}
+    
 
     

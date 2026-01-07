@@ -103,14 +103,14 @@
         "notes_placeholder": "मरम्मत के बारे में कोई अतिरिक्त नोट्स...",
         "cancel_button": "रद्द करें",
         "confirm_button": "पूर्णता की पुष्टि करें",
-        "proceed_to_payment": "भुगतान के लिए आगे बढ़ें",
-        "toast_title": "मरम्मत विवरण सहेजा गया",
-        "toast_description": "अंतिम लागत के रूप में पुष्टि की गई"
+        "proceed_to_payment": "भुगतान के लिए आगे बढ़ें"
     },
     "inspection_details_form": {
         "title": "निरीक्षण विवरण",
-        "findings_label": "निष्कर्ष",
-        "findings_placeholder": "निरीक्षण के दौरान आपको क्या मिला, उसका वर्णन करें...",
+        "findings_label": "सभी लागू मुद्दों का चयन करें",
+        "other_findings_label": "अन्य निष्कर्ष (यदि कोई हो)",
+        "other_findings_placeholder": "पाए गए किसी भी अन्य मुद्दे का वर्णन करें...",
+        "upload_photo_label": "समस्या का फोटो अपलोड करें",
         "inspection_fee_label": "अंतिम निरीक्षण शुल्क",
         "submit_button": "निष्कर्ष जमा करें",
         "toast_title_success": "निरीक्षण पूरा हुआ",
@@ -205,3 +205,4 @@
     }
 }
 
+    

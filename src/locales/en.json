@@ -103,14 +103,14 @@
         "notes_placeholder": "Any additional notes about the repair...",
         "cancel_button": "Cancel",
         "confirm_button": "Confirm Completion",
-        "proceed_to_payment": "Proceed to Payment",
-        "toast_title": "Repair Details Saved",
-        "toast_description": "Final cost confirmed as"
+        "proceed_to_payment": "Proceed to Payment"
     },
     "inspection_details_form": {
         "title": "Inspection Details",
-        "findings_label": "Findings",
-        "findings_placeholder": "Describe what you found during the inspection...",
+        "findings_label": "Select all applicable issues",
+        "other_findings_label": "Other Findings (if any)",
+        "other_findings_placeholder": "Describe any other issues found...",
+        "upload_photo_label": "Upload Issue Photo",
         "inspection_fee_label": "Final Inspection Fee",
         "submit_button": "Submit Findings",
         "toast_title_success": "Inspection Completed",
@@ -205,3 +205,4 @@
     }
 }
 
+    
