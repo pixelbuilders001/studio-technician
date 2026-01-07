@@ -28,9 +28,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "@/hooks/useTranslation";
 import { type Job } from "@/lib/types";
-import { Loader2 } from "lucide-react";
+import { Loader2, X } from "lucide-react";
 import { saveInspectionDetailsAction, getIssuesForCategoryAction } from "@/app/actions";
-import { Checkbox } from "../ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "../ui/badge";
 import { Skeleton } from "../ui/skeleton";
 
 const inspectionDetailsSchema = z.object({
@@ -72,6 +79,8 @@ export function InspectionDetailsForm({ job, technicianId, children, onFormSubmi
     },
   });
 
+  const selectedIssues = form.watch("selected_issues");
+
   useEffect(() => {
     if (open && job.categories.id) {
       const fetchIssues = async () => {
@@ -108,8 +117,8 @@ export function InspectionDetailsForm({ job, technicianId, children, onFormSubmi
         }
         formData.append('findings', JSON.stringify(allFindings));
 
-        if (values.issue_image?.[0]) {
-            formData.append('issue_image', values.issue_image[0]);
+        if (values.issue_image) {
+            formData.append('issue_image', values.issue_image);
         }
 
         const result = await saveInspectionDetailsAction(formData);
@@ -131,6 +140,22 @@ export function InspectionDetailsForm({ job, technicianId, children, onFormSubmi
         setIsLoading(false);
     }
   };
+  
+  const handleIssueSelect = (issueTitle: string) => {
+    const currentIssues = form.getValues("selected_issues") || [];
+    if (!currentIssues.includes(issueTitle)) {
+      form.setValue("selected_issues", [...currentIssues, issueTitle]);
+    }
+  };
+
+  const handleRemoveIssue = (issueTitle: string) => {
+    const currentIssues = form.getValues("selected_issues") || [];
+    form.setValue(
+      "selected_issues",
+      currentIssues.filter((issue) => issue !== issueTitle)
+    );
+  };
+
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -149,55 +174,36 @@ export function InspectionDetailsForm({ job, technicianId, children, onFormSubmi
               name="selected_issues"
               render={() => (
                 <FormItem>
-                  <div className="mb-4">
-                    <FormLabel className="text-base">{t('inspection_details_form.findings_label')}</FormLabel>
-                  </div>
-                  {isFetchingIssues ? (
-                    <div className="space-y-2">
-                        <Skeleton className="h-5 w-full" />
-                        <Skeleton className="h-5 w-full" />
-                        <Skeleton className="h-5 w-2/3" />
-                    </div>
-                  ) : (
-                    <>
-                      <div className="max-h-32 overflow-y-auto space-y-2">
-                      {issues.map((item) => (
-                        <FormField
-                          key={item.id}
-                          control={form.control}
-                          name="selected_issues"
-                          render={({ field }) => {
-                            return (
-                              <FormItem
-                                key={item.id}
-                                className="flex flex-row items-start space-x-3 space-y-0"
-                              >
-                                <FormControl>
-                                  <Checkbox
-                                    checked={field.value?.includes(item.title)}
-                                    onCheckedChange={(checked) => {
-                                      return checked
-                                        ? field.onChange([...field.value, item.title])
-                                        : field.onChange(
-                                            field.value?.filter(
-                                              (value) => value !== item.title
-                                            )
-                                          )
-                                    }}
-                                  />
-                                </FormControl>
-                                <FormLabel className="font-normal">
-                                  {item.title}
-                                </FormLabel>
-                              </FormItem>
-                            )
-                          }}
-                        />
-                      ))}
-                      </div>
-                      <FormMessage />
-                    </>
-                  )}
+                  <FormLabel className="text-base">{t('inspection_details_form.findings_label')}</FormLabel>
+                   {isFetchingIssues ? (
+                     <Skeleton className="h-10 w-full" />
+                   ) : (
+                    <Select onValueChange={handleIssueSelect} value="">
+                        <FormControl>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Add an issue from the list" />
+                        </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                        {issues.filter(issue => !selectedIssues.includes(issue.title)).map(issue => (
+                            <SelectItem key={issue.id} value={issue.title}>
+                                {issue.title}
+                            </SelectItem>
+                        ))}
+                        </SelectContent>
+                    </Select>
+                   )}
+                   <div className="flex flex-wrap gap-2 pt-2">
+                        {selectedIssues.map(issue => (
+                            <Badge key={issue} variant="secondary" className="flex items-center gap-1">
+                                {issue}
+                                <button type="button" onClick={() => handleRemoveIssue(issue)} className="rounded-full hover:bg-muted-foreground/20">
+                                    <X className="h-3 w-3" />
+                                </button>
+                            </Badge>
+                        ))}
+                   </div>
+                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -223,7 +229,7 @@ export function InspectionDetailsForm({ job, technicianId, children, onFormSubmi
                 <FormItem>
                     <FormLabel>{t('inspection_details_form.upload_photo_label')}</FormLabel>
                     <FormControl>
-                        <Input type="file" accept="image/*" capture="environment" onChange={(e) => onChange(e.target.files)} {...rest} />
+                        <Input type="file" accept="image/*" capture="environment" onChange={(e) => onChange(e.target.files?.[0])} {...rest} />
                     </FormControl>
                     <FormMessage/>
                 </FormItem>
