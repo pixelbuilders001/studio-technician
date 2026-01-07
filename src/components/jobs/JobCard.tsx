@@ -26,7 +26,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { MapPin, Check, X, Wrench, Tv, Refrigerator, Smartphone, AirVent, WashingMachine, Info, IndianRupee, Phone, Navigation, CheckCircle, ArrowRight, HandCoins } from "lucide-react";
+import { MapPin, Check, X, Wrench, Tv, Refrigerator, Smartphone, AirVent, WashingMachine, Info, IndianRupee, Phone, Navigation, CheckCircle, ArrowRight, HandCoins, FileText, Share2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import React, { useState, useTransition } from "react";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -38,6 +38,8 @@ import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { RepairDetailsForm } from "./RepairDetailsForm";
 import { EarningSheet } from "./EarningSheet";
+import { InspectionDetailsForm } from "./InspectionDetailsForm";
+import { ShareQuoteForm } from "./ShareQuoteForm";
 
 const iconMap: { [key: string]: React.ElementType } = {
   LAPTOPS: Wrench,
@@ -73,12 +75,12 @@ const statusFlow: StatusConfig = {
         buttonIcon: Navigation,
     },
     'on_the_way': {
-        nextStatus: 'in-progress',
-        buttonTextKey: 'start_repair',
+        nextStatus: 'inspection_started',
+        buttonTextKey: 'start_inspection',
         buttonIcon: Wrench,
     },
-    'in-progress': {
-        nextStatus: 'completed',
+    'repair_started': {
+        nextStatus: 'repair_completed',
         buttonTextKey: 'complete_job',
         buttonIcon: CheckCircle,
     }
@@ -128,8 +130,9 @@ export function JobCard({ job }: { job: Job }) {
 
   const statusBadge = () => {
     let className = "";
+    const statusKey = job.status as JobStatus;
 
-    switch(job.status) {
+    switch(statusKey) {
         case 'assigned':
             className="bg-orange-100 text-orange-800 border-orange-200 hover:bg-orange-100/80";
             break;
@@ -139,14 +142,24 @@ export function JobCard({ job }: { job: Job }) {
         case 'on_the_way':
             className="bg-cyan-100 text-cyan-800 border-cyan-200";
             break;
-        case 'in-progress':
-            className="bg-purple-100 text-purple-800 border-purple-200";
+        case 'in-progress': // This might be deprecated by more specific statuses
+        case 'inspection_started':
+        case 'repair_started':
+             className="bg-purple-100 text-purple-800 border-purple-200";
+            break;
+        case 'inspection_completed':
+        case 'quotation_shared':
+        case 'quotation_approved':
+            className="bg-yellow-100 text-yellow-800 border-yellow-200";
             break;
         case 'completed':
+        case 'repair_completed':
+        case 'closed_no_repair':
             className="bg-green-100 text-green-800 border-green-200";
             break;
         case 'cancelled':
         case 'rejected':
+        case 'quotation_rejected':
             className="bg-red-100 text-red-800 border-red-200";
             break;
         default:
@@ -154,7 +167,7 @@ export function JobCard({ job }: { job: Job }) {
     }
 
     if (job.status) {
-        return <Badge variant="outline" className={cn("capitalize", className)}>{t(`job_api_status.${job.status}`)}</Badge>
+        return <Badge variant="outline" className={cn("capitalize whitespace-nowrap", className)}>{t(`job_api_status.${statusKey}`)}</Badge>
     }
     return null
   }
@@ -170,21 +183,126 @@ export function JobCard({ job }: { job: Job }) {
   const NextActionIcon = nextAction?.buttonIcon;
 
 
+  const renderFooter = () => {
+    if (job.status === 'assigned') {
+        return (
+             <>
+              <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                      <Button variant="outline" className="w-full bg-card" disabled={isPending}>
+                          {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <X className="mr-2 h-4 w-4" />}
+                          {t('job_card.reject')}
+                      </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                      <AlertDialogHeader>
+                      <AlertDialogTitle>Are you sure you want to reject this job?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                          This action cannot be undone. This job will be removed from your list.
+                      </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction onClick={() => handleStatusUpdate('rejected')}>
+                          Confirm Reject
+                      </AlertDialogAction>
+                      </AlertDialogFooter>
+                  </AlertDialogContent>
+              </AlertDialog>
+              <Button className="w-full" onClick={() => handleStatusUpdate('accepted')} disabled={isPending}>
+                {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Check className="mr-2 h-4 w-4" />}
+                {t('job_card.accept')}
+              </Button>
+            </>
+        )
+    }
+
+    if (['completed', 'repair_completed', 'closed_no_repair'].includes(job.status)) {
+        return (
+             <div className="col-span-2">
+                <EarningSheet job={job}>
+                    <Button variant="secondary" className="w-full">
+                        <HandCoins className="mr-2 h-4 w-4" />
+                        See Earning
+                    </Button>
+                </EarningSheet>
+            </div>
+        )
+    }
+
+    // Default buttons for ongoing jobs
+    let mainActionButton = null;
+
+    if (nextAction && NextActionIcon) {
+        mainActionButton = (
+            <Button size="sm" className="w-full text-xs" onClick={() => handleStatusUpdate(nextAction.nextStatus)} disabled={isPending}>
+                {isPending ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <NextActionIcon className="mr-1 h-4 w-4" />}
+                {t(`status_updater.${nextAction.buttonTextKey}`)}
+            </Button>
+        );
+    } else if (job.status === 'inspection_started' && profile) {
+        mainActionButton = (
+             <InspectionDetailsForm
+                job={job}
+                technicianId={profile.id}
+                onFormSubmit={() => router.refresh()}
+             >
+                <Button size="sm" className="w-full text-xs" disabled={isPending}>
+                    {isPending ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <FileText className="mr-1 h-4 w-4" />}
+                    {t('status_updater.inspection_done')}
+                </Button>
+            </InspectionDetailsForm>
+        );
+    } else if (job.status === 'inspection_completed') {
+        mainActionButton = (
+            <ShareQuoteForm
+                job={job}
+                onFormSubmit={() => router.refresh()}
+            >
+                <Button size="sm" className="w-full text-xs" disabled={isPending}>
+                    {isPending ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <Share2 className="mr-1 h-4 w-4" />}
+                    {t('status_updater.share_quote')}
+                </Button>
+            </ShareQuoteForm>
+        );
+    }
+
+    return (
+        <div className="col-span-2 grid grid-cols-3 gap-2">
+            <Button variant="outline" size="sm" className="w-full text-xs" asChild>
+                <a href={`tel:${job.mobile_number}`}><Phone className="mr-1 h-4 w-4" /> Call</a>
+            </Button>
+            {job.map_url ? (
+                <Button variant="outline" size="sm" className="w-full text-xs" asChild>
+                    <a href={job.map_url} target="_blank" rel="noopener noreferrer">
+                        <Navigation className="mr-1 h-4 w-4" /> Navigate
+                    </a>
+                </Button>
+            ) : (
+                <Button variant="outline" size="sm" className="w-full text-xs" disabled>
+                    <Navigation className="mr-1 h-4 w-4" /> Navigate
+                </Button>
+            )}
+            {mainActionButton}
+        </div>
+    )
+  }
+
   return (
       <Card className="overflow-hidden transition-all shadow-md">
          <CardHeader className="flex-row items-start justify-between gap-4 p-4">
-             <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-secondary">
+             <div className="flex items-center gap-3 overflow-hidden">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-secondary flex-shrink-0">
                     <DeviceIcon className="h-6 w-6 text-secondary-foreground" />
                 </div>
-                <div>
-                    <CardTitle className="text-base font-bold font-headline">{job.categories.name}</CardTitle>
+                <div className="flex-1 overflow-hidden">
+                    <CardTitle className="text-base font-bold font-headline truncate">{job.categories.name}</CardTitle>
                     <p className="text-xs text-muted-foreground">
                         {format(new Date(job.created_at), 'MMM dd, yyyy · h:mm a')}
                     </p>
                 </div>
             </div>
-             <div className="text-right flex-shrink-0">
+             <div className="text-right flex-shrink-0 flex flex-col items-end gap-1">
                 <p className="font-bold text-lg">₹{job.total_estimated_price}</p>
                  {statusBadge()}
             </div>
@@ -224,86 +342,11 @@ export function JobCard({ job }: { job: Job }) {
         </div>
         
         <CardFooter className="grid grid-cols-2 gap-3 p-2 bg-muted/50">
-          {job.status === "assigned" ? (
-            <>
-              <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                      <Button variant="outline" className="w-full bg-card" disabled={isPending}>
-                          {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <X className="mr-2 h-4 w-4" />}
-                          {t('job_card.reject')}
-                      </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                      <AlertDialogHeader>
-                      <AlertDialogTitle>Are you sure you want to reject this job?</AlertDialogTitle>
-                      <AlertDialogDescription>
-                          This action cannot be undone. This job will be removed from your list.
-                      </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={() => handleStatusUpdate('rejected')}>
-                          Confirm Reject
-                      </AlertDialogAction>
-                      </AlertDialogFooter>
-                  </AlertDialogContent>
-              </AlertDialog>
-              <Button className="w-full" onClick={() => handleStatusUpdate('accepted')} disabled={isPending}>
-                {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Check className="mr-2 h-4 w-4" />}
-                {t('job_card.accept')}
-              </Button>
-            </>
-          ) : job.status === "completed" ? (
-            <div className="col-span-2">
-                <EarningSheet job={job}>
-                    <Button variant="secondary" className="w-full">
-                        <HandCoins className="mr-2 h-4 w-4" />
-                        See Earning
-                    </Button>
-                </EarningSheet>
-            </div>
-          ) : (
-            <div className="col-span-2 grid grid-cols-3 gap-2">
-              <Button variant="outline" size="sm" className="w-full text-xs" asChild>
-                <a href={`tel:${job.mobile_number}`}><Phone className="mr-1 h-4 w-4" /> Call</a>
-              </Button>
-               {job.map_url ? (
-                  <Button variant="outline" size="sm" className="w-full text-xs" asChild>
-                    <a href={job.map_url} target="_blank" rel="noopener noreferrer">
-                      <Navigation className="mr-1 h-4 w-4" /> Navigate
-                    </a>
-                  </Button>
-                ) : (
-                   <Button variant="outline" size="sm" className="w-full text-xs" disabled>
-                      <Navigation className="mr-1 h-4 w-4" /> Navigate
-                    </Button>
-                )}
-                
-                {nextAction && NextActionIcon && job.status !== 'in-progress' && (
-                    <Button size="sm" className="w-full text-xs" onClick={() => handleStatusUpdate(nextAction.nextStatus)} disabled={isPending}>
-                        {isPending ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <NextActionIcon className="mr-1 h-4 w-4" />}
-                        {t(`status_updater.${nextAction.buttonTextKey}`)}
-                    </Button>
-                )}
-
-                {job.status === 'in-progress' && (
-                    <RepairDetailsForm 
-                      job={job}
-                      onFormSubmit={() => router.refresh()}
-                    >
-                        <Button size="sm" className="w-full text-xs" disabled={isPending}>
-                            {isPending ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <CheckCircle className="mr-1 h-4 w-4" />}
-                            {t(`status_updater.complete_job`)}
-                        </Button>
-                    </RepairDetailsForm>
-                )}
-                
-                {job.status === 'cancelled' && <Button size="sm" disabled variant="destructive" className="w-full text-xs col-start-3"><X className="mr-1"/> Cancelled</Button>}
-                {job.status === 'rejected' && <Button size="sm" disabled variant="destructive" className="w-full text-xs col-start-3"><X className="mr-1"/> Rejected</Button>}
-            </div>
-          )}
+          {renderFooter()}
         </CardFooter>
 
       </Card>
   );
 }
+
+    

@@ -1,6 +1,22 @@
 
 
-export type JobStatus = 'assigned' | 'accepted' | 'on_the_way' | 'in-progress' | 'completed' | 'cancelled' | 'rejected';
+
+export type JobStatus = 
+  'assigned' | 
+  'accepted' | 
+  'rejected' |
+  'on_the_way' | 
+  'inspection_started' |
+  'inspection_completed' |
+  'quotation_shared' |
+  'quotation_approved' |
+  'quotation_rejected' |
+  'repair_started' |
+  'repair_completed' |
+  'closed_no_repair' |
+  'in-progress' | // Legacy or fallback
+  'completed' | 
+  'cancelled';
 
 // This represents the data structure from your API
 export type Job = {
@@ -51,3 +67,5 @@ export type Technician = {
   average_rating: number;
   total_ratings: number;
 };
+
+    

@@ -106,6 +106,26 @@
         "toast_title": "मरम्मत विवरण सहेजा गया",
         "toast_description": "अंतिम लागत के रूप में दर्ज की गई"
     },
+    "inspection_details_form": {
+        "title": "निरीक्षण विवरण",
+        "findings_label": "निष्कर्ष",
+        "findings_placeholder": "निरीक्षण के दौरान आपको क्या मिला, उसका वर्णन करें...",
+        "inspection_fee_label": "अंतिम निरीक्षण शुल्क",
+        "submit_button": "निष्कर्ष जमा करें",
+        "toast_title_success": "निरीक्षण पूरा हुआ",
+        "toast_description_success": "निष्कर्ष सहेज लिए गए हैं।"
+    },
+    "share_quote_form": {
+        "title": "मरम्मत कोटेशन साझा करें",
+        "labor_cost_label": "श्रम लागत",
+        "parts_cost_label": "पुर्जों की लागत",
+        "total_amount_label": "कुल कोटेशन राशि",
+        "notes_label": "ग्राहक के लिए नोट्स (वैकल्पिक)",
+        "notes_placeholder": "उदा., वारंटी विवरण, मरम्मत की समय-सीमा...",
+        "submit_button": "कोटेशन साझा करें",
+        "toast_title_success": "कोटेशन साझा किया गया",
+        "toast_description_success": "कोटेशन ग्राहक के साथ साझा किया गया है: ₹"
+    },
     "status_updater": {
         "toast_title": "स्थिति अपडेट की गई",
         "toast_description": "नौकरी की स्थिति अब है:",
@@ -114,6 +134,9 @@
         "accept_job": "नौकरी स्वीकार करें",
         "start_travel": "यात्रा शुरू करें",
         "start_repair": "निरीक्षण करें",
+        "start_inspection": "निरीक्षण शुरू करें",
+        "inspection_done": "निरीक्षण हो गया",
+        "share_quote": "कोटेशन साझा करें",
         "complete_job": "नौकरी पूरी करें",
         "complete_job_note": "भुगतान एकत्र करने के बाद, नौकरी पूरी करने के लिए मरम्मत विवरण जोड़ें।"
     },
@@ -124,7 +147,15 @@
         "in-progress": "प्रगति में है",
         "completed": "पूरा हुआ",
         "cancelled": "रद्द",
-        "rejected": "अस्वीकृत"
+        "rejected": "अस्वीकृत",
+        "inspection_started": "निरीक्षण शुरू",
+        "inspection_completed": "निरीक्षण पूरा",
+        "quotation_shared": "कोटेशन साझा",
+        "quotation_approved": "कोटेशन स्वीकृत",
+        "quotation_rejected": "कोटेशन अस्वीकृत",
+        "repair_started": "मरम्मत शुरू",
+        "repair_completed": "मरम्मत पूरी",
+        "closed_no_repair": "बंद (कोई मरम्मत नहीं)"
     },
     "devices": {
         "television": "टेलीविजन",
@@ -161,3 +192,5 @@
         "aadhar_back": "आधार कार्ड (पिछला फोटो)"
     }
 }
+
+    

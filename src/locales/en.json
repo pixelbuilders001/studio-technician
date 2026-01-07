@@ -106,6 +106,26 @@
         "toast_title": "Repair Details Saved",
         "toast_description": "Final cost recorded as"
     },
+    "inspection_details_form": {
+        "title": "Inspection Details",
+        "findings_label": "Findings",
+        "findings_placeholder": "Describe what you found during the inspection...",
+        "inspection_fee_label": "Final Inspection Fee",
+        "submit_button": "Submit Findings",
+        "toast_title_success": "Inspection Completed",
+        "toast_description_success": "Findings have been saved."
+    },
+    "share_quote_form": {
+        "title": "Share Repair Quote",
+        "labor_cost_label": "Labor Cost",
+        "parts_cost_label": "Parts Cost",
+        "total_amount_label": "Total Quote Amount",
+        "notes_label": "Notes for Customer (Optional)",
+        "notes_placeholder": "e.g., Warranty details, repair timeline...",
+        "submit_button": "Share Quote",
+        "toast_title_success": "Quote Shared",
+        "toast_description_success": "The quote has been shared with the customer: ₹"
+    },
     "status_updater": {
         "toast_title": "Status Updated",
         "toast_description": "Job status is now:",
@@ -114,6 +134,9 @@
         "accept_job": "Accept Job",
         "start_travel": "Start Travel",
         "start_repair": "Inspect",
+        "start_inspection": "Start Inspection",
+        "inspection_done": "Inspection Done",
+        "share_quote": "Share Quote",
         "complete_job": "Complete Job",
         "complete_job_note": "After collecting payment, add repair details to complete the job."
     },
@@ -124,7 +147,15 @@
         "in-progress": "In Progress",
         "completed": "Completed",
         "cancelled": "Cancelled",
-        "rejected": "Rejected"
+        "rejected": "Rejected",
+        "inspection_started": "Inspection Started",
+        "inspection_completed": "Inspection Completed",
+        "quotation_shared": "Quote Shared",
+        "quotation_approved": "Quote Approved",
+        "quotation_rejected": "Quote Rejected",
+        "repair_started": "Repair Started",
+        "repair_completed": "Repair Completed",
+        "closed_no_repair": "Closed (No Repair)"
     },
     "devices": {
         "television": "Television",
@@ -161,3 +192,5 @@
         "aadhar_back": "Aadhar Card (Back Photo)"
     }
 }
+
+    

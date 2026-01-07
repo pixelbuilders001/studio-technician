@@ -19,8 +19,26 @@ export function JobTabs({ jobs, activeTab, onTabChange }: JobTabsProps) {
   const router = useRouter();
 
   const newJobs = jobs.filter((job) => job.status === "assigned");
-  const ongoingJobs = jobs.filter((job) => ["accepted", "on_the_way", "in-progress"].includes(job.status));
-  const completedJobs = jobs.filter((job) => job.status === "completed");
+  const ongoingJobs = jobs.filter((job) => [
+    "accepted",
+    "on_the_way",
+    "inspection_started",
+    "inspection_completed",
+    "quotation_shared",
+    "quotation_approved",
+    "repair_started",
+    "in-progress" // Keep for backward compatibility
+  ].includes(job.status));
+  
+  const completedJobs = jobs.filter((job) => [
+    "completed", 
+    "repair_completed", 
+    "closed_no_repair",
+    "cancelled",
+    "rejected",
+    "quotation_rejected"
+  ].includes(job.status));
+
 
   const renderJobList = (jobList: Job[], emptyMessage: string) => {
     if (jobList.length === 0) {
@@ -66,3 +84,5 @@ export function JobTabs({ jobs, activeTab, onTabChange }: JobTabsProps) {
     </Tabs>
   );
 }
+
+    

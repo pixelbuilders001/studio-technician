@@ -19,7 +19,7 @@ export async function estimateTimeAction(input: EstimateCompletionTimeInput) {
 
 type UpdateStatusPayload = {
     booking_id: string;
-    status: 'accepted' | 'rejected' | 'on_the_way' | 'in-progress' | 'completed' | 'cancelled';
+    status: 'accepted' | 'rejected' | 'on_the_way' | 'in-progress' | 'completed' | 'cancelled' | 'inspection_started' | 'inspection_completed' | 'quotation_shared' | 'quotation_approved' | 'quotation_rejected' | 'repair_started' | 'repair_completed' | 'closed_no_repair';
     note: string;
     order_id: string;
     final_cost?: number;
@@ -60,6 +60,89 @@ export async function updateJobStatusAction(payload: UpdateStatusPayload) {
     console.error('Update job status API error:', error);
     throw new Error(error.message || "An unexpected error occurred while updating status.");
   }
+}
+
+type InspectionDetailsPayload = {
+    booking_id: string;
+    technician_id: string;
+    findings: string;
+    inspection_fee: number;
+}
+
+export async function saveInspectionDetailsAction(payload: InspectionDetailsPayload) {
+    const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/inspections`;
+    const apikey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!url || !apikey) {
+        throw new Error("Server configuration error.");
+    }
+    
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'apikey': apikey,
+                'Authorization': `Bearer ${apikey}`,
+                'Prefer': 'return=minimal',
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (response.status !== 201) {
+            const errorText = await response.text();
+            throw new Error(`Failed to save inspection details: ${errorText}`);
+        }
+        
+        revalidatePath('/jobs');
+        return { success: true };
+
+    } catch (e: any) {
+        console.error("saveInspectionDetailsAction error:", e);
+        throw new Error(e.message);
+    }
+}
+
+type QuotePayload = {
+  booking_id: string;
+  labor_cost: number;
+  parts_cost: number;
+  total_amount: number;
+  notes?: string;
+}
+
+export async function shareQuoteAction(payload: QuotePayload) {
+    const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/repair_quotes`;
+    const apikey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!url || !apikey) {
+        throw new Error("Server configuration error.");
+    }
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'apikey': apikey,
+                'Authorization': `Bearer ${apikey}`,
+                'Prefer': 'return=minimal',
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (response.status !== 201) {
+             const errorText = await response.text();
+            throw new Error(`Failed to save quote: ${errorText}`);
+        }
+        
+        revalidatePath('/jobs');
+        return { success: true };
+
+    } catch(e: any) {
+        console.error("shareQuoteAction error:", e);
+        throw new Error(e.message);
+    }
 }
 
 
@@ -323,3 +406,5 @@ export async function getTechnicianStats(technicianId: string): Promise<Technici
     return null;
   }
 }
+
+    
