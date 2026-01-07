@@ -35,10 +35,12 @@ import { Separator } from "../ui/separator";
 import { updateJobStatusAction } from "@/app/actions";
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { RepairDetailsForm } from "./RepairDetailsForm";
+import { RepairDetailsForm, type RepairDetails } from "./RepairDetailsForm";
 import { EarningSheet } from "./EarningSheet";
 import { InspectionDetailsForm } from "./InspectionDetailsForm";
 import { ShareQuoteForm } from "./ShareQuoteForm";
+import { CompletionCodeDialog } from "./CompletionCodeDialog";
+import { PaymentCollectionDialog } from "./PaymentCollectionDialog";
 
 const iconMap: { [key: string]: React.ElementType } = {
   LAPTOPS: Wrench,
@@ -91,6 +93,11 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
   const { toast } = useToast();
   const { t } = useTranslation();
   const [isPending, startTransition] = useTransition();
+  
+  const [codeOpen, setCodeOpen] = useState(false);
+  const [paymentOpen, setPaymentOpen] = useState(false);
+  const [repairDetails, setRepairDetails] = useState<RepairDetails | null>(null);
+
 
   const handleStatusUpdate = (status: JobStatus) => {
     if (!technicianId) {
@@ -120,6 +127,49 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
             });
         }
     });
+  };
+
+  const handleCodeSent = (details: RepairDetails) => {
+      setRepairDetails(details);
+      onJobsUpdate(); // Refresh list to show 'code_sent' status
+      setCodeOpen(true); // Open code dialog
+  };
+
+  const onCodeVerified = () => {
+      setCodeOpen(false);
+      setPaymentOpen(true);
+  }
+
+  const onPaymentSuccess = async () => {
+    if (!repairDetails) {
+        toast({ title: "Error", description: "Repair details are missing.", variant: "destructive" });
+        return;
+    }
+    try {
+        await updateJobStatusAction({
+            booking_id: job.id,
+            status: 'repair_completed',
+            note: `Payment of ₹${repairDetails.finalCost} collected. Notes: ${repairDetails.notes}`,
+            order_id: job.order_id,
+            final_cost: repairDetails.finalCost,
+            spare_parts_used: repairDetails.spareParts,
+        });
+
+        toast({
+            title: t('payment_collection_dialog.toast_title_success'),
+            description: t('payment_collection_dialog.toast_description_success'),
+        });
+        
+        setPaymentOpen(false);
+        onJobsUpdate();
+
+    } catch(error: any) {
+         toast({
+            title: "Update Failed",
+            description: error.message || "Could not complete the job.",
+            variant: "destructive",
+        });
+    }
   };
   
   const DeviceIcon = iconMap[job.categories.name] || Wrench;
@@ -273,18 +323,25 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
                 {t('status_updater.quote_sent')}
             </Button>
         );
-    } else if (job.status === 'repair_started' || job.status === 'code_sent') {
+    } else if (job.status === 'repair_started') {
         mainActionButton = (
              <RepairDetailsForm
                 job={job}
-                onFormSubmit={onJobsUpdate}
+                onCodeSent={handleCodeSent}
              >
                 <Button size="sm" className="w-full text-xs" disabled={isPending}>
                     {isPending ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <CheckCircle className="mr-1 h-4 w-4" />}
-                    {job.status === 'code_sent' ? t('status_updater.enter_code') : t('status_updater.complete_job')}
+                    {t('status_updater.complete_job')}
                 </Button>
             </RepairDetailsForm>
         );
+    } else if (job.status === 'code_sent') {
+         mainActionButton = (
+            <Button size="sm" className="w-full text-xs" onClick={() => setCodeOpen(true)}>
+                <CheckCircle className="mr-1 h-4 w-4" />
+                {t('status_updater.enter_code')}
+            </Button>
+         )
     }
 
 
@@ -310,6 +367,7 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
   }
 
   return (
+    <>
       <Card className="overflow-hidden transition-all shadow-md">
          <CardHeader className="flex-row items-start justify-between gap-4 p-4">
              <div className="flex items-center gap-3 overflow-hidden">
@@ -367,5 +425,21 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
         </CardFooter>
 
       </Card>
+
+      <CompletionCodeDialog
+          bookingId={job.id}
+          open={codeOpen}
+          onOpenChange={setCodeOpen}
+          onVerificationSuccess={onCodeVerified}
+      />
+      
+      <PaymentCollectionDialog
+          job={job}
+          totalAmount={repairDetails?.finalCost || 0}
+          open={paymentOpen}
+          onOpenChange={setPaymentOpen}
+          onPaymentSuccess={onPaymentSuccess}
+      />
+    </>
   );
 }
