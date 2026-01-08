@@ -1,6 +1,7 @@
 
 
 
+
 export type JobStatus = 
   'assigned' | 
   'accepted' | 
@@ -27,6 +28,7 @@ export type Job = {
   full_address: string;
   pincode: string;
   total_estimated_price: number;
+  final_amount_to_be_paid?: number;
   net_inspection_fee: number;
   media_url: string | null;
   user_name: string;
@@ -67,5 +69,7 @@ export type Technician = {
   average_rating: number;
   total_ratings: number;
 };
+
+    
 
     

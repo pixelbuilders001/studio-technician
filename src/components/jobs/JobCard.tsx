@@ -97,7 +97,7 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [repairDetails, setRepairDetails] = useState<RepairDetails | null>(null);
 
-  const finalCost = repairDetails?.finalCost || job.total_estimated_price;
+  const finalCost = repairDetails?.finalCost || job.final_amount_to_be_paid || job.total_estimated_price;
   const platformFeePercentage = 20; // Assuming 20% platform fee
   const technicianPayout = finalCost - ((finalCost * platformFeePercentage) / 100);
 
@@ -392,7 +392,7 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
                 </div>
             </div>
              <div className="text-right flex-shrink-0 flex flex-col items-end gap-1">
-                <p className="font-bold text-lg">₹{job.total_estimated_price}</p>
+                <p className="font-bold text-lg">₹{job.final_amount_to_be_paid ?? job.total_estimated_price}</p>
                  {statusBadge()}
             </div>
         </CardHeader>
@@ -459,5 +459,7 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
     </>
   );
 }
+
+    
 
     
