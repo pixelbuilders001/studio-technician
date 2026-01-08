@@ -30,7 +30,8 @@ export function JobTabs({ jobs, activeTab, onTabChange, technicianId, onJobsUpda
     "quotation_approved",
     "repair_started",
     "in-progress",// Keep for backward compatibility
-    "code_sent"
+    "code_sent",
+    "payment_pending"
   ].includes(job.status));
   
   const completedJobs = jobs.filter((job) => [

@@ -52,10 +52,6 @@ export function CompletionCodeDialog({
         technician_id: technicianId,
         earning_amount: earningAmount,
       });
-      toast({
-        title: "Code Verified!",
-        description: "Please proceed to collect payment.",
-      });
       onVerificationSuccess();
     } catch (e: any) {
       setError("Invalid code. Please try again.");

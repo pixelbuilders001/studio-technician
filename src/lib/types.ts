@@ -2,6 +2,7 @@
 
 
 
+
 export type JobStatus = 
   'assigned' | 
   'accepted' | 
@@ -13,6 +14,8 @@ export type JobStatus =
   'quotation_approved' |
   'quotation_rejected' |
   'repair_started' |
+  'code_sent' |
+  'payment_pending' |
   'repair_completed' |
   'closed_no_repair' |
   'in-progress' | // Legacy or fallback

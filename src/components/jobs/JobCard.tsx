@@ -25,7 +25,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { MapPin, Check, X, Wrench, Tv, Refrigerator, Smartphone, AirVent, WashingMachine, Info, IndianRupee, Phone, Navigation, CheckCircle, ArrowRight, HandCoins, FileText, Share2 } from "lucide-react";
+import { MapPin, Check, X, Wrench, Tv, Refrigerator, Smartphone, AirVent, WashingMachine, Info, IndianRupee, Phone, Navigation, CheckCircle, ArrowRight, HandCoins, FileText, Share2, Wallet } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import React, { useState, useTransition } from "react";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -97,7 +97,7 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [repairDetails, setRepairDetails] = useState<RepairDetails | null>(null);
 
-  const finalCost = repairDetails?.finalCost || job.final_amount_to_be_paid || job.total_estimated_price;
+  const finalCost = job.final_amount_to_be_paid || job.total_estimated_price;
   const platformFeePercentage = 20; // Assuming 20% platform fee
   const technicianPayout = finalCost - ((finalCost * platformFeePercentage) / 100);
 
@@ -137,13 +137,36 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
       setCodeOpen(true); // Open code dialog
   };
 
-  const onCodeVerified = () => {
-      setCodeOpen(false);
-      setPaymentOpen(true);
+  const onCodeVerified = async () => {
+      if (!technicianId) return;
+
+      try {
+        await updateJobStatusAction({
+            booking_id: job.id,
+            status: 'payment_pending',
+            note: 'Completion code verified. Awaiting payment.',
+            order_id: job.order_id,
+        });
+
+        toast({
+            title: "Code Verified!",
+            description: "Please proceed to collect payment.",
+        });
+
+        setCodeOpen(false);
+        onJobsUpdate();
+
+      } catch (error: any) {
+         toast({
+            title: "Update Failed",
+            description: error.message || "Could not update job status.",
+            variant: "destructive",
+        });
+      }
   }
 
   const onPaymentSuccess = async () => {
-    if (!repairDetails || !technicianId) {
+    if (!technicianId) {
         toast({ title: "Error", description: "Repair details are missing.", variant: "destructive" });
         return;
     }
@@ -151,10 +174,9 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
         await updateJobStatusAction({
             booking_id: job.id,
             status: 'repair_completed',
-            note: `Payment of ₹${repairDetails.finalCost} collected. Notes: ${repairDetails.notes}`,
+            note: `Payment of ₹${finalCost} collected.`,
             order_id: job.order_id,
-            final_cost: repairDetails.finalCost,
-            spare_parts_used: repairDetails.spareParts,
+            final_cost: finalCost
         });
 
         toast({
@@ -191,15 +213,16 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
             className="bg-cyan-100 text-cyan-800 border-cyan-200";
             break;
         case 'in-progress': // This might be deprecated by more specific statuses
-        case 'inspection_started':
         case 'repair_started':
              className="bg-purple-100 text-purple-800 border-purple-200";
             break;
+        case 'inspection_started':
         case 'inspection_completed':
         case 'quotation_shared':
             className="bg-yellow-100 text-yellow-800 border-yellow-200";
             break;
         case 'code_sent':
+        case 'payment_pending':
             className="bg-indigo-100 text-indigo-800 border-indigo-200";
             break;
         case 'quotation_approved':
@@ -352,6 +375,13 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
                 {t('status_updater.enter_code')}
             </Button>
          )
+    } else if (job.status === 'payment_pending') {
+        mainActionButton = (
+            <Button size="sm" className="w-full text-xs" onClick={() => setPaymentOpen(true)}>
+                <Wallet className="mr-1 h-4 w-4" />
+                Receive Payment
+            </Button>
+        );
     }
 
 
@@ -449,7 +479,7 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
           
           <PaymentCollectionDialog
               job={job}
-              totalAmount={repairDetails?.finalCost || 0}
+              totalAmount={finalCost}
               open={paymentOpen}
               onOpenChange={setPaymentOpen}
               onPaymentSuccess={onPaymentSuccess}
