@@ -118,7 +118,12 @@ export function RepairDetailsForm({ job, children, onCodeSent }: RepairDetailsFo
                     <FormItem>
                     <FormLabel>{t('repair_details_form.final_cost_label')}</FormLabel>
                     <FormControl>
-                        <Input type="number" {...field} disabled className="font-bold text-base" />
+                        <div className="relative">
+                            <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
+                                ₹
+                            </span>
+                            <Input type="number" {...field} disabled className="font-bold text-base pl-8" />
+                        </div>
                     </FormControl>
                     <FormMessage />
                     </FormItem>
