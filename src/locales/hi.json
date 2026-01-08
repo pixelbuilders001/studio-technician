@@ -95,7 +95,7 @@
     "repair_details_form": {
         "trigger_button": "मरम्मत विवरण जोड़ें",
         "title": "नौकरी पूरी करें",
-        "final_cost_label": "अंतिम मरम्मत लागत",
+        "final_cost_label": "कुल देय राशि",
         "final_cost_placeholder": "उदा., 1500",
         "spare_parts_label": "स्पेयर पार्ट्स का इस्तेमाल (वैकल्पिक)",
         "spare_parts_placeholder": "उदा., 1x कैपेसिटर, 1x फ्यूज",

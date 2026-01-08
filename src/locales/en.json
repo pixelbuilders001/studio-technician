@@ -95,7 +95,7 @@
     "repair_details_form": {
         "trigger_button": "Add Repair Details",
         "title": "Complete Job",
-        "final_cost_label": "Final Repair Cost",
+        "final_cost_label": "Total Payable Amount",
         "final_cost_placeholder": "e.g., 1500",
         "spare_parts_label": "Spare Parts Used (Optional)",
         "spare_parts_placeholder": "e.g., 1x Capacitor, 1x Fuse",
