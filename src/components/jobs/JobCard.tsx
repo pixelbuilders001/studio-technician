@@ -303,14 +303,18 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
 
     if (['completed', 'repair_completed', 'closed_no_repair'].includes(job.status)) {
         return (
-             <div className="col-span-2">
+            <>
+                <Button variant="secondary" className="w-full" onClick={() => setPaymentOpen(true)}>
+                    <Wallet className="mr-2 h-4 w-4" />
+                    Receive Payment
+                </Button>
                 <EarningSheet job={job}>
                     <Button variant="secondary" className="w-full">
                         <HandCoins className="mr-2 h-4 w-4" />
                         See Earning
                     </Button>
                 </EarningSheet>
-            </div>
+            </>
         )
     }
 
@@ -489,7 +493,5 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
     </>
   );
 }
-
-    
 
     
