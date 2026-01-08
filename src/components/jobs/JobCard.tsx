@@ -414,11 +414,11 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
                 <Dialog>
                     <DialogTrigger asChild>
                         <div className="relative h-12 w-12 rounded-md overflow-hidden cursor-pointer flex-shrink-0">
-                            <Image src={job.media_url} alt="Job photo" layout="fill" className="object-cover"/>
+                            <Image src={job.media_url} alt="Job photo" fill className="object-cover"/>
                         </div>
                     </DialogTrigger>
                     <DialogContent className="p-0 border-0 max-w-screen-md">
-                            <Image 
+                        <Image 
                             src={job.media_url} 
                             alt="Job photo" 
                             width={800}
@@ -459,3 +459,5 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
     </>
   );
 }
+
+    
