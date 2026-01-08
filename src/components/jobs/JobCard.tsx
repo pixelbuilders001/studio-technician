@@ -25,7 +25,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { MapPin, Check, X, Wrench, Tv, Refrigerator, Smartphone, AirVent, WashingMachine, Info, IndianRupee, Phone, Navigation, CheckCircle, ArrowRight, HandCoins, FileText, Share2, Wallet } from "lucide-react";
+import { MapPin, Check, X, Wrench, Tv, Refrigerator, Smartphone, AirVent, WashingMachine, Info, IndianRupee, Phone, Navigation, CheckCircle, ArrowRight, HandCoins, FileText, Share2, Wallet, Download } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import React, { useState, useTransition } from "react";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -98,7 +98,7 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
   const [repairDetails, setRepairDetails] = useState<RepairDetails | null>(null);
 
   const finalCost = job.final_amount_to_be_paid || job.total_estimated_price;
-  const platformFeePercentage = 20; // Assuming 20% platform fee
+  const platformFeePercentage = 18; // Assuming 20% platform fee
   const technicianPayout = finalCost - ((finalCost * platformFeePercentage) / 100);
 
   const handleStatusUpdate = (status: JobStatus) => {
@@ -302,12 +302,20 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
     }
 
     if (['completed', 'repair_completed', 'closed_no_repair'].includes(job.status)) {
+        const isPaid = (job.final_amount_paid ?? 0) > 0;
         return (
             <>
-                <Button variant="secondary" className="w-full" onClick={() => setPaymentOpen(true)}>
-                    <Wallet className="mr-2 h-4 w-4" />
-                    Receive Payment
-                </Button>
+                {isPaid ? (
+                    <Button variant="secondary" className="w-full">
+                        <Download className="mr-2 h-4 w-4" />
+                        Download Invoice
+                    </Button>
+                ) : (
+                    <Button variant="secondary" className="w-full" onClick={() => setPaymentOpen(true)}>
+                        <Wallet className="mr-2 h-4 w-4" />
+                        Receive Payment
+                    </Button>
+                )}
                 <EarningSheet job={job}>
                     <Button variant="secondary" className="w-full">
                         <HandCoins className="mr-2 h-4 w-4" />
@@ -448,7 +456,7 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
                 <Dialog>
                     <DialogTrigger asChild>
                         <div className="relative h-12 w-12 rounded-md overflow-hidden cursor-pointer flex-shrink-0">
-                            <Image src={job.media_url} alt="Job photo" fill className="object-cover"/>
+                             <Image src={job.media_url} alt="Job photo" fill className="object-cover"/>
                         </div>
                     </DialogTrigger>
                     <DialogContent className="p-0 border-0 max-w-screen-md">

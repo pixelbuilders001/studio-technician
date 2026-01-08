@@ -3,6 +3,7 @@
 
 
 
+
 export type JobStatus = 
   'assigned' | 
   'accepted' | 
@@ -32,6 +33,7 @@ export type Job = {
   pincode: string;
   total_estimated_price: number;
   final_amount_to_be_paid?: number;
+  final_amount_paid?: number;
   net_inspection_fee: number;
   media_url: string | null;
   user_name: string;

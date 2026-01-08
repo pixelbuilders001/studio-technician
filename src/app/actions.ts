@@ -200,7 +200,7 @@ export async function technicianLoginAction(payload: LoginPayload): Promise<Logi
 }
 
 export async function getJobsAction(technicianId: string) {
-  const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/booking?technician_id=eq.${technicianId}&select=final_amount_to_be_paid%2Cnet_inspection_fee%2Cuser_name%2Cid%2Corder_id%2Cstatus%2Ccreated_at%2Cfull_address%2Cpreferred_time_slot%2Cpincode%2Ctotal_estimated_price%2Cmedia_url%2Cmobile_number%2Cmap_url%2Ccategories(id%2Cname)%2Cissues(id%2Ctitle)&order=created_at.desc`;
+  const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/booking?technician_id=eq.${technicianId}&select=final_amount_to_be_paid%2Cfinal_amount_paid%2Cnet_inspection_fee%2Cuser_name%2Cid%2Corder_id%2Cstatus%2Ccreated_at%2Cfull_address%2Cpreferred_time_slot%2Cpincode%2Ctotal_estimated_price%2Cmedia_url%2Cmobile_number%2Cmap_url%2Ccategories(id%2Cname)%2Cissues(id%2Ctitle)&order=created_at.desc`;
   const apikey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!url || !apikey) {
@@ -230,7 +230,7 @@ export async function getJobsAction(technicianId: string) {
 }
 
 export async function getJobByIdAction(jobId: string, technicianId: string) {
-  const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/booking?id=eq.${jobId}&technician_id=eq.${technicianId}&select=final_amount_to_be_paid%2Cnet_inspection_fee%2Cuser_name%2Cid%2Corder_id%2Cstatus%2Ccreated_at%2Cfull_address%2Cpreferred_time_slot%2Cpincode%2Ctotal_estimated_price%2Cmedia_url%2Cmobile_number%2Cmap_url%2Ccategories(id%2Cname)%2Cissues(id%2Ctitle)&limit=1`;
+  const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/booking?id=eq.${jobId}&technician_id=eq.${technicianId}&select=final_amount_to_be_paid%2Cfinal_amount_paid%2Cnet_inspection_fee%2Cuser_name%2Cid%2Corder_id%2Cstatus%2Ccreated_at%2Cfull_address%2Cpreferred_time_slot%2Cpincode%2Ctotal_estimated_price%2Cmedia_url%2Cmobile_number%2Cmap_url%2Ccategories(id%2Cname)%2Cissues(id%2Ctitle)&limit=1`;
   const apikey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!url || !apikey) {
