@@ -15,6 +15,8 @@ import {
 import { useTranslation } from "@/hooks/useTranslation";
 import { type Job } from "@/lib/types";
 import { Loader2 } from "lucide-react";
+import { verifyPaymentAction } from "@/app/actions";
+import { useToast } from "@/hooks/use-toast";
 
 type PaymentCollectionDialogProps = {
   job: Job;
@@ -33,13 +35,24 @@ export function PaymentCollectionDialog({
 }: PaymentCollectionDialogProps) {
   const [isLoading, setIsLoading] = useState(false);
   const { t } = useTranslation();
+  const { toast } = useToast();
 
   const handleCashPayment = async () => {
     setIsLoading(true);
     try {
+      await verifyPaymentAction({
+        booking_id: job.id,
+        payment_method: 'cash',
+        final_amount_paid: totalAmount,
+      });
+
       await onPaymentSuccess();
     } catch (error: any) {
-      // The parent component will show the toast on error
+       toast({
+        variant: "destructive",
+        title: "Payment Verification Failed",
+        description: error.message || "Could not verify cash payment.",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -56,7 +69,7 @@ export function PaymentCollectionDialog({
         <div className="flex flex-col items-center justify-center space-y-4 py-4">
           <p className="text-muted-foreground">{t('payment_collection_dialog.total_due')}</p>
           <p className="text-4xl font-bold">
-            {new Intl.NumberFormat('en-IN', {
+           {new Intl.NumberFormat('en-IN', {
               style: 'currency',
               currency: 'INR',
               minimumFractionDigits: 0,

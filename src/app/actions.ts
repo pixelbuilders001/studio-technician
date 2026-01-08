@@ -19,7 +19,7 @@ export async function estimateTimeAction(input: EstimateCompletionTimeInput) {
 
 type UpdateStatusPayload = {
     booking_id: string;
-    status: 'accepted' | 'rejected' | 'on_the_way' | 'in-progress' | 'code_sent' | 'completed' | 'cancelled' | 'inspection_started' | 'inspection_completed' | 'quotation_shared' | 'quotation_approved' | 'quotation_rejected' | 'repair_started' | 'repair_completed' | 'closed_no_repair';
+    status: 'accepted' | 'rejected' | 'on_the_way' | 'in-progress' | 'code_sent' | 'completed' | 'cancelled' | 'inspection_started' | 'inspection_completed' | 'quotation_shared' | 'quotation_approved' | 'quotation_rejected' | 'repair_started' | 'repair_completed' | 'closed_no_repair' | 'payment_pending';
     note: string;
     order_id: string;
     final_cost?: number;
@@ -510,6 +510,47 @@ export async function verifyCompletionCodeAction(payload: VerifyCodePayload) {
   }
 }
 
+
+type VerifyPaymentPayload = {
+  booking_id: string;
+  payment_method: 'cash' | 'upi';
+  final_amount_paid: number;
+}
+
+export async function verifyPaymentAction(payload: VerifyPaymentPayload) {
+  const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/verify-payment`;
+  const apikey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+   if (!url || !apikey) {
+    throw new Error("Server configuration error.");
+  }
+
+  try {
+     const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': apikey,
+        'Authorization': `Bearer ${apikey}`,
+      },
+      body: JSON.stringify(payload),
+    });
+
+     if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Could not verify payment.");
+    }
+
+    const data = await response.json();
+    if(data.success) {
+      return { success: true };
+    }
+    throw new Error(data.error || "Payment verification failed.");
+
+  } catch(e: any) {
+    console.error("verifyPaymentAction error", e);
+    throw new Error(e.message);
+  }
+}
     
 
     
