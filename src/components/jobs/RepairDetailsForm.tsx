@@ -24,17 +24,15 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "@/hooks/useTranslation";
 import { type Job } from "@/lib/types";
 import { Loader2 } from "lucide-react";
 import { updateJobStatusAction, sendCompletionCodeAction } from "@/app/actions";
+import { Alert, AlertDescription } from "../ui/alert";
 
 const repairDetailsSchema = z.object({
   finalCost: z.coerce.number().positive({ message: "Please enter a valid cost." }),
-  spareParts: z.string().optional(),
-  notes: z.string().optional(),
 });
 
 export type RepairDetails = z.infer<typeof repairDetailsSchema>;
@@ -51,12 +49,12 @@ export function RepairDetailsForm({ job, children, onCodeSent }: RepairDetailsFo
   const { toast } = useToast();
   const { t } = useTranslation();
 
+  const finalAmount = job.final_amount_to_be_paid ?? job.total_estimated_price;
+
   const form = useForm<RepairDetails>({
     resolver: zodResolver(repairDetailsSchema),
     defaultValues: {
-      finalCost: job.total_estimated_price,
-      spareParts: "",
-      notes: "",
+      finalCost: finalAmount,
     },
   });
   
@@ -96,9 +94,7 @@ export function RepairDetailsForm({ job, children, onCodeSent }: RepairDetailsFo
   const handleOpenChange = (isOpen: boolean) => {
     if (!isOpen) {
       form.reset({
-          finalCost: job.total_estimated_price,
-          spareParts: "",
-          notes: "",
+          finalCost: finalAmount,
       });
     }
     setOpen(isOpen);
@@ -122,38 +118,19 @@ export function RepairDetailsForm({ job, children, onCodeSent }: RepairDetailsFo
                     <FormItem>
                     <FormLabel>{t('repair_details_form.final_cost_label')}</FormLabel>
                     <FormControl>
-                        <Input type="number" placeholder={t('repair_details_form.final_cost_placeholder')} {...field} />
+                        <Input type="number" {...field} disabled className="font-bold text-base" />
                     </FormControl>
                     <FormMessage />
                     </FormItem>
                 )}
                 />
-                <FormField
-                control={form.control}
-                name="spareParts"
-                render={({ field }) => (
-                    <FormItem>
-                    <FormLabel>{t('repair_details_form.spare_parts_label')}</FormLabel>
-                    <FormControl>
-                        <Input placeholder={t('repair_details_form.spare_parts_placeholder')} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                    </FormItem>
-                )}
-                />
-                <FormField
-                control={form.control}
-                name="notes"
-                render={({ field }) => (
-                    <FormItem>
-                    <FormLabel>{t('repair_details_form.notes_label')}</FormLabel>
-                    <FormControl>
-                        <Textarea placeholder={t('repair_details_form.notes_placeholder')} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                    </FormItem>
-                )}
-                />
+                
+                <Alert>
+                  <AlertDescription>
+                    After code verification, please collect ₹{finalAmount} from the customer.
+                  </AlertDescription>
+                </Alert>
+
                 <DialogFooter className="pt-4">
                   <DialogClose asChild>
                       <Button type="button" variant="outline">{t('repair_details_form.cancel_button')}</Button>
