@@ -53,7 +53,7 @@ export async function updateJobStatusAction(payload: UpdateStatusPayload) {
     }
     
     revalidatePath('/jobs');
-
+  console.log("revalidated /jobs path");
     const data = await response.json();
     return data;
 
