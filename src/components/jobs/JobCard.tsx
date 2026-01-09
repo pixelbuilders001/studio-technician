@@ -243,7 +243,7 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
     }
 
     if (job.status) {
-        return <Badge variant="outline" className={cn("capitalize whitespace-nowrap", className)}>{t(`job_api_status.${statusKey}`)}</Badge>
+        return <Badge variant="outline" className={cn("capitalize whitespace-nowrap", className)}>{statusKey.replace(/_/g, ' ')}</Badge>
     }
     return null
   }

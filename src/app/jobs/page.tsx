@@ -25,6 +25,7 @@ function JobsPageContent() {
   const { t } = useTranslation();
   const { profile } = useProfile(); // Keep for header, but not for fetching logic
   const [jobs, setJobs] = useState<Job[]>([]);
+  console.log("jfjjfdjfdjj",jobs)
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [technicianId, setTechnicianId] = useState<string | null>(null);
