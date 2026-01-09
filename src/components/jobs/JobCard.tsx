@@ -417,10 +417,22 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
         </div>
     )
   }
+  
+  const isCompleted = job.status === 'repair_completed';
 
   return (
     <>
-      <Card className="overflow-hidden transition-all shadow-md">
+      <Card className={cn(
+        "overflow-hidden transition-all shadow-md relative",
+        isCompleted && "bg-green-50 border-green-200"
+        )}>
+         {isCompleted && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div className="text-green-600/10 font-black text-6xl transform -rotate-12 select-none">
+                    COMPLETED
+                </div>
+            </div>
+         )}
          <CardHeader className="flex-row items-start justify-between gap-4 p-4">
              <div className="flex items-center gap-3 overflow-hidden">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-secondary flex-shrink-0">
@@ -501,5 +513,3 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
     </>
   );
 }
-
-    
