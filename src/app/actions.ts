@@ -518,14 +518,17 @@ type VerifyPaymentPayload = {
 }
 
 export async function verifyPaymentAction(payload: VerifyPaymentPayload) {
-  const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/verify-payment`;
   const apikey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-   if (!url || !apikey) {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+
+  if (!supabaseUrl || !apikey) {
     throw new Error("Server configuration error.");
   }
 
   try {
-     const response = await fetch(url, {
+    // Step 1: Verify the payment
+    const verifyPaymentUrl = `${supabaseUrl}/functions/v1/verify-payment`;
+    const verifyResponse = await fetch(verifyPaymentUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -535,18 +538,38 @@ export async function verifyPaymentAction(payload: VerifyPaymentPayload) {
       body: JSON.stringify(payload),
     });
 
-     if (!response.ok) {
-      const errorData = await response.json();
+    if (!verifyResponse.ok) {
+      const errorData = await verifyResponse.json();
       throw new Error(errorData.error || "Could not verify payment.");
     }
-
-    const data = await response.json();
-    if(data.success) {
-      return { success: true };
+    
+    const verifyData = await verifyResponse.json();
+    if (!verifyData.success) {
+      throw new Error(verifyData.error || "Payment verification failed.");
     }
-    throw new Error(data.error || "Payment verification failed.");
 
-  } catch(e: any) {
+    // Step 2: Complete the booking
+    const completeBookingUrl = `${supabaseUrl}/functions/v1/complete-booking`;
+    const completeResponse = await fetch(completeBookingUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': apikey,
+        'Authorization': `Bearer ${apikey}`,
+      },
+      body: JSON.stringify({ booking_id: payload.booking_id }),
+    });
+
+    if (!completeResponse.ok) {
+      const errorData = await completeResponse.json();
+      // Even if this fails, the payment was verified. We might want to log this differently.
+      console.error("Failed to complete booking after payment verification:", errorData.error);
+      // We can still return success as payment was the primary goal here.
+    }
+    
+    return { success: true };
+
+  } catch (e: any) {
     console.error("verifyPaymentAction error", e);
     throw new Error(e.message);
   }
@@ -554,3 +577,4 @@ export async function verifyPaymentAction(payload: VerifyPaymentPayload) {
     
 
     
+
