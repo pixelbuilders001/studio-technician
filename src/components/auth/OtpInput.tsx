@@ -17,7 +17,7 @@ export const OtpInput = React.forwardRef<HTMLInputElement, OtpInputProps>(
     const handleChange = (element: HTMLInputElement, index: number) => {
       // Allow only single digits
       const value = element.value.replace(/[^0-9]/g, '').slice(0, 1);
-      
+
       const newOtp = [...otp];
       newOtp[index] = value;
       setOtp(newOtp);
@@ -31,24 +31,24 @@ export const OtpInput = React.forwardRef<HTMLInputElement, OtpInputProps>(
         inputRefs.current[index + 1]?.focus();
       }
     };
-    
+
     const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
-        e.preventDefault();
-        const paste = e.clipboardData.getData('text').slice(0, length);
-        if (/[^0-9]/.test(paste)) return;
+      e.preventDefault();
+      const paste = e.clipboardData.getData('text').slice(0, length);
+      if (/[^0-9]/.test(paste)) return;
 
-        const newOtp = new Array(length).fill('');
-        for (let i = 0; i < paste.length; i++) {
-            newOtp[i] = paste[i];
-        }
-        setOtp(newOtp);
+      const newOtp = new Array(length).fill('');
+      for (let i = 0; i < paste.length; i++) {
+        newOtp[i] = paste[i];
+      }
+      setOtp(newOtp);
 
-        if (onChange) {
-            onChange(newOtp.join(''));
-        }
+      if (onChange) {
+        onChange(newOtp.join(''));
+      }
 
-        const nextFocusIndex = Math.min(paste.length, length - 1);
-        inputRefs.current[nextFocusIndex]?.focus();
+      const nextFocusIndex = Math.min(paste.length, length - 1);
+      inputRefs.current[nextFocusIndex]?.focus();
     }
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
@@ -76,7 +76,7 @@ export const OtpInput = React.forwardRef<HTMLInputElement, OtpInputProps>(
               onKeyDown={e => handleKeyDown(e, index)}
               onFocus={e => e.target.select()}
               onPaste={handlePaste}
-              ref={el => (inputRefs.current[index] = el)}
+              ref={el => { inputRefs.current[index] = el; }}
             />
           );
         })}

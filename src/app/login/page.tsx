@@ -17,22 +17,20 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 function LoginContent() {
   const { t } = useTranslation();
-  const searchParams = useSearchParams();
-  const mobile = searchParams.get('mobile');
 
   return (
     <div className="bg-background p-8 rounded-t-3xl -mt-6 relative z-20">
       <Card className="border-none shadow-none">
         <CardHeader className="p-0 text-center">
           <CardTitle className="text-2xl font-bold font-headline">
-            {t('login_form.verify_otp_title')}
+            {t('login_page.title')}
           </CardTitle>
           <CardDescription className="pt-1">
-            {t('login_form.verify_otp_subtitle', mobile ? `+91${mobile}` : "")}
+            {t('login_page.subtitle')}
           </CardDescription>
         </CardHeader>
         <CardContent className="p-0 pt-6">
-          <LoginForm initialStep="otp" mobileNumber={mobile || ""} />
+          <LoginForm />
         </CardContent>
       </Card>
     </div>
@@ -40,16 +38,16 @@ function LoginContent() {
 }
 
 function LoginSkeleton() {
-    return (
-        <div className="bg-background p-8 rounded-t-3xl -mt-6 relative z-20">
-            <div className="space-y-4 text-center">
-                <Skeleton className="h-8 w-48 mx-auto" />
-                <Skeleton className="h-4 w-64 mx-auto" />
-                <Skeleton className="h-14 w-full mt-6" />
-                <Skeleton className="h-10 w-full" />
-            </div>
-        </div>
-    )
+  return (
+    <div className="bg-background p-8 rounded-t-3xl -mt-6 relative z-20">
+      <div className="space-y-4 text-center">
+        <Skeleton className="h-8 w-48 mx-auto" />
+        <Skeleton className="h-4 w-64 mx-auto" />
+        <Skeleton className="h-14 w-full mt-6" />
+        <Skeleton className="h-10 w-full" />
+      </div>
+    </div>
+  )
 }
 
 export default function LoginPage() {

@@ -25,7 +25,7 @@ function JobsPageContent() {
   const { t } = useTranslation();
   const { profile } = useProfile(); // Keep for header, but not for fetching logic
   const [jobs, setJobs] = useState<Job[]>([]);
-  console.log("jfjjfdjfdjj",jobs)
+  console.log("jfjjfdjfdjj", jobs)
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [technicianId, setTechnicianId] = useState<string | null>(null);
@@ -47,14 +47,14 @@ function JobsPageContent() {
         if (parsedProfile.id) {
           setTechnicianId(parsedProfile.id);
         } else {
-           setLoading(false);
+          setLoading(false);
         }
       } catch (e) {
         console.error("Failed to parse technician profile from storage", e);
         setLoading(false);
       }
     } else {
-        setLoading(false);
+      setLoading(false);
     }
   }, []); // Empty dependency array ensures this runs only once
 
@@ -81,7 +81,7 @@ function JobsPageContent() {
   }, [technicianId]); // This will run exactly once when technicianId is set.
 
   const refreshJobs = () => {
-     if (technicianId) {
+    if (technicianId) {
       getJobsAction(technicianId).then(setJobs);
     }
   }
@@ -97,9 +97,9 @@ function JobsPageContent() {
       ) : error ? (
         <div className="flex h-64 items-center justify-center text-destructive">{error}</div>
       ) : (
-        <JobTabs 
-          jobs={jobs} 
-          activeTab={tab as 'new' | 'ongoing' | 'completed'} 
+        <JobTabs
+          jobs={jobs}
+          activeTab={tab as 'new' | 'ongoing' | 'completed'}
           onTabChange={handleTabChange}
           technicianId={technicianId}
           onJobsUpdate={refreshJobs}
