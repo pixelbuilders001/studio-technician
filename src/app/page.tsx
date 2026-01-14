@@ -10,6 +10,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Suspense } from "react";
+import { Loader2 } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
 import { LoginForm } from "@/components/auth/LoginForm";
 import Link from "next/link";
@@ -42,7 +44,9 @@ export default function WelcomePage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="p-0 pt-6">
-            <LoginForm />
+            <Suspense fallback={<div className="h-64 flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin" /></div>}>
+              <LoginForm />
+            </Suspense>
           </CardContent>
         </Card>
       </div>

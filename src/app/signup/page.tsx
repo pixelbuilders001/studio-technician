@@ -10,6 +10,8 @@ import {
 } from "@/components/ui/card";
 import { useTranslation } from "@/hooks/useTranslation";
 import { SignUpForm } from "@/components/auth/SignUpForm";
+import { Suspense } from "react";
+import { Loader2 } from "lucide-react";
 
 export default function SignUpPage() {
     const { t } = useTranslation();
@@ -39,7 +41,9 @@ export default function SignUpPage() {
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="p-0 pt-6">
-                        <SignUpForm />
+                        <Suspense fallback={<div className="h-64 flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin" /></div>}>
+                            <SignUpForm />
+                        </Suspense>
                     </CardContent>
                 </Card>
             </div>
