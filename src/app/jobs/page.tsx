@@ -85,9 +85,15 @@ function JobsPageContent() {
 
   return (
     <div className="flex h-full flex-col">
-      <header className="flex h-14 items-center justify-between border-b bg-background px-4">
-        <h1 className="text-xl font-bold font-headline">{t('jobs_page.title')}</h1>
-        {profile && <span className="text-sm font-medium">Welcome, {profile.full_name}</span>}
+      <header className="flex h-16 items-center border-b border-white/20 bg-white/70 backdrop-blur-lg px-4 justify-between sticky top-0 z-50">
+        <h1 className="text-xl font-bold font-headline bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+          {t('jobs_page.title')}
+        </h1>
+        {profile && (
+          <div className="flex items-center gap-2 px-3 py-1 bg-primary/5 rounded-full border border-primary/10">
+            <span className="text-xs font-semibold text-primary">{profile.full_name}</span>
+          </div>
+        )}
       </header>
       {loading ? (
         <JobsSkeleton />

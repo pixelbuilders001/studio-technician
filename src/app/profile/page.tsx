@@ -45,11 +45,15 @@ export default function ProfilePage() {
 
     if (loading) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-screen">
-                <Skeleton className="h-24 w-24 rounded-full mb-4" />
-                <Skeleton className="h-7 w-32 mb-2" />
-                <Skeleton className="h-5 w-40 mb-2" />
-                <Skeleton className="h-5 w-40 mb-2" />
+            <div className="flex flex-col items-center justify-center min-h-screen p-4 space-y-4">
+                <Skeleton className="h-28 w-28 rounded-full" />
+                <Skeleton className="h-8 w-48" />
+                <Skeleton className="h-4 w-32" />
+                <div className="grid grid-cols-2 gap-4 w-full">
+                    <Skeleton className="h-24 w-full rounded-2xl" />
+                    <Skeleton className="h-24 w-full rounded-2xl" />
+                </div>
+                <Skeleton className="h-64 w-full rounded-2xl" />
             </div>
         );
     }
@@ -59,181 +63,260 @@ export default function ProfilePage() {
     }
 
     return (
-        <div className="flex flex-col bg-secondary/30 min-h-screen">
-            <header className="flex h-14 items-center border-b bg-background px-4 justify-between sticky top-0 z-10">
-                <h1 className="text-xl font-bold font-headline">{t('profile_page.title')}</h1>
+        <div className="flex flex-col bg-slate-50 min-h-screen pb-10">
+            {/* Glassmorphism Header */}
+            <header className="flex h-16 items-center border-b border-white/20 bg-white/70 backdrop-blur-lg px-4 justify-between sticky top-0 z-50">
+                <h1 className="text-xl font-bold font-headline bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+                    {t('profile_page.title')}
+                </h1>
                 <LanguageSelector />
             </header>
 
-            <div className="flex-1 space-y-4 p-4">
-                <Card>
-                    <CardContent className="pt-6">
-                        <div className="flex flex-col items-center text-center">
-                            <div className="relative h-24 w-24">
+            <div className="flex-1 space-y-6">
+                {/* Hero Section with Gradient */}
+                <div className="relative pt-8 pb-12 px-4 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent overflow-hidden">
+                    <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-primary/10 rounded-full blur-3xl opacity-50"></div>
+                    <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-64 h-64 bg-blue-400/10 rounded-full blur-3xl opacity-50"></div>
+
+                    <div className="flex flex-col items-center text-center relative z-10">
+                        <div className="relative">
+                            <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl animate-pulse"></div>
+                            <div className="relative h-28 w-28 rounded-full border-4 border-white shadow-2xl overflow-hidden ring-4 ring-primary/10">
                                 <Image
                                     src={profile.selfie_url || 'https://picsum.photos/seed/tech/200/200'}
                                     alt={profile.full_name}
-                                    width={96}
-                                    height={96}
-                                    className="rounded-full object-cover border-4 border-background shadow-md"
-                                    data-ai-hint="person portrait"
+                                    width={112}
+                                    height={112}
+                                    className="object-cover h-full w-full"
+                                    priority
                                 />
                             </div>
-                            <h2 className="mt-3 text-2xl font-bold font-headline">{profile.full_name}</h2>
-                            <p className="text-muted-foreground text-sm">{t('profile_page.technician_id')}: {profile.id.substring(0, 8).toUpperCase()}</p>
-                            {stats.average_rating && stats.average_rating > 0 &&
-                                <div className="flex items-center gap-1 mt-2 text-sm text-muted-foreground">
-                                    <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
-                                    <span className="font-bold text-foreground">{stats.average_rating.toFixed(1)}</span>
-                                    ({stats.total_ratings} ratings)
-                                </div>
-                            }
+                            {profile.role && (
+                                <Badge className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-3 py-1 bg-primary text-white border-white shadow-lg">
+                                    {profile.role.toUpperCase()}
+                                </Badge>
+                            )}
                         </div>
-                    </CardContent>
-                </Card>
+                        <h2 className="mt-6 text-3xl font-extrabold font-headline text-slate-900 tracking-tight">
+                            {profile.full_name}
+                        </h2>
+                        <div className="mt-1 flex items-center gap-2 text-slate-500 font-medium">
+                            <span className="bg-slate-200/50 px-2 py-0.5 rounded text-xs uppercase tracking-wider">
+                                ID: {profile.id.substring(0, 8).toUpperCase()}
+                            </span>
+                        </div>
+                    </div>
+                </div>
 
-                <Card>
-                    <CardContent className="flex justify-around pt-6 text-center">
-                        <div className="flex flex-col items-center">
-                            <p className="text-sm text-muted-foreground">{t('profile_page.todays_earnings')}</p>
-                            <p className="text-2xl font-bold">{new Intl.NumberFormat('en-IN', {
-                                style: 'currency',
-                                currency: 'INR',
-                                minimumFractionDigits: 0,
-                                maximumFractionDigits: 0,
-                            }).format(stats.today_earnings ?? 0)}</p>
-                        </div>
-                        <div className="flex flex-col items-center">
-                            <p className="text-sm text-muted-foreground">{t('profile_page.lifetime_earnings')}</p>
-                            <p className="text-2xl font-bold">{new Intl.NumberFormat('en-IN', {
-                                style: 'currency',
-                                currency: 'INR',
-                                minimumFractionDigits: 0,
-                                maximumFractionDigits: 0,
-                            }).format(stats.lifetime_earnings ?? 0)}</p>
-                        </div>
-                    </CardContent>
-                </Card>
+                <div className="px-4 space-y-6 -mt-8 relative z-20">
+                    {/* Earnings Quick Stats */}
+                    <div className="grid grid-cols-2 gap-4">
+                        <Card className="border-none shadow-xl shadow-slate-200/50 bg-white group overflow-hidden">
+                            <CardContent className="p-5 relative">
+                                <div className="absolute -right-4 -top-4 w-12 h-12 bg-green-50 rounded-full transition-transform group-hover:scale-150 duration-500"></div>
+                                <div className="space-y-1 relative z-10">
+                                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Today</p>
+                                    <p className="text-xl font-bold font-headline text-slate-900">
+                                        ₹{new Intl.NumberFormat('en-IN', {
+                                            maximumFractionDigits: 0,
+                                        }).format(stats.today_earnings ?? 0)}
+                                    </p>
+                                </div>
+                            </CardContent>
+                        </Card>
+                        <Card className="border-none shadow-xl shadow-slate-200/50 bg-white group overflow-hidden">
+                            <CardContent className="p-5 relative">
+                                <div className="absolute -right-4 -top-4 w-12 h-12 bg-primary/5 rounded-full transition-transform group-hover:scale-150 duration-500"></div>
+                                <div className="space-y-1 relative z-10">
+                                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Lifetime</p>
+                                    <p className="text-xl font-bold font-headline text-slate-900">
+                                        ₹{new Intl.NumberFormat('en-IN', {
+                                            maximumFractionDigits: 0,
+                                        }).format(stats.lifetime_earnings ?? 0)}
+                                    </p>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
 
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="text-base font-semibold">Job Statistics</CardTitle>
-                    </CardHeader>
-                    <CardContent className="grid grid-cols-3 gap-3">
-                        <div className="flex flex-col items-center justify-center space-y-1 rounded-lg p-3 text-white bg-blue-400">
-                            <Briefcase className="h-7 w-7" />
-                            <p className="text-sm font-medium">Assigned</p>
-                            <p className="text-2xl font-bold">{stats.total_jobs_assigned ?? 0}</p>
-                        </div>
-                        <div className="flex flex-col items-center justify-center space-y-1 rounded-lg p-3 text-white bg-green-500">
-                            <CheckCircle className="h-7 w-7" />
-                            <p className="text-sm font-medium">Completed</p>
-                            <p className="text-2xl font-bold">{stats.total_jobs_completed ?? 0}</p>
-                        </div>
-                        <div className="flex flex-col items-center justify-center space-y-1 rounded-lg p-3 text-white bg-red-500">
-                            <XCircle className="h-7 w-7" />
-                            <p className="text-sm font-medium">Cancelled</p>
-                            <p className="text-2xl font-bold">{stats.total_jobs_cancelled ?? 0}</p>
-                        </div>
-                    </CardContent>
-                </Card>
+                    {/* Work Summary Grid */}
+                    <Card className="border-none shadow-xl shadow-slate-200/50 bg-white">
+                        <CardHeader className="pb-3">
+                            <CardTitle className="text-lg font-bold font-headline flex items-center gap-2">
+                                <Briefcase className="h-5 w-5 text-primary" />
+                                Work Summary
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="grid grid-cols-3 gap-3">
+                                <div className="flex flex-col items-center justify-center space-y-1 rounded-2xl p-4 bg-blue-50/50 border border-blue-100/50 transition-colors hover:bg-blue-50">
+                                    <p className="text-2xl font-bold text-blue-600">{stats.total_jobs_assigned ?? 0}</p>
+                                    <p className="text-[10px] font-bold text-blue-400 uppercase tracking-tighter">Assigned</p>
+                                </div>
+                                <div className="flex flex-col items-center justify-center space-y-1 rounded-2xl p-4 bg-emerald-50/50 border border-emerald-100/50 transition-colors hover:bg-emerald-50">
+                                    <p className="text-2xl font-bold text-emerald-600">{stats.total_jobs_completed ?? 0}</p>
+                                    <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-tighter">Done</p>
+                                </div>
+                                <div className="flex flex-col items-center justify-center space-y-1 rounded-2xl p-4 bg-rose-50/50 border border-rose-100/50 transition-colors hover:bg-rose-50">
+                                    <p className="text-2xl font-bold text-rose-600">{stats.total_jobs_cancelled ?? 0}</p>
+                                    <p className="text-[10px] font-bold text-rose-400 uppercase tracking-tighter">Failed</p>
+                                </div>
+                            </div>
 
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="text-base font-semibold">Profile Details</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4 pt-6">
-                        <div className="flex items-start gap-4">
-                            <Phone className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-1" />
-                            <div>
-                                <p className="text-sm text-muted-foreground">{t('profile_page.phone_number')}</p>
-                                <div className="font-medium">{profile?.phone}</div>
-                            </div>
-                        </div>
-                        <Separator />
-                        <div className="flex items-start gap-4">
-                            <Map className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-1" />
-                            <div>
-                                <p className="text-sm text-muted-foreground">{t('profile_page.service_area')}</p>
-                                <div className="font-medium">{stats.service_area}</div>
-                            </div>
-                        </div>
-                        <Separator />
-                        <div className="flex items-start gap-4">
-                            <Tag className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-1" />
-                            <div>
-                                <p className="text-sm text-muted-foreground">{t('profile_page.service_categories')}</p>
-                                <div className="flex flex-wrap gap-2 pt-1">
-                                    {stats.other_skills && stats.other_skills.length > 0 ? stats.other_skills.map((cat: string) => <Badge key={cat} variant="secondary">{cat.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}</Badge>) : <span className="text-muted-foreground">No skills listed</span>}
+                            {stats.average_rating && stats.average_rating > 0 && (
+                                <div className="mt-4 pt-4 border-t border-slate-50 flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <div className="bg-yellow-100 p-1.5 rounded-lg">
+                                            <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                                        </div>
+                                        <div>
+                                            <p className="text-sm font-bold text-slate-900">{stats.average_rating.toFixed(1)} Rating</p>
+                                            <p className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">From {stats.total_ratings} reviews</p>
+                                        </div>
+                                    </div>
+                                    <CheckCircle className="h-5 w-5 text-primary opacity-20" />
                                 </div>
-                            </div>
-                        </div>
-                        <Separator />
-                        <div className="flex items-start gap-4">
-                            <Tag className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-1" />
-                            <div>
-                                <p className="text-sm text-muted-foreground">Primary Skill</p>
-                                <div className="font-medium">{profile.primary_skill || '-'}</div>
-                            </div>
-                        </div>
-                        <Separator />
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="flex items-start gap-4">
-                                <Briefcase className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-1" />
-                                <div>
-                                    <p className="text-sm text-muted-foreground">Total Assigned</p>
-                                    <div className="font-medium">{stats.total_jobs_assigned?.toString()}</div>
-                                </div>
-                            </div>
-                            <div className="flex items-start gap-4">
-                                <CheckCircle className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-1" />
-                                <div>
-                                    <p className="text-sm text-muted-foreground">Total Completed</p>
-                                    <div className="font-medium">{stats.total_jobs_completed?.toString()}</div>
-                                </div>
-                            </div>
-                            <div className="flex items-start gap-4">
-                                <XCircle className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-1" />
-                                <div>
-                                    <p className="text-sm text-muted-foreground">Total Cancelled</p>
-                                    <div className="font-medium">{stats.total_jobs_cancelled?.toString()}</div>
-                                </div>
-                            </div>
-                            <div className="flex items-start gap-4">
-                                <Star className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-1" />
-                                <div>
-                                    <p className="text-sm text-muted-foreground">Average Rating</p>
-                                    <div className="font-medium">{stats.average_rating?.toFixed(1)}</div>
-                                </div>
-                            </div>
-                            <div className="flex items-start gap-4">
-                                <User className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-1" />
-                                <div>
-                                    <p className="text-sm text-muted-foreground">Total Ratings</p>
-                                    <div className="font-medium">{stats.total_ratings?.toString()}</div>
-                                </div>
-                            </div>
-                            <div className="flex items-start gap-4">
-                                <Tag className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-1" />
-                                <div>
-                                    <p className="text-sm text-muted-foreground">Today Earnings</p>
-                                    <div className="font-medium">{stats.today_earnings?.toString()}</div>
-                                </div>
-                            </div>
-                            <div className="flex items-start gap-4">
-                                <Tag className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-1" />
-                                <div>
-                                    <p className="text-sm text-muted-foreground">Lifetime Earnings</p>
-                                    <div className="font-medium">{stats.lifetime_earnings?.toString()}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
+                            )}
+                        </CardContent>
+                    </Card>
 
-                <Button variant="destructive" className="w-full h-12 text-base" onClick={handleLogout}>
-                    <LogOut className="mr-2 h-5 w-5" /> {t('profile_page.logout')}
-                </Button>
+                    {/* Professional Info */}
+                    <Card className="border-none shadow-xl shadow-slate-200/50 bg-white overflow-hidden">
+                        <CardHeader className="pb-3 border-b border-slate-50">
+                            <CardTitle className="text-lg font-bold font-headline">Professional Info</CardTitle>
+                        </CardHeader>
+                        <CardContent className="p-0">
+                            <div className="divide-y divide-slate-50">
+                                <div className="flex items-center gap-4 p-4 transition-colors hover:bg-slate-50/50">
+                                    <div className="p-2.5 bg-indigo-50 rounded-xl">
+                                        <Phone className="h-5 w-5 text-indigo-500" />
+                                    </div>
+                                    <div>
+                                        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Contact</p>
+                                        <p className="text-sm font-bold text-slate-900">{profile?.phone}</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-4 p-4 transition-colors hover:bg-slate-50/50">
+                                    <div className="p-2.5 bg-sky-50 rounded-xl">
+                                        <Map className="h-5 w-5 text-sky-500" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Service Area</p>
+                                        <p className="text-sm font-bold text-slate-900">{stats.service_area}</p>
+                                    </div>
+                                </div>
+                                <div className="p-4 space-y-3">
+                                    <div className="flex items-center gap-2">
+                                        <div className="p-1.5 bg-violet-50 rounded-lg">
+                                            <Tag className="h-4 w-4 text-violet-500" />
+                                        </div>
+                                        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Specialties</p>
+                                    </div>
+                                    <div className="flex flex-wrap gap-2">
+                                        {profile.primary_skill && (
+                                            <Badge className="bg-violet-100 text-violet-700 border-none hover:bg-violet-200 transition-colors">
+                                                {profile.primary_skill}
+                                            </Badge>
+                                        )}
+                                        {stats.other_skills?.map((cat: string) => (
+                                            <Badge key={cat} variant="secondary" className="bg-slate-100 text-slate-600 border-none capitalize">
+                                                {cat.replace(/_/g, ' ')}
+                                            </Badge>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Detailed Statistics List - Restored */}
+                    <Card className="border-none shadow-xl shadow-slate-200/50 bg-white">
+                        <CardHeader className="pb-3 border-b border-slate-50">
+                            <CardTitle className="text-lg font-bold font-headline">Performance Metrics</CardTitle>
+                        </CardHeader>
+                        <CardContent className="pt-6">
+                            <div className="grid grid-cols-2 gap-6">
+                                <div className="flex items-start gap-3">
+                                    <div className="p-2 bg-blue-50 rounded-lg">
+                                        <Briefcase className="h-4 w-4 text-blue-500" />
+                                    </div>
+                                    <div>
+                                        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Assigned</p>
+                                        <p className="text-lg font-bold text-slate-900">{stats.total_jobs_assigned}</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-start gap-3">
+                                    <div className="p-2 bg-emerald-50 rounded-lg">
+                                        <CheckCircle className="h-4 w-4 text-emerald-500" />
+                                    </div>
+                                    <div>
+                                        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Completed</p>
+                                        <p className="text-lg font-bold text-slate-900">{stats.total_jobs_completed}</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-start gap-3">
+                                    <div className="p-2 bg-rose-50 rounded-lg">
+                                        <XCircle className="h-4 w-4 text-rose-500" />
+                                    </div>
+                                    <div>
+                                        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Cancelled</p>
+                                        <p className="text-lg font-bold text-slate-900">{stats.total_jobs_cancelled}</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-start gap-3">
+                                    <div className="p-2 bg-yellow-50 rounded-lg">
+                                        <Star className="h-4 w-4 text-yellow-500" />
+                                    </div>
+                                    <div>
+                                        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Avg Rating</p>
+                                        <p className="text-lg font-bold text-slate-900">{stats.average_rating?.toFixed(1) || '0.0'}</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-start gap-3">
+                                    <div className="p-2 bg-purple-50 rounded-lg">
+                                        <User className="h-4 w-4 text-purple-500" />
+                                    </div>
+                                    <div>
+                                        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Ratings</p>
+                                        <p className="text-lg font-bold text-slate-900">{stats.total_ratings || 0}</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-start gap-3">
+                                    <div className="p-2 bg-amber-50 rounded-lg">
+                                        <Tag className="h-4 w-4 text-amber-500" />
+                                    </div>
+                                    <div>
+                                        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Today Earnings</p>
+                                        <p className="text-lg font-bold text-slate-900">₹{stats.today_earnings || 0}</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-start gap-3">
+                                    <div className="p-2 bg-green-50 rounded-lg">
+                                        <Tag className="h-4 w-4 text-green-500" />
+                                    </div>
+                                    <div>
+                                        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Lifetime Earnings</p>
+                                        <p className="text-lg font-bold text-slate-900">₹{stats.lifetime_earnings || 0}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Actions */}
+                    <div className="pt-4 space-y-3">
+                        <Button
+                            variant="outline"
+                            className="w-full h-14 text-base font-bold text-rose-500 border-rose-100 bg-rose-50/30 hover:bg-rose-50 hover:text-rose-600 border-2 rounded-2xl transition-all active:scale-[0.98]"
+                            onClick={handleLogout}
+                        >
+                            <LogOut className="mr-2 h-5 w-5" /> {t('profile_page.logout')}
+                        </Button>
+                        <p className="text-center text-[10px] text-slate-400 font-medium uppercase tracking-widest pb-8">
+                            App Version 1.0.4 • © SevaSetu
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
     );

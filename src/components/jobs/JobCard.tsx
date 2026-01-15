@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useRouter } from "next/navigation";
@@ -25,7 +24,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { MapPin, Check, X, Wrench, Tv, Refrigerator, Smartphone, AirVent, WashingMachine, Info, IndianRupee, Phone, Navigation, CheckCircle, ArrowRight, HandCoins, FileText, Share2, Wallet, Download } from "lucide-react";
+import { MapPin, Check, X, Wrench, Tv, Refrigerator, Smartphone, AirVent, WashingMachine, Info, IndianRupee, Phone, Navigation, CheckCircle, ArrowRight, HandCoins, FileText, Share2, Wallet, Download, Clock, User, ChevronRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import React, { useState, useTransition } from "react";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -49,16 +48,6 @@ const iconMap: { [key: string]: React.ElementType } = {
     "Air Conditioner": AirVent,
     "Washing Machine": WashingMachine,
 };
-
-const InfoRow = ({ icon: Icon, value, label }: { icon: React.ElementType, value: React.ReactNode, label: string }) => (
-    <div className="flex items-start gap-3 text-sm">
-        <Icon className="h-4 w-4 flex-shrink-0 text-muted-foreground mt-1" />
-        <div>
-            <p className="font-semibold text-foreground">{label}</p>
-            <p className="text-muted-foreground">{value}</p>
-        </div>
-    </div>
-);
 
 type StatusConfig = {
     [key in JobStatus]?: {
@@ -86,7 +75,6 @@ const statusFlow: StatusConfig = {
     },
 }
 
-
 export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technicianId: string | null, onJobsUpdate: () => void }) {
     const router = useRouter();
     const { toast } = useToast();
@@ -98,7 +86,7 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
     const [repairDetails, setRepairDetails] = useState<RepairDetails | null>(null);
 
     const finalCost = job.final_amount_to_be_paid || job.total_estimated_price;
-    const platformFeePercentage = 18; // Assuming 20% platform fee
+    const platformFeePercentage = 18;
     const technicianPayout = finalCost - ((finalCost * platformFeePercentage) / 100);
 
     const handleStatusUpdate = (status: JobStatus) => {
@@ -133,8 +121,8 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
 
     const handleCodeSent = (details: RepairDetails) => {
         setRepairDetails(details);
-        onJobsUpdate(); // Refresh list to show 'code_sent' status
-        setCodeOpen(true); // Open code dialog
+        onJobsUpdate();
+        setCodeOpen(true);
     };
 
     const onCodeVerified = async () => {
@@ -204,55 +192,58 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
 
         switch (statusKey) {
             case 'assigned':
-                className = "bg-orange-100 text-orange-800 border-orange-200 hover:bg-orange-100/80";
+                className = "bg-orange-100 text-orange-700 border-orange-200";
                 break;
             case 'accepted':
-                className = "bg-blue-100 text-blue-800 border-blue-200";
+                className = "bg-indigo-100 text-indigo-700 border-indigo-200";
                 break;
             case 'on_the_way':
-                className = "bg-cyan-100 text-cyan-800 border-cyan-200";
+                className = "bg-cyan-100 text-cyan-700 border-cyan-200";
                 break;
-            case 'in-progress': // This might be deprecated by more specific statuses
+            case 'in-progress':
             case 'repair_started':
-                className = "bg-purple-100 text-purple-800 border-purple-200";
+                className = "bg-purple-100 text-purple-700 border-purple-200";
                 break;
             case 'inspection_started':
             case 'inspection_completed':
             case 'quotation_shared':
-                className = "bg-yellow-100 text-yellow-800 border-yellow-200";
+                className = "bg-amber-100 text-amber-700 border-amber-200";
                 break;
             case 'code_sent':
             case 'payment_pending':
-                className = "bg-indigo-100 text-indigo-800 border-indigo-200";
+                className = "bg-blue-100 text-blue-700 border-blue-200";
                 break;
             case 'quotation_approved':
-                className = "bg-teal-100 text-teal-800 border-teal-200";
+                className = "bg-teal-100 text-teal-700 border-teal-200";
                 break;
             case 'completed':
             case 'repair_completed':
             case 'closed_no_repair':
-                className = "bg-green-100 text-green-800 border-green-200";
+                className = "bg-emerald-100 text-emerald-700 border-emerald-200";
                 break;
             case 'cancelled':
             case 'rejected':
             case 'quotation_rejected':
-                className = "bg-red-100 text-red-800 border-red-200";
+                className = "bg-rose-100 text-rose-700 border-rose-200";
                 break;
             default:
-                className = "bg-gray-100 text-gray-800 border-gray-200";
+                className = "bg-slate-100 text-slate-700 border-slate-200";
         }
 
         if (job.status) {
-            return <Badge variant="outline" className={cn("capitalize whitespace-nowrap", className)}>{statusKey.replace(/_/g, ' ')}</Badge>
+            return (
+                <Badge variant="outline" className={cn("capitalize px-2 py-0.5 rounded-md text-[10px] font-bold tracking-tight shadow-sm", className)}>
+                    {statusKey.replace(/_/g, ' ')}
+                </Badge>
+            )
         }
         return null
     }
 
     const formatPhoneNumber = (phone: string) => {
         if (!phone || phone.length < 10) return phone;
-        const countryCode = phone.length > 10 ? phone.slice(0, -10) : '91';
         const number = phone.slice(-10);
-        return `+${countryCode}XXXXXX${number.slice(-2)}`;
+        return `+91 XXXXXX${number.slice(-4)}`;
     }
 
     const nextAction = statusFlow[job.status];
@@ -262,77 +253,76 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
     const renderFooter = () => {
         if (!technicianId) {
             return (
-                <div className="col-span-2 text-center text-muted-foreground text-sm">
-                    Loading...
+                <div className="w-full text-center text-slate-400 text-sm py-2">
+                    <Loader2 className="h-4 w-4 animate-spin mx-auto" />
                 </div>
             );
         }
 
         if (job.status === 'assigned') {
             return (
-                <>
+                <div className="flex gap-3 w-full p-4 bg-slate-50 border-t border-slate-100">
                     <AlertDialog>
                         <AlertDialogTrigger asChild>
-                            <Button variant="outline" className="w-full bg-card" disabled={isPending}>
+                            <Button variant="outline" className="flex-1 h-12 rounded-xl text-rose-500 border-rose-100 hover:bg-rose-50 font-bold" disabled={isPending}>
                                 {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <X className="mr-2 h-4 w-4" />}
                                 {t('job_card.reject')}
                             </Button>
                         </AlertDialogTrigger>
-                        <AlertDialogContent>
+                        <AlertDialogContent className="rounded-3xl max-w-[90vw]">
                             <AlertDialogHeader>
-                                <AlertDialogTitle>Are you sure you want to reject this job?</AlertDialogTitle>
+                                <AlertDialogTitle>Reject this job?</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                    This action cannot be undone. This job will be removed from your list.
+                                    This job will be removed from your list and assigned to another technician.
                                 </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => handleStatusUpdate('rejected')}>
+                                <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => handleStatusUpdate('rejected')} className="bg-rose-500 hover:bg-rose-600 rounded-xl">
                                     Confirm Reject
                                 </AlertDialogAction>
                             </AlertDialogFooter>
                         </AlertDialogContent>
                     </AlertDialog>
-                    <Button className="w-full" onClick={() => handleStatusUpdate('accepted')} disabled={isPending}>
+                    <Button className="flex-1 h-12 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold shadow-lg shadow-primary/20" onClick={() => handleStatusUpdate('accepted')} disabled={isPending}>
                         {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Check className="mr-2 h-4 w-4" />}
                         {t('job_card.accept')}
                     </Button>
-                </>
+                </div>
             )
         }
 
         if (['completed', 'repair_completed', 'closed_no_repair'].includes(job.status)) {
             const isPaid = (job.final_amount_paid ?? 0) > 0;
             return (
-                <>
+                <div className="flex gap-3 w-full p-4 bg-slate-50 border-t border-slate-100">
                     {isPaid ? (
-                        <Button variant="secondary" className="w-full">
+                        <Button variant="outline" className="flex-1 h-11 rounded-xl border-slate-200 font-bold text-slate-700">
                             <Download className="mr-2 h-4 w-4" />
-                            Download Invoice
+                            Invoice
                         </Button>
                     ) : (
-                        <Button variant="secondary" className="w-full" onClick={() => setPaymentOpen(true)}>
+                        <Button variant="outline" className="flex-1 h-11 rounded-xl bg-amber-50 border-amber-100 text-amber-700 hover:bg-amber-100 font-bold" onClick={() => setPaymentOpen(true)}>
                             <Wallet className="mr-2 h-4 w-4" />
-                            Receive Payment
+                            Collect
                         </Button>
                     )}
                     <EarningSheet job={job}>
-                        <Button variant="secondary" className="w-full">
+                        <Button className="flex-1 h-11 rounded-xl bg-emerald-500 hover:bg-emerald-600 font-bold text-white shadow-lg shadow-emerald-500/20">
                             <HandCoins className="mr-2 h-4 w-4" />
-                            See Earning
+                            Earnings
                         </Button>
                     </EarningSheet>
-                </>
+                </div>
             )
         }
 
-        // Default buttons for ongoing jobs
         let mainActionButton = null;
 
         if (nextAction && NextActionIcon) {
             mainActionButton = (
-                <Button size="sm" className="w-full text-xs" onClick={() => handleStatusUpdate(nextAction.nextStatus)} disabled={isPending}>
-                    {isPending ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <NextActionIcon className="mr-1 h-4 w-4" />}
+                <Button className="h-11 flex-1 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold shadow-lg shadow-primary/20" onClick={() => handleStatusUpdate(nextAction.nextStatus)} disabled={isPending}>
+                    {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <NextActionIcon className="mr-2 h-4 w-4" />}
                     {t(`status_updater.${nextAction.buttonTextKey}`)}
                 </Button>
             );
@@ -343,8 +333,8 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
                     technicianId={technicianId}
                     onFormSubmit={onJobsUpdate}
                 >
-                    <Button size="sm" className="w-full text-xs" disabled={isPending}>
-                        {isPending ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <FileText className="mr-1 h-4 w-4" />}
+                    <Button className="h-11 flex-1 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold shadow-lg shadow-primary/20" disabled={isPending}>
+                        {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FileText className="mr-2 h-4 w-4" />}
                         {t('status_updater.inspection_done')}
                     </Button>
                 </InspectionDetailsForm>
@@ -355,16 +345,16 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
                     job={job}
                     onFormSubmit={onJobsUpdate}
                 >
-                    <Button size="sm" className="w-full text-xs" disabled={isPending}>
-                        {isPending ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <Share2 className="mr-1 h-4 w-4" />}
+                    <Button className="h-11 flex-1 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold shadow-lg shadow-primary/20" disabled={isPending}>
+                        {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Share2 className="mr-2 h-4 w-4" />}
                         {t('status_updater.share_quote')}
                     </Button>
                 </ShareQuoteForm>
             );
         } else if (job.status === 'quotation_shared') {
             mainActionButton = (
-                <Button size="sm" className="w-full text-xs" disabled>
-                    <Check className="mr-1 h-4 w-4" />
+                <Button className="h-11 flex-1 rounded-xl bg-slate-100 text-slate-500 font-bold cursor-not-allowed" disabled>
+                    <Check className="mr-2 h-4 w-4" />
                     {t('status_updater.quote_sent')}
                 </Button>
             );
@@ -374,120 +364,162 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
                     job={job}
                     onCodeSent={handleCodeSent}
                 >
-                    <Button size="sm" className="w-full text-xs" disabled={isPending}>
-                        {isPending ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <CheckCircle className="mr-1 h-4 w-4" />}
+                    <Button className="h-11 flex-1 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold shadow-lg shadow-emerald-500/20" disabled={isPending}>
+                        {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle className="mr-2 h-4 w-4" />}
                         {t('status_updater.complete_job')}
                     </Button>
                 </RepairDetailsForm>
             );
         } else if (job.status === 'code_sent') {
             mainActionButton = (
-                <Button size="sm" className="w-full text-xs" onClick={() => setCodeOpen(true)}>
-                    <CheckCircle className="mr-1 h-4 w-4" />
+                <Button className="h-11 flex-1 rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white font-bold shadow-lg shadow-indigo-500/20" onClick={() => setCodeOpen(true)}>
+                    <CheckCircle className="mr-2 h-4 w-4" />
                     {t('status_updater.enter_code')}
                 </Button>
             )
         } else if (job.status === 'payment_pending') {
             mainActionButton = (
-                <Button size="sm" className="w-full text-xs" onClick={() => setPaymentOpen(true)}>
-                    <Wallet className="mr-1 h-4 w-4" />
-                    Receive Payment
+                <Button className="h-11 flex-1 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold shadow-lg shadow-amber-500/20" onClick={() => setPaymentOpen(true)}>
+                    <Wallet className="mr-2 h-4 w-4" />
+                    Payment
                 </Button>
             );
         }
 
-
         return (
-            <div className="col-span-2 grid grid-cols-3 gap-2">
-                <Button variant="outline" size="sm" className="w-full text-xs" asChild>
-                    <a href={`tel:${job.mobile_number}`}><Phone className="mr-1 h-4 w-4" /> Call</a>
-                </Button>
-                {job.map_url ? (
-                    <Button variant="outline" size="sm" className="w-full text-xs" asChild>
-                        <a href={job.map_url} target="_blank" rel="noopener noreferrer">
-                            <Navigation className="mr-1 h-4 w-4" /> Navigate
-                        </a>
+            <div className="flex flex-col gap-3 w-full p-4 bg-slate-50 border-t border-slate-100">
+                <div className="flex gap-2">
+                    <Button variant="outline" className="flex-1 h-11 rounded-xl border-slate-200 bg-white" asChild>
+                        <a href={`tel:${job.mobile_number}`}><Phone className="mr-2 h-4 w-4 text-primary" /> Call</a>
                     </Button>
-                ) : (
-                    <Button variant="outline" size="sm" className="w-full text-xs" disabled>
-                        <Navigation className="mr-1 h-4 w-4" /> Navigate
-                    </Button>
-                )}
+                    {job.map_url ? (
+                        <Button variant="outline" className="flex-1 h-11 rounded-xl border-slate-200 bg-white" asChild>
+                            <a href={job.map_url} target="_blank" rel="noopener noreferrer">
+                                <Navigation className="mr-2 h-4 w-4 text-primary" /> Map
+                            </a>
+                        </Button>
+                    ) : (
+                        <Button variant="outline" className="flex-1 h-11 rounded-xl border-slate-200 bg-white opacity-50 cursor-not-allowed">
+                            <Navigation className="mr-2 h-4 w-4" /> Map
+                        </Button>
+                    )}
+                </div>
                 {mainActionButton}
             </div>
         )
     }
 
-    const isCompleted = job.status === 'repair_completed';
+    const isCompleted = ['completed', 'repair_completed', 'closed_no_repair'].includes(job.status);
 
     return (
         <>
             <Card className={cn(
-                "overflow-hidden transition-all shadow-md relative",
-                isCompleted && "bg-green-50 border-green-200"
+                "overflow-hidden transition-all duration-300 border-none shadow-xl shadow-slate-200/50 bg-white group rounded-2xl relative",
+                isCompleted && "opacity-90 grayscale-[0.2]"
             )}>
                 {isCompleted && (
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                        <div className="text-green-600/10 font-black text-6xl transform -rotate-12 select-none">
+                    <div className="absolute top-4 right-4 pointer-events-none z-10">
+                        <div className="flex items-center gap-1 bg-emerald-500 text-white px-2 py-1 rounded-lg text-[10px] font-bold shadow-lg shadow-emerald-500/20 ring-2 ring-white">
+                            <CheckCircle size={12} />
                             COMPLETED
                         </div>
                     </div>
                 )}
-                <CardHeader className="flex-row items-start justify-between gap-4 p-4">
-                    <div className="flex items-center gap-3 overflow-hidden">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-secondary flex-shrink-0">
-                            <DeviceIcon className="h-6 w-6 text-secondary-foreground" />
+
+                <CardHeader className="p-4 bg-gradient-to-br from-slate-50 to-white">
+                    <div className="flex items-start justify-between gap-4">
+                        <div className="flex items-center gap-4">
+                            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white shadow-md border border-slate-100 flex-shrink-0 transition-transform group-hover:scale-110 duration-500">
+                                <DeviceIcon className="h-8 w-8 text-primary" />
+                            </div>
+                            <div className="flex-1 overflow-hidden">
+                                <CardTitle className="text-lg font-bold font-headline text-slate-900 truncate">
+                                    {job.categories.name}
+                                </CardTitle>
+                                <div className="flex flex-wrap items-center gap-y-1 gap-x-3 mt-1">
+                                    <div className="flex items-center gap-1.5 text-xs text-slate-400 font-medium">
+                                        <Clock size={12} />
+                                        {format(new Date(job.created_at), 'h:mm a')}
+                                    </div>
+                                    <div className="flex items-center gap-1.5 text-xs text-slate-400 font-medium">
+                                        <div className="w-1 h-1 rounded-full bg-slate-300"></div>
+                                        {format(new Date(job.created_at), 'MMM dd')}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div className="flex-1 overflow-hidden">
-                            <CardTitle className="text-base font-bold font-headline truncate">{job.categories.name}</CardTitle>
-                            <p className="text-xs text-muted-foreground">
-                                {format(new Date(job.created_at), 'MMM dd, yyyy · h:mm a')}
-                            </p>
+                        <div className="text-right flex-shrink-0">
+                            <div className="text-xl font-extrabold text-slate-900 tracking-tight">₹{finalCost}</div>
+                            <div className="mt-1 flex justify-end">
+                                {statusBadge()}
+                            </div>
                         </div>
-                    </div>
-                    <div className="text-right flex-shrink-0 flex flex-col items-end gap-1">
-                        <p className="font-bold text-lg">₹{job.final_amount_to_be_paid ?? job.total_estimated_price}</p>
-                        {statusBadge()}
                     </div>
                 </CardHeader>
 
-                <CardContent className="p-4 pt-0 space-y-4">
-                    <InfoRow icon={Info} label="Problem" value={job.issues.title} />
-                    <InfoRow icon={MapPin} label="Address" value={job.full_address} />
-                    <InfoRow icon={IndianRupee} label="Inspection Fee" value={`₹${job.net_inspection_fee}`} />
+                <CardContent className="p-4 space-y-4 pt-2">
+                    <div className="p-3 bg-slate-50 rounded-xl space-y-3">
+                        <div className="flex gap-3 items-start">
+                            <div className="mt-1">
+                                <div className="p-1.5 bg-indigo-50 rounded-lg">
+                                    <Info className="h-3.5 w-3.5 text-indigo-500" />
+                                </div>
+                            </div>
+                            <div>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Problem Reported</p>
+                                <p className="text-sm font-semibold text-slate-800 leading-tight mt-0.5">{job.issues.title}</p>
+                            </div>
+                        </div>
+
+                        <Separator className="bg-slate-200/50" />
+
+                        <div className="flex gap-3 items-start">
+                            <div className="mt-1">
+                                <div className="p-1.5 bg-rose-50 rounded-lg">
+                                    <MapPin className="h-3.5 w-3.5 text-rose-500" />
+                                </div>
+                            </div>
+                            <div className="flex-1">
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Service Location</p>
+                                <p className="text-sm font-semibold text-slate-800 leading-tight mt-0.5 line-clamp-2">{job.full_address}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="flex items-center justify-between p-3 border border-slate-100 rounded-xl bg-white shadow-sm">
+                        <div className="flex items-center gap-3">
+                            <div className="relative h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center border border-primary/5">
+                                <User className="h-5 w-5 text-primary" />
+                            </div>
+                            <div>
+                                <p className="text-sm font-bold text-slate-900">{job.user_name}</p>
+                                <p className="text-xs text-slate-400 font-medium">{formatPhoneNumber(job.mobile_number)}</p>
+                            </div>
+                        </div>
+                        {job.media_url && (
+                            <Dialog>
+                                <DialogTrigger asChild>
+                                    <div className="relative h-10 w-10 rounded-lg overflow-hidden cursor-pointer border-2 border-white shadow-md ring-1 ring-slate-100 ring-offset-2">
+                                        <Image src={job.media_url} alt="Job photo" fill className="object-cover" />
+                                    </div>
+                                </DialogTrigger>
+                                <DialogContent className="p-0 border-0 max-w-screen-md bg-transparent shadow-none">
+                                    <Image
+                                        src={job.media_url}
+                                        alt="Job photo"
+                                        width={800}
+                                        height={600}
+                                        className="w-full h-auto object-contain rounded-2xl shadow-2xl"
+                                    />
+                                </DialogContent>
+                            </Dialog>
+                        )}
+                    </div>
                 </CardContent>
 
-                <Separator />
-
-                <div className="p-4 flex items-center justify-between">
-                    <div>
-                        <p className="font-semibold text-sm">{job.user_name}</p>
-                        {job.mobile_number && <p className="text-sm text-muted-foreground flex items-center gap-1"><Phone size={12} /> {formatPhoneNumber(job.mobile_number)}</p>}
-                    </div>
-                    {job.media_url && (
-                        <Dialog>
-                            <DialogTrigger asChild>
-                                <div className="relative h-12 w-12 rounded-md overflow-hidden cursor-pointer flex-shrink-0">
-                                    <Image src={job.media_url} alt="Job photo" fill className="object-cover" />
-                                </div>
-                            </DialogTrigger>
-                            <DialogContent className="p-0 border-0 max-w-screen-md">
-                                <Image
-                                    src={job.media_url}
-                                    alt="Job photo"
-                                    width={800}
-                                    height={600}
-                                    className="w-full h-auto object-contain rounded-lg"
-                                />
-                            </DialogContent>
-                        </Dialog>
-                    )}
-                </div>
-
-                <CardFooter className="grid grid-cols-2 gap-3 p-2 bg-muted/50">
+                <CardFooter className="p-0">
                     {renderFooter()}
                 </CardFooter>
-
             </Card>
 
             {technicianId && (

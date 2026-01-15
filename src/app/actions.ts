@@ -38,13 +38,17 @@ export async function updateJobStatusAction(payload: UpdateStatusPayload) {
     throw new Error("Server configuration error.");
   }
 
+  const supabase = await createClient();
+  const { data: { session } } = await supabase.auth.getSession();
+  const token = session?.access_token || apikey;
+
   try {
     const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'apikey': apikey,
-        'Authorization': `Bearer ${apikey}`,
+        'Authorization': `Bearer ${token}`,
       },
       body: JSON.stringify(payload),
     });
@@ -73,11 +77,16 @@ export async function saveInspectionDetailsAction(formData: FormData) {
     throw new Error("Server configuration error.");
   }
 
+  const supabase = await createClient();
+  const { data: { session } } = await supabase.auth.getSession();
+  const token = session?.access_token || apikey;
+
   try {
     const response = await fetch(url, {
       method: 'POST',
       headers: {
         'apikey': apikey,
+        'Authorization': `Bearer ${token}`,
       },
       body: formData
     });
@@ -117,13 +126,17 @@ export async function shareQuoteAction(payload: QuotePayload) {
     throw new Error("Server configuration error.");
   }
 
+  const supabase = await createClient();
+  const { data: { session } } = await supabase.auth.getSession();
+  const token = session?.access_token || apikey;
+
   try {
     const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'apikey': apikey,
-        'Authorization': `Bearer ${apikey}`,
+        'Authorization': `Bearer ${token}`,
         'Prefer': 'return=minimal',
       },
       body: JSON.stringify(payload)

@@ -37,9 +37,23 @@ export async function updateSession(request: NextRequest) {
         data: { user },
     } = await supabase.auth.getUser()
 
-    // Protect all routes except auth routes and landing page if needed
-    // For now, we allow public access but ensure session is kept alive
-    // specific route protection can be added here or in layout/page checks
+    const url = request.nextUrl.clone()
+    const isAuthRoute = url.pathname === '/login' || url.pathname === '/signup' || url.pathname === '/'
+    const isProtectedRoute = url.pathname.startsWith('/jobs') ||
+        url.pathname.startsWith('/profile') ||
+        url.pathname.startsWith('/partner')
+
+    // Redirect authenticated users away from auth routes
+    if (user && isAuthRoute) {
+        url.pathname = '/jobs'
+        return NextResponse.redirect(url)
+    }
+
+    // Redirect unauthenticated users away from protected routes
+    if (!user && isProtectedRoute) {
+        url.pathname = '/login'
+        return NextResponse.redirect(url)
+    }
 
     return supabaseResponse
 }
