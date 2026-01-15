@@ -40,7 +40,7 @@ export function JobTabs({ jobs, activeTab, onTabChange, technicianId, onJobsUpda
     "repair_completed",
     "closed_no_repair",
     "cancelled",
-    "rejected",
+    "job_rejected",
     "quotation_rejected"
   ].includes(job.status));
 

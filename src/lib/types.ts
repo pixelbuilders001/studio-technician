@@ -4,11 +4,11 @@
 
 
 
-export type JobStatus = 
-  'assigned' | 
-  'accepted' | 
-  'rejected' |
-  'on_the_way' | 
+export type JobStatus =
+  'assigned' |
+  'job_rejected' |
+  'accepted' |
+  'on_the_way' |
   'inspection_started' |
   'inspection_completed' |
   'quotation_shared' |
@@ -20,7 +20,7 @@ export type JobStatus =
   'repair_completed' |
   'closed_no_repair' |
   'in-progress' | // Legacy or fallback
-  'completed' | 
+  'completed' |
   'cancelled';
 
 // This represents the data structure from your API
@@ -75,6 +75,6 @@ export type Technician = {
   total_ratings: number;
 };
 
-    
 
-    
+
+

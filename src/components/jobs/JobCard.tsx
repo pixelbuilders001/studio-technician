@@ -222,7 +222,7 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
                 className = "bg-emerald-100 text-emerald-700 border-emerald-200";
                 break;
             case 'cancelled':
-            case 'rejected':
+            case 'job_rejected':
             case 'quotation_rejected':
                 className = "bg-rose-100 text-rose-700 border-rose-200";
                 break;
@@ -278,7 +278,7 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
                             </AlertDialogHeader>
                             <AlertDialogFooter>
                                 <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => handleStatusUpdate('rejected')} className="bg-rose-500 hover:bg-rose-600 rounded-xl">
+                                <AlertDialogAction onClick={() => handleStatusUpdate('job_rejected')} className="bg-rose-500 hover:bg-rose-600 rounded-xl">
                                     Confirm Reject
                                 </AlertDialogAction>
                             </AlertDialogFooter>
