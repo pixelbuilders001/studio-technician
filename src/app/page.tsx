@@ -50,11 +50,11 @@ export default function WelcomePage() {
           </CardContent>
         </Card>
       </div>
-      <div className="bg-background px-8 pb-4 text-center">
+      {/* <div className="bg-background px-8 pb-4 text-center">
         <Link href="/partner-signup">
           <span className="text-sm text-muted-foreground hover:text-primary">{t('login_page.become_partner')}</span>
         </Link>
-      </div>
+      </div> */}
     </main>
   );
 }

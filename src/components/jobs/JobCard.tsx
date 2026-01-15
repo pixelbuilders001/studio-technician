@@ -5,16 +5,16 @@ import { useRouter } from "next/navigation";
 import type { Job, JobStatus } from "@/lib/types";
 import Image from "next/image";
 import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
+    Card,
+    CardContent,
+    CardFooter,
+    CardHeader,
+    CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { 
+import {
     AlertDialog,
     AlertDialogAction,
     AlertDialogCancel,
@@ -42,12 +42,12 @@ import { CompletionCodeDialog } from "./CompletionCodeDialog";
 import { PaymentCollectionDialog } from "./PaymentCollectionDialog";
 
 const iconMap: { [key: string]: React.ElementType } = {
-  LAPTOPS: Wrench,
-  TV: Tv,
-  Refrigerator,
-  Smartphone,
-  "Air Conditioner": AirVent,
-  "Washing Machine": WashingMachine,
+    LAPTOPS: Wrench,
+    TV: Tv,
+    Refrigerator,
+    Smartphone,
+    "Air Conditioner": AirVent,
+    "Washing Machine": WashingMachine,
 };
 
 const InfoRow = ({ icon: Icon, value, label }: { icon: React.ElementType, value: React.ReactNode, label: string }) => (
@@ -88,39 +88,74 @@ const statusFlow: StatusConfig = {
 
 
 export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technicianId: string | null, onJobsUpdate: () => void }) {
-  const router = useRouter();
-  const { toast } = useToast();
-  const { t } = useTranslation();
-  const [isPending, startTransition] = useTransition();
-  
-  const [codeOpen, setCodeOpen] = useState(false);
-  const [paymentOpen, setPaymentOpen] = useState(false);
-  const [repairDetails, setRepairDetails] = useState<RepairDetails | null>(null);
+    const router = useRouter();
+    const { toast } = useToast();
+    const { t } = useTranslation();
+    const [isPending, startTransition] = useTransition();
 
-  const finalCost = job.final_amount_to_be_paid || job.total_estimated_price;
-  const platformFeePercentage = 18; // Assuming 20% platform fee
-  const technicianPayout = finalCost - ((finalCost * platformFeePercentage) / 100);
+    const [codeOpen, setCodeOpen] = useState(false);
+    const [paymentOpen, setPaymentOpen] = useState(false);
+    const [repairDetails, setRepairDetails] = useState<RepairDetails | null>(null);
 
-  const handleStatusUpdate = (status: JobStatus) => {
-    if (!technicianId) {
-        toast({ title: "Error", description: "Technician profile not found.", variant: "destructive" });
-        return;
-    }
+    const finalCost = job.final_amount_to_be_paid || job.total_estimated_price;
+    const platformFeePercentage = 18; // Assuming 20% platform fee
+    const technicianPayout = finalCost - ((finalCost * platformFeePercentage) / 100);
 
-    startTransition(async () => {
+    const handleStatusUpdate = (status: JobStatus) => {
+        if (!technicianId) {
+            toast({ title: "Error", description: "Technician profile not found.", variant: "destructive" });
+            return;
+        }
+
+        startTransition(async () => {
+            try {
+                await updateJobStatusAction({
+                    booking_id: job.id,
+                    status: status,
+                    note: `Technician has updated the job to ${status}.`,
+                    order_id: job.order_id,
+                });
+                toast({
+                    title: t('status_updater.toast_title'),
+                    description: `${t('status_updater.toast_description')} ${t(`job_api_status.${status}`)}`,
+                });
+                onJobsUpdate();
+
+            } catch (error: any) {
+                toast({
+                    title: "Update Failed",
+                    description: error.message || "Could not update job status.",
+                    variant: "destructive",
+                });
+            }
+        });
+    };
+
+    const handleCodeSent = (details: RepairDetails) => {
+        setRepairDetails(details);
+        onJobsUpdate(); // Refresh list to show 'code_sent' status
+        setCodeOpen(true); // Open code dialog
+    };
+
+    const onCodeVerified = async () => {
+        if (!technicianId) return;
+
         try {
             await updateJobStatusAction({
                 booking_id: job.id,
-                status: status,
-                note: `Technician has updated the job to ${status}.`,
+                status: 'payment_pending',
+                note: 'Completion code verified. Awaiting payment.',
                 order_id: job.order_id,
             });
+
             toast({
-                title: t('status_updater.toast_title'),
-                description: `${t('status_updater.toast_description')} ${t(`job_api_status.${status}`)}`,
+                title: "Code Verified!",
+                description: "Please proceed to collect payment.",
             });
+
+            setCodeOpen(false);
             onJobsUpdate();
-            
+
         } catch (error: any) {
             toast({
                 title: "Update Failed",
@@ -128,388 +163,353 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
                 variant: "destructive",
             });
         }
-    });
-  };
-
-  const handleCodeSent = (details: RepairDetails) => {
-      setRepairDetails(details);
-      onJobsUpdate(); // Refresh list to show 'code_sent' status
-      setCodeOpen(true); // Open code dialog
-  };
-
-  const onCodeVerified = async () => {
-      if (!technicianId) return;
-
-      try {
-        await updateJobStatusAction({
-            booking_id: job.id,
-            status: 'payment_pending',
-            note: 'Completion code verified. Awaiting payment.',
-            order_id: job.order_id,
-        });
-
-        toast({
-            title: "Code Verified!",
-            description: "Please proceed to collect payment.",
-        });
-
-        setCodeOpen(false);
-        onJobsUpdate();
-
-      } catch (error: any) {
-         toast({
-            title: "Update Failed",
-            description: error.message || "Could not update job status.",
-            variant: "destructive",
-        });
-      }
-  }
-
-  const onPaymentSuccess = async () => {
-    if (!technicianId) {
-        toast({ title: "Error", description: "Repair details are missing.", variant: "destructive" });
-        return;
-    }
-    try {
-        await updateJobStatusAction({
-            booking_id: job.id,
-            status: 'repair_completed',
-            note: `Payment of ₹${finalCost} collected.`,
-            order_id: job.order_id,
-            final_cost: finalCost
-        });
-
-        toast({
-            title: t('payment_collection_dialog.toast_title_success'),
-            description: t('payment_collection_dialog.toast_description_success'),
-        });
-        
-        setPaymentOpen(false);
-        onJobsUpdate();
-
-    } catch(error: any) {
-         toast({
-            title: "Update Failed",
-            description: error.message || "Could not complete the job.",
-            variant: "destructive",
-        });
-    }
-  };
-  
-  const DeviceIcon = iconMap[job.categories.name] || Wrench;
-
-  const statusBadge = () => {
-    let className = "";
-    const statusKey = job.status as JobStatus;
-
-    switch(statusKey) {
-        case 'assigned':
-            className="bg-orange-100 text-orange-800 border-orange-200 hover:bg-orange-100/80";
-            break;
-        case 'accepted':
-            className="bg-blue-100 text-blue-800 border-blue-200";
-            break;
-        case 'on_the_way':
-            className="bg-cyan-100 text-cyan-800 border-cyan-200";
-            break;
-        case 'in-progress': // This might be deprecated by more specific statuses
-        case 'repair_started':
-             className="bg-purple-100 text-purple-800 border-purple-200";
-            break;
-        case 'inspection_started':
-        case 'inspection_completed':
-        case 'quotation_shared':
-            className="bg-yellow-100 text-yellow-800 border-yellow-200";
-            break;
-        case 'code_sent':
-        case 'payment_pending':
-            className="bg-indigo-100 text-indigo-800 border-indigo-200";
-            break;
-        case 'quotation_approved':
-            className="bg-teal-100 text-teal-800 border-teal-200";
-            break;
-        case 'completed':
-        case 'repair_completed':
-        case 'closed_no_repair':
-            className="bg-green-100 text-green-800 border-green-200";
-            break;
-        case 'cancelled':
-        case 'rejected':
-        case 'quotation_rejected':
-            className="bg-red-100 text-red-800 border-red-200";
-            break;
-        default:
-            className="bg-gray-100 text-gray-800 border-gray-200";
     }
 
-    if (job.status) {
-        return <Badge variant="outline" className={cn("capitalize whitespace-nowrap", className)}>{statusKey.replace(/_/g, ' ')}</Badge>
+    const onPaymentSuccess = async () => {
+        if (!technicianId) {
+            toast({ title: "Error", description: "Repair details are missing.", variant: "destructive" });
+            return;
+        }
+        try {
+            await updateJobStatusAction({
+                booking_id: job.id,
+                status: 'repair_completed',
+                note: `Payment of ₹${finalCost} collected.`,
+                order_id: job.order_id,
+                final_cost: finalCost
+            });
+
+            toast({
+                title: t('payment_collection_dialog.toast_title_success'),
+                description: t('payment_collection_dialog.toast_description_success'),
+            });
+
+            setPaymentOpen(false);
+            onJobsUpdate();
+
+        } catch (error: any) {
+            toast({
+                title: "Update Failed",
+                description: error.message || "Could not complete the job.",
+                variant: "destructive",
+            });
+        }
+    };
+
+    const DeviceIcon = iconMap[job?.categories?.name] || Wrench;
+
+    const statusBadge = () => {
+        let className = "";
+        const statusKey = job.status as JobStatus;
+
+        switch (statusKey) {
+            case 'assigned':
+                className = "bg-orange-100 text-orange-800 border-orange-200 hover:bg-orange-100/80";
+                break;
+            case 'accepted':
+                className = "bg-blue-100 text-blue-800 border-blue-200";
+                break;
+            case 'on_the_way':
+                className = "bg-cyan-100 text-cyan-800 border-cyan-200";
+                break;
+            case 'in-progress': // This might be deprecated by more specific statuses
+            case 'repair_started':
+                className = "bg-purple-100 text-purple-800 border-purple-200";
+                break;
+            case 'inspection_started':
+            case 'inspection_completed':
+            case 'quotation_shared':
+                className = "bg-yellow-100 text-yellow-800 border-yellow-200";
+                break;
+            case 'code_sent':
+            case 'payment_pending':
+                className = "bg-indigo-100 text-indigo-800 border-indigo-200";
+                break;
+            case 'quotation_approved':
+                className = "bg-teal-100 text-teal-800 border-teal-200";
+                break;
+            case 'completed':
+            case 'repair_completed':
+            case 'closed_no_repair':
+                className = "bg-green-100 text-green-800 border-green-200";
+                break;
+            case 'cancelled':
+            case 'rejected':
+            case 'quotation_rejected':
+                className = "bg-red-100 text-red-800 border-red-200";
+                break;
+            default:
+                className = "bg-gray-100 text-gray-800 border-gray-200";
+        }
+
+        if (job.status) {
+            return <Badge variant="outline" className={cn("capitalize whitespace-nowrap", className)}>{statusKey.replace(/_/g, ' ')}</Badge>
+        }
+        return null
     }
-    return null
-  }
 
-  const formatPhoneNumber = (phone: string) => {
-    if (!phone || phone.length < 10) return phone;
-    const countryCode = phone.length > 10 ? phone.slice(0, -10) : '91';
-    const number = phone.slice(-10);
-    return `+${countryCode}XXXXXX${number.slice(-2)}`;
-  }
-
-  const nextAction = statusFlow[job.status];
-  const NextActionIcon = nextAction?.buttonIcon;
-
-
-  const renderFooter = () => {
-    if (!technicianId) {
-      return (
-        <div className="col-span-2 text-center text-muted-foreground text-sm">
-          Loading...
-        </div>
-      );
+    const formatPhoneNumber = (phone: string) => {
+        if (!phone || phone.length < 10) return phone;
+        const countryCode = phone.length > 10 ? phone.slice(0, -10) : '91';
+        const number = phone.slice(-10);
+        return `+${countryCode}XXXXXX${number.slice(-2)}`;
     }
-    
-    if (job.status === 'assigned') {
+
+    const nextAction = statusFlow[job.status];
+    const NextActionIcon = nextAction?.buttonIcon;
+
+
+    const renderFooter = () => {
+        if (!technicianId) {
+            return (
+                <div className="col-span-2 text-center text-muted-foreground text-sm">
+                    Loading...
+                </div>
+            );
+        }
+
+        if (job.status === 'assigned') {
+            return (
+                <>
+                    <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                            <Button variant="outline" className="w-full bg-card" disabled={isPending}>
+                                {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <X className="mr-2 h-4 w-4" />}
+                                {t('job_card.reject')}
+                            </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>Are you sure you want to reject this job?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    This action cannot be undone. This job will be removed from your list.
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => handleStatusUpdate('rejected')}>
+                                    Confirm Reject
+                                </AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
+                    <Button className="w-full" onClick={() => handleStatusUpdate('accepted')} disabled={isPending}>
+                        {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Check className="mr-2 h-4 w-4" />}
+                        {t('job_card.accept')}
+                    </Button>
+                </>
+            )
+        }
+
+        if (['completed', 'repair_completed', 'closed_no_repair'].includes(job.status)) {
+            const isPaid = (job.final_amount_paid ?? 0) > 0;
+            return (
+                <>
+                    {isPaid ? (
+                        <Button variant="secondary" className="w-full">
+                            <Download className="mr-2 h-4 w-4" />
+                            Download Invoice
+                        </Button>
+                    ) : (
+                        <Button variant="secondary" className="w-full" onClick={() => setPaymentOpen(true)}>
+                            <Wallet className="mr-2 h-4 w-4" />
+                            Receive Payment
+                        </Button>
+                    )}
+                    <EarningSheet job={job}>
+                        <Button variant="secondary" className="w-full">
+                            <HandCoins className="mr-2 h-4 w-4" />
+                            See Earning
+                        </Button>
+                    </EarningSheet>
+                </>
+            )
+        }
+
+        // Default buttons for ongoing jobs
+        let mainActionButton = null;
+
+        if (nextAction && NextActionIcon) {
+            mainActionButton = (
+                <Button size="sm" className="w-full text-xs" onClick={() => handleStatusUpdate(nextAction.nextStatus)} disabled={isPending}>
+                    {isPending ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <NextActionIcon className="mr-1 h-4 w-4" />}
+                    {t(`status_updater.${nextAction.buttonTextKey}`)}
+                </Button>
+            );
+        } else if (job.status === 'inspection_started') {
+            mainActionButton = (
+                <InspectionDetailsForm
+                    job={job}
+                    technicianId={technicianId}
+                    onFormSubmit={onJobsUpdate}
+                >
+                    <Button size="sm" className="w-full text-xs" disabled={isPending}>
+                        {isPending ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <FileText className="mr-1 h-4 w-4" />}
+                        {t('status_updater.inspection_done')}
+                    </Button>
+                </InspectionDetailsForm>
+            );
+        } else if (job.status === 'inspection_completed') {
+            mainActionButton = (
+                <ShareQuoteForm
+                    job={job}
+                    onFormSubmit={onJobsUpdate}
+                >
+                    <Button size="sm" className="w-full text-xs" disabled={isPending}>
+                        {isPending ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <Share2 className="mr-1 h-4 w-4" />}
+                        {t('status_updater.share_quote')}
+                    </Button>
+                </ShareQuoteForm>
+            );
+        } else if (job.status === 'quotation_shared') {
+            mainActionButton = (
+                <Button size="sm" className="w-full text-xs" disabled>
+                    <Check className="mr-1 h-4 w-4" />
+                    {t('status_updater.quote_sent')}
+                </Button>
+            );
+        } else if (job.status === 'repair_started') {
+            mainActionButton = (
+                <RepairDetailsForm
+                    job={job}
+                    onCodeSent={handleCodeSent}
+                >
+                    <Button size="sm" className="w-full text-xs" disabled={isPending}>
+                        {isPending ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <CheckCircle className="mr-1 h-4 w-4" />}
+                        {t('status_updater.complete_job')}
+                    </Button>
+                </RepairDetailsForm>
+            );
+        } else if (job.status === 'code_sent') {
+            mainActionButton = (
+                <Button size="sm" className="w-full text-xs" onClick={() => setCodeOpen(true)}>
+                    <CheckCircle className="mr-1 h-4 w-4" />
+                    {t('status_updater.enter_code')}
+                </Button>
+            )
+        } else if (job.status === 'payment_pending') {
+            mainActionButton = (
+                <Button size="sm" className="w-full text-xs" onClick={() => setPaymentOpen(true)}>
+                    <Wallet className="mr-1 h-4 w-4" />
+                    Receive Payment
+                </Button>
+            );
+        }
+
+
         return (
-             <>
-              <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                      <Button variant="outline" className="w-full bg-card" disabled={isPending}>
-                          {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <X className="mr-2 h-4 w-4" />}
-                          {t('job_card.reject')}
-                      </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                      <AlertDialogHeader>
-                      <AlertDialogTitle>Are you sure you want to reject this job?</AlertDialogTitle>
-                      <AlertDialogDescription>
-                          This action cannot be undone. This job will be removed from your list.
-                      </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={() => handleStatusUpdate('rejected')}>
-                          Confirm Reject
-                      </AlertDialogAction>
-                      </AlertDialogFooter>
-                  </AlertDialogContent>
-              </AlertDialog>
-              <Button className="w-full" onClick={() => handleStatusUpdate('accepted')} disabled={isPending}>
-                {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Check className="mr-2 h-4 w-4" />}
-                {t('job_card.accept')}
-              </Button>
-            </>
-        )
-    }
-
-    if (['completed', 'repair_completed', 'closed_no_repair'].includes(job.status)) {
-        const isPaid = (job.final_amount_paid ?? 0) > 0;
-        return (
-            <>
-                {isPaid ? (
-                    <Button variant="secondary" className="w-full">
-                        <Download className="mr-2 h-4 w-4" />
-                        Download Invoice
+            <div className="col-span-2 grid grid-cols-3 gap-2">
+                <Button variant="outline" size="sm" className="w-full text-xs" asChild>
+                    <a href={`tel:${job.mobile_number}`}><Phone className="mr-1 h-4 w-4" /> Call</a>
+                </Button>
+                {job.map_url ? (
+                    <Button variant="outline" size="sm" className="w-full text-xs" asChild>
+                        <a href={job.map_url} target="_blank" rel="noopener noreferrer">
+                            <Navigation className="mr-1 h-4 w-4" /> Navigate
+                        </a>
                     </Button>
                 ) : (
-                    <Button variant="secondary" className="w-full" onClick={() => setPaymentOpen(true)}>
-                        <Wallet className="mr-2 h-4 w-4" />
-                        Receive Payment
+                    <Button variant="outline" size="sm" className="w-full text-xs" disabled>
+                        <Navigation className="mr-1 h-4 w-4" /> Navigate
                     </Button>
                 )}
-                <EarningSheet job={job}>
-                    <Button variant="secondary" className="w-full">
-                        <HandCoins className="mr-2 h-4 w-4" />
-                        See Earning
-                    </Button>
-                </EarningSheet>
-            </>
+                {mainActionButton}
+            </div>
         )
     }
 
-    // Default buttons for ongoing jobs
-    let mainActionButton = null;
-
-    if (nextAction && NextActionIcon) {
-        mainActionButton = (
-            <Button size="sm" className="w-full text-xs" onClick={() => handleStatusUpdate(nextAction.nextStatus)} disabled={isPending}>
-                {isPending ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <NextActionIcon className="mr-1 h-4 w-4" />}
-                {t(`status_updater.${nextAction.buttonTextKey}`)}
-            </Button>
-        );
-    } else if (job.status === 'inspection_started') {
-        mainActionButton = (
-             <InspectionDetailsForm
-                job={job}
-                technicianId={technicianId}
-                onFormSubmit={onJobsUpdate}
-             >
-                <Button size="sm" className="w-full text-xs" disabled={isPending}>
-                    {isPending ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <FileText className="mr-1 h-4 w-4" />}
-                    {t('status_updater.inspection_done')}
-                </Button>
-            </InspectionDetailsForm>
-        );
-    } else if (job.status === 'inspection_completed') {
-        mainActionButton = (
-            <ShareQuoteForm
-                job={job}
-                onFormSubmit={onJobsUpdate}
-            >
-                <Button size="sm" className="w-full text-xs" disabled={isPending}>
-                    {isPending ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <Share2 className="mr-1 h-4 w-4" />}
-                    {t('status_updater.share_quote')}
-                </Button>
-            </ShareQuoteForm>
-        );
-    } else if (job.status === 'quotation_shared') {
-        mainActionButton = (
-            <Button size="sm" className="w-full text-xs" disabled>
-                <Check className="mr-1 h-4 w-4" />
-                {t('status_updater.quote_sent')}
-            </Button>
-        );
-    } else if (job.status === 'repair_started') {
-        mainActionButton = (
-             <RepairDetailsForm
-                job={job}
-                onCodeSent={handleCodeSent}
-             >
-                <Button size="sm" className="w-full text-xs" disabled={isPending}>
-                    {isPending ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <CheckCircle className="mr-1 h-4 w-4" />}
-                    {t('status_updater.complete_job')}
-                </Button>
-            </RepairDetailsForm>
-        );
-    } else if (job.status === 'code_sent') {
-         mainActionButton = (
-            <Button size="sm" className="w-full text-xs" onClick={() => setCodeOpen(true)}>
-                <CheckCircle className="mr-1 h-4 w-4" />
-                {t('status_updater.enter_code')}
-            </Button>
-         )
-    } else if (job.status === 'payment_pending') {
-        mainActionButton = (
-            <Button size="sm" className="w-full text-xs" onClick={() => setPaymentOpen(true)}>
-                <Wallet className="mr-1 h-4 w-4" />
-                Receive Payment
-            </Button>
-        );
-    }
-
+    const isCompleted = job.status === 'repair_completed';
 
     return (
-        <div className="col-span-2 grid grid-cols-3 gap-2">
-            <Button variant="outline" size="sm" className="w-full text-xs" asChild>
-                <a href={`tel:${job.mobile_number}`}><Phone className="mr-1 h-4 w-4" /> Call</a>
-            </Button>
-            {job.map_url ? (
-                <Button variant="outline" size="sm" className="w-full text-xs" asChild>
-                    <a href={job.map_url} target="_blank" rel="noopener noreferrer">
-                        <Navigation className="mr-1 h-4 w-4" /> Navigate
-                    </a>
-                </Button>
-            ) : (
-                <Button variant="outline" size="sm" className="w-full text-xs" disabled>
-                    <Navigation className="mr-1 h-4 w-4" /> Navigate
-                </Button>
-            )}
-            {mainActionButton}
-        </div>
-    )
-  }
-  
-  const isCompleted = job.status === 'repair_completed';
-
-  return (
-    <>
-      <Card className={cn(
-        "overflow-hidden transition-all shadow-md relative",
-        isCompleted && "bg-green-50 border-green-200"
-        )}>
-         {isCompleted && (
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className="text-green-600/10 font-black text-6xl transform -rotate-12 select-none">
-                    COMPLETED
-                </div>
-            </div>
-         )}
-         <CardHeader className="flex-row items-start justify-between gap-4 p-4">
-             <div className="flex items-center gap-3 overflow-hidden">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-secondary flex-shrink-0">
-                    <DeviceIcon className="h-6 w-6 text-secondary-foreground" />
-                </div>
-                <div className="flex-1 overflow-hidden">
-                    <CardTitle className="text-base font-bold font-headline truncate">{job.categories.name}</CardTitle>
-                    <p className="text-xs text-muted-foreground">
-                        {format(new Date(job.created_at), 'MMM dd, yyyy · h:mm a')}
-                    </p>
-                </div>
-            </div>
-             <div className="text-right flex-shrink-0 flex flex-col items-end gap-1">
-                <p className="font-bold text-lg">₹{job.final_amount_to_be_paid ?? job.total_estimated_price}</p>
-                 {statusBadge()}
-            </div>
-        </CardHeader>
-        
-        <CardContent className="p-4 pt-0 space-y-4">
-            <InfoRow icon={Info} label="Problem" value={job.issues.title} />
-            <InfoRow icon={MapPin} label="Address" value={job.full_address} />
-            <InfoRow icon={IndianRupee} label="Inspection Fee" value={`₹${job.net_inspection_fee}`} />
-        </CardContent>
-
-        <Separator/>
-
-        <div className="p-4 flex items-center justify-between">
-             <div>
-                <p className="font-semibold text-sm">{job.user_name}</p>
-                 {job.mobile_number && <p className="text-sm text-muted-foreground flex items-center gap-1"><Phone size={12}/> {formatPhoneNumber(job.mobile_number)}</p>}
-            </div>
-            {job.media_url && (
-                <Dialog>
-                    <DialogTrigger asChild>
-                        <div className="relative h-12 w-12 rounded-md overflow-hidden cursor-pointer flex-shrink-0">
-                             <Image src={job.media_url} alt="Job photo" fill className="object-cover"/>
-                        </div>
-                    </DialogTrigger>
-                    <DialogContent className="p-0 border-0 max-w-screen-md">
-                        <Image 
-                            src={job.media_url} 
-                            alt="Job photo" 
-                            width={800}
-                            height={600}
-                            className="w-full h-auto object-contain rounded-lg"
-                        />
-                    </DialogContent>
-                </Dialog>
-            )}
-        </div>
-        
-        <CardFooter className="grid grid-cols-2 gap-3 p-2 bg-muted/50">
-          {renderFooter()}
-        </CardFooter>
-
-      </Card>
-      
-      {technicianId && (
         <>
-          <CompletionCodeDialog
-              bookingId={job.id}
-              technicianId={technicianId}
-              earningAmount={technicianPayout}
-              open={codeOpen}
-              onOpenChange={setCodeOpen}
-              onVerificationSuccess={onCodeVerified}
-          />
-          
-          <PaymentCollectionDialog
-              job={job}
-              totalAmount={finalCost}
-              open={paymentOpen}
-              onOpenChange={setPaymentOpen}
-              onPaymentSuccess={onPaymentSuccess}
-          />
+            <Card className={cn(
+                "overflow-hidden transition-all shadow-md relative",
+                isCompleted && "bg-green-50 border-green-200"
+            )}>
+                {isCompleted && (
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <div className="text-green-600/10 font-black text-6xl transform -rotate-12 select-none">
+                            COMPLETED
+                        </div>
+                    </div>
+                )}
+                <CardHeader className="flex-row items-start justify-between gap-4 p-4">
+                    <div className="flex items-center gap-3 overflow-hidden">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-secondary flex-shrink-0">
+                            <DeviceIcon className="h-6 w-6 text-secondary-foreground" />
+                        </div>
+                        <div className="flex-1 overflow-hidden">
+                            <CardTitle className="text-base font-bold font-headline truncate">{job.categories.name}</CardTitle>
+                            <p className="text-xs text-muted-foreground">
+                                {format(new Date(job.created_at), 'MMM dd, yyyy · h:mm a')}
+                            </p>
+                        </div>
+                    </div>
+                    <div className="text-right flex-shrink-0 flex flex-col items-end gap-1">
+                        <p className="font-bold text-lg">₹{job.final_amount_to_be_paid ?? job.total_estimated_price}</p>
+                        {statusBadge()}
+                    </div>
+                </CardHeader>
+
+                <CardContent className="p-4 pt-0 space-y-4">
+                    <InfoRow icon={Info} label="Problem" value={job.issues.title} />
+                    <InfoRow icon={MapPin} label="Address" value={job.full_address} />
+                    <InfoRow icon={IndianRupee} label="Inspection Fee" value={`₹${job.net_inspection_fee}`} />
+                </CardContent>
+
+                <Separator />
+
+                <div className="p-4 flex items-center justify-between">
+                    <div>
+                        <p className="font-semibold text-sm">{job.user_name}</p>
+                        {job.mobile_number && <p className="text-sm text-muted-foreground flex items-center gap-1"><Phone size={12} /> {formatPhoneNumber(job.mobile_number)}</p>}
+                    </div>
+                    {job.media_url && (
+                        <Dialog>
+                            <DialogTrigger asChild>
+                                <div className="relative h-12 w-12 rounded-md overflow-hidden cursor-pointer flex-shrink-0">
+                                    <Image src={job.media_url} alt="Job photo" fill className="object-cover" />
+                                </div>
+                            </DialogTrigger>
+                            <DialogContent className="p-0 border-0 max-w-screen-md">
+                                <Image
+                                    src={job.media_url}
+                                    alt="Job photo"
+                                    width={800}
+                                    height={600}
+                                    className="w-full h-auto object-contain rounded-lg"
+                                />
+                            </DialogContent>
+                        </Dialog>
+                    )}
+                </div>
+
+                <CardFooter className="grid grid-cols-2 gap-3 p-2 bg-muted/50">
+                    {renderFooter()}
+                </CardFooter>
+
+            </Card>
+
+            {technicianId && (
+                <>
+                    <CompletionCodeDialog
+                        bookingId={job.id}
+                        technicianId={technicianId}
+                        earningAmount={technicianPayout}
+                        open={codeOpen}
+                        onOpenChange={setCodeOpen}
+                        onVerificationSuccess={onCodeVerified}
+                    />
+
+                    <PaymentCollectionDialog
+                        job={job}
+                        totalAmount={finalCost}
+                        open={paymentOpen}
+                        onOpenChange={setPaymentOpen}
+                        onPaymentSuccess={onPaymentSuccess}
+                    />
+                </>
+            )}
         </>
-      )}
-    </>
-  );
+    );
 }

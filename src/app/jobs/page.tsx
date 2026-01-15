@@ -4,8 +4,9 @@
 import { JobTabs } from "@/components/jobs/JobTabs";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useEffect, useState, Suspense } from "react";
-import { getJobsAction } from "../actions";
+import { getJobsAction, getProfileAction } from "../actions";
 import { useProfile } from "@/hooks/useProfile";
+import { createClient } from "@/lib/supabase/client";
 import type { Job } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -23,7 +24,7 @@ function JobsSkeleton() {
 
 function JobsPageContent() {
   const { t } = useTranslation();
-  const { profile } = useProfile(); // Keep for header, but not for fetching logic
+  const [profile, setProfile] = useState<any>(null);
   const [jobs, setJobs] = useState<Job[]>([]);
   console.log("jfjjfdjfdjj", jobs)
   const [loading, setLoading] = useState(true);
@@ -38,25 +39,23 @@ function JobsPageContent() {
     router.push(`/jobs?tab=${newTab}`);
   }
 
-  // Effect 1: Get Technician ID from localStorage, runs only once.
+  // Effect 1: Get Technician Profile from Server Action
   useEffect(() => {
-    const storedProfile = localStorage.getItem('technicianProfile');
-    if (storedProfile) {
+    const fetchProfile = async () => {
+      setLoading(true);
       try {
-        const parsedProfile = JSON.parse(storedProfile);
-        if (parsedProfile.id) {
-          setTechnicianId(parsedProfile.id);
-        } else {
-          setLoading(false);
-        }
-      } catch (e) {
-        console.error("Failed to parse technician profile from storage", e);
+        const profileData = await getProfileAction();
+        setProfile(profileData);
+        setTechnicianId(profileData.id);
+      } catch (e: any) {
+        console.error("Failed to fetch technician profile", e);
+        setError(e.message || "Failed to load profile.");
         setLoading(false);
       }
-    } else {
-      setLoading(false);
-    }
-  }, []); // Empty dependency array ensures this runs only once
+    };
+
+    fetchProfile();
+  }, []);
 
   // Effect 2: Fetch jobs, runs only when technicianId changes.
   useEffect(() => {
@@ -67,7 +66,7 @@ function JobsPageContent() {
     const fetchJobs = async () => {
       setLoading(true);
       try {
-        const fetchedJobs = await getJobsAction(technicianId);
+        const fetchedJobs = await getJobsAction();
         setJobs(fetchedJobs);
         setError(null);
       } catch (e: any) {
@@ -78,19 +77,17 @@ function JobsPageContent() {
     };
 
     fetchJobs();
-  }, [technicianId]); // This will run exactly once when technicianId is set.
+  }, [technicianId]); // This will run whenever technicianId is set.
 
   const refreshJobs = () => {
-    if (technicianId) {
-      getJobsAction(technicianId).then(setJobs);
-    }
+    getJobsAction().then(setJobs);
   }
 
   return (
     <div className="flex h-full flex-col">
       <header className="flex h-14 items-center justify-between border-b bg-background px-4">
         <h1 className="text-xl font-bold font-headline">{t('jobs_page.title')}</h1>
-        {profile && <span className="text-sm font-medium">Welcome, {profile.name.split(' ')[0]}</span>}
+        {profile && <span className="text-sm font-medium">Welcome, {profile.full_name}</span>}
       </header>
       {loading ? (
         <JobsSkeleton />
