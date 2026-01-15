@@ -173,18 +173,18 @@ export function PartnerSignupForm({ pincode, city }: PartnerSignupFormProps) {
   };
 
 
-  if (isSubmitted) {
-    return (
-      <div className="flex flex-col items-center justify-center text-center space-y-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-        <PartyPopper className="h-12 w-12 text-green-600" />
-        <h2 className="text-2xl font-bold font-headline text-green-900">{t('partner_signup_form.submitted_title')}</h2>
-        <p className="text-green-800">{t('partner_signup_form.submitted_message')}</p>
-        <Button onClick={() => router.push('/')} className="w-full">
-          {t('partner_signup_form.back_to_login')}
-        </Button>
-      </div>
-    )
-  }
+  // if (isSubmitted) {
+  //   return (
+  //     <div className="flex flex-col items-center justify-center text-center space-y-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+  //       <PartyPopper className="h-12 w-12 text-green-600" />
+  //       <h2 className="text-2xl font-bold font-headline text-green-900">{t('partner_signup_form.submitted_title')}</h2>
+  //       <p className="text-green-800">{t('partner_signup_form.submitted_message')}</p>
+  //       <Button onClick={() => router.push('/')} className="w-full">
+  //         {t('partner_signup_form.back_to_login')}
+  //       </Button>
+  //     </div>
+  //   )
+  // }
 
   return (
     <Form {...form}>

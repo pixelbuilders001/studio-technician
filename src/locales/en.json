@@ -39,7 +39,9 @@
         "dont_have_account": "Don't have an account? Sign Up",
         "login_error": "Login failed",
         "email_not_confirmed": "Email not confirmed. Please check your inbox.",
-        "invalid_credentials": "Invalid email or password"
+        "invalid_credentials": "Invalid email or password",
+        "verifying": "Verifying Your Details...",
+        "please_wait": "Hang tight! Our technician is on the way to verify your account."
     },
     "jobs_page": {
         "title": "Jobs"

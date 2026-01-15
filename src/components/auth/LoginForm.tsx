@@ -19,6 +19,7 @@ import { Loader2 } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
 import { createClient } from "@/lib/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { FullPageLoader } from "@/components/ui/FullPageLoader";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -56,8 +57,10 @@ export function LoginForm({ }) {
       const { data, error } = await supabase.auth.signInWithPassword({
         email: values.email,
         password: values.password,
-
       });
+
+      // Add a small delay to show the nice loader UI as requested
+      await new Promise(resolve => setTimeout(resolve, 5000));
 
       if (error) {
         throw error;
@@ -91,45 +94,48 @@ export function LoginForm({ }) {
   }
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t('login_form.email_label')}</FormLabel>
-              <FormControl>
-                <Input placeholder={t('login_form.email_placeholder')} {...field} type="email" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t('login_form.password_label')}</FormLabel>
-              <FormControl>
-                <Input placeholder={t('login_form.password_placeholder')} {...field} type="password" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button type="submit" className="w-full h-12 text-lg" disabled={isLoading}>
-          {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {isLoading ? t('login_form.logging_in') : t('login_form.submit_button')}
-        </Button>
-
-        <div className="text-center pt-2">
-          <Button variant="link" type="button" onClick={() => router.push('/signup')}>
-            {t('login_form.dont_have_account')}
+    <>
+      {isLoading && <FullPageLoader />}
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t('login_form.email_label')}</FormLabel>
+                <FormControl>
+                  <Input placeholder={t('login_form.email_placeholder')} {...field} type="email" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t('login_form.password_label')}</FormLabel>
+                <FormControl>
+                  <Input placeholder={t('login_form.password_placeholder')} {...field} type="password" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button type="submit" className="w-full h-12 text-lg" disabled={isLoading}>
+            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {isLoading ? t('login_form.logging_in') : t('login_form.submit_button')}
           </Button>
-        </div>
-      </form>
-    </Form>
+
+          <div className="text-center pt-2">
+            <Button variant="link" type="button" onClick={() => router.push('/signup')}>
+              {t('login_form.dont_have_account')}
+            </Button>
+          </div>
+        </form>
+      </Form>
+    </>
   );
 }
