@@ -87,6 +87,7 @@ export function SignUpForm() {
                 description: "Please check your email for the confirmation link.",
             });
         } catch (error: any) {
+            console.log("error", error);
             toast({
                 variant: "destructive",
                 title: "Sign Up Failed",
