@@ -21,7 +21,7 @@ export async function estimateTimeAction(input: EstimateCompletionTimeInput) {
 
 type UpdateStatusPayload = {
   booking_id: string;
-  status: 'assigned' | 'accepted' | 'rejected' | 'on_the_way' | 'in-progress' | 'code_sent' | 'completed' | 'cancelled' | 'inspection_started' | 'inspection_completed' | 'quotation_shared' | 'quotation_approved' | 'quotation_rejected' | 'repair_started' | 'repair_completed' | 'closed_no_repair' | 'payment_pending';
+  status: 'assigned' | 'accepted' | 'job_rejected' | 'on_the_way' | 'in-progress' | 'code_sent' | 'completed' | 'cancelled' | 'inspection_started' | 'inspection_completed' | 'quotation_shared' | 'quotation_approved' | 'quotation_rejected' | 'repair_started' | 'repair_completed' | 'closed_no_repair' | 'payment_pending';
   note: string;
   order_id: string;
   final_cost?: number;
