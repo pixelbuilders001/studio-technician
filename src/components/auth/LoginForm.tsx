@@ -68,7 +68,7 @@ export function LoginForm({ }) {
         description: "Welcome back!",
       });
 
-      router.push('/jobs');
+      router.push('/auth/callback')
 
     } catch (error: any) {
       console.error("Login error:", error);

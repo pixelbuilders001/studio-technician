@@ -6,61 +6,82 @@ export async function GET(request: Request) {
     const code = searchParams.get('code')
 
     if (!code) {
-        return NextResponse.redirect(new URL('/login?error=missing_code', origin))
+        return NextResponse.redirect(
+            new URL('/login?error=missing_code', origin)
+        )
     }
 
     const supabase = await createClient()
 
-    // Exchange code for session
+    // 1️⃣ Exchange code for session
     const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+
     if (error || !data?.user) {
-        return NextResponse.redirect(new URL('/login?error=verification_failed', origin))
+        return NextResponse.redirect(
+            new URL('/login?error=auth_failed', origin)
+        )
     }
 
     const userId = data.user.id
 
-    // ✅ Fetch user profile to get role and onboarding_status
+    // 2️⃣ Fetch profile
     const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('role, onboarding_status, is_verified')
         .eq('id', userId)
-        .maybeSingle()
+        .single()
 
     if (profileError || !profile) {
-        return NextResponse.redirect(new URL('/login?error=profile_missing', origin))
+        return NextResponse.redirect(
+            new URL('/login?error=profile_missing', origin)
+        )
     }
 
-    // 🔀 ROLE BASED & STATUS BASED REDIRECT
-    if (profile.role === 'technician') {
-        if (profile.onboarding_status === 'pending') {
-            // First-time signup → fill partner form
-            return NextResponse.redirect('https://studio-technician.vercel.app/partner-signup')
-        }
+    // 3️⃣ ROLE + STATUS BASED ACCESS
+    switch (profile.role) {
+        case 'technician':
+            // 🚧 NOT onboarded
+            if (profile.onboarding_status === 'pending') {
+                return NextResponse.redirect(
+                    'https://studio-technician.vercel.app/partner-signup'
+                )
+            }
 
-        if (profile.onboarding_status === 'submitted') {
-            // Waiting for admin approval
-            return NextResponse.redirect('https://studio-technician.vercel.app/partner/waiting-approval')
-        }
+            // ⏳ Waiting approval
+            if (profile.onboarding_status === 'submitted') {
+                return NextResponse.redirect(
+                    'https://studio-technician.vercel.app/partner/waiting-approval'
+                )
+            }
 
-        if (profile.onboarding_status === 'approved' && profile.is_verified) {
-            // Full access
-            return NextResponse.redirect('https://studio-technician.vercel.app/jobs')
-        }
+            // ❌ Rejected
+            if (profile.onboarding_status === 'rejected') {
+                return NextResponse.redirect(
+                    'https://studio-technician.vercel.app/partner/onboarding?resubmit=true'
+                )
+            }
 
-        if (profile.onboarding_status === 'rejected') {
-            // Allow resubmission
-            return NextResponse.redirect('https://studio-technician.vercel.app/partner/onboarding?resubmit=true')
-        }
+            // ✅ Fully approved
+            if (
+                profile.onboarding_status === 'approved' &&
+                profile.is_verified
+            ) {
+                return NextResponse.redirect(
+                    'https://fixit.technician.com/jobs'
+                )
+            }
+
+            break
+
+        case 'customer':
+            return NextResponse.redirect('https://fixit.com')
+
+        case 'admin':
+            return NextResponse.redirect('https://fixit.com/admin')
     }
 
-    if (profile.role === 'customer') {
-        return NextResponse.redirect('https://fixit.com')
-    }
-
-    if (profile.role === 'admin') {
-        return NextResponse.redirect('https://fixit.com/admin')
-    }
-
-    // Fallback
-    return NextResponse.redirect(new URL('/login?error=unknown_role', origin))
+    // fallback
+    return NextResponse.redirect(
+        new URL('/login?error=access_denied', origin)
+    )
 }
