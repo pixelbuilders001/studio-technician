@@ -14,7 +14,7 @@ type JobTabsProps = {
   activeTab: 'new' | 'ongoing' | 'completed';
   onTabChange: (tab: 'new' | 'ongoing' | 'completed') => void;
   technicianId: string | null;
-  onJobsUpdate: () => void;
+  onJobsUpdate: (newTab?: 'new' | 'ongoing' | 'completed') => void;
 };
 
 export function JobTabs({ jobs, activeTab, onTabChange, technicianId, onJobsUpdate }: JobTabsProps) {

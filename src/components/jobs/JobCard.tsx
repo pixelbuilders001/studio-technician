@@ -75,7 +75,7 @@ const statusFlow: StatusConfig = {
     },
 }
 
-export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technicianId: string | null, onJobsUpdate: () => void }) {
+export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technicianId: string | null, onJobsUpdate: (newTab?: 'new' | 'ongoing' | 'completed') => void }) {
     const router = useRouter();
     const { toast } = useToast();
     const { t } = useTranslation();
@@ -107,7 +107,7 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
                     title: t('status_updater.toast_title'),
                     description: `${t('status_updater.toast_description')} ${t(`job_api_status.${status}`)}`,
                 });
-                onJobsUpdate();
+                onJobsUpdate(status === 'accepted' ? 'ongoing' : undefined);
 
             } catch (error: any) {
                 toast({
@@ -249,6 +249,27 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
     const nextAction = statusFlow[job.status];
     const NextActionIcon = nextAction?.buttonIcon;
 
+    const allowCommunication = ['assigned', 'pending', 'on_the_way', 'accepted'].includes(job.status);
+
+    const communicationButtons = (
+        <div className="flex gap-2 mb-3">
+            <Button variant="outline" className="flex-1 h-11 rounded-xl border-slate-200 bg-white" asChild>
+                <a href={`tel:${job.mobile_number}`}><Phone className="mr-2 h-4 w-4 text-primary" /> Call</a>
+            </Button>
+            {job.map_url ? (
+                <Button variant="outline" className="flex-1 h-11 rounded-xl border-slate-200 bg-white" asChild>
+                    <a href={job.map_url} target="_blank" rel="noopener noreferrer">
+                        <Navigation className="mr-2 h-4 w-4 text-primary" /> Map
+                    </a>
+                </Button>
+            ) : (
+                <Button variant="outline" className="flex-1 h-11 rounded-xl border-slate-200 bg-white opacity-50 cursor-not-allowed">
+                    <Navigation className="mr-2 h-4 w-4" /> Map
+                </Button>
+            )}
+        </div>
+    );
+
 
     const renderFooter = () => {
         if (!technicianId) {
@@ -261,33 +282,36 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
 
         if (job.status === 'assigned') {
             return (
-                <div className="flex gap-3 w-full p-4 bg-slate-50 border-t border-slate-100">
-                    <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                            <Button variant="outline" className="flex-1 h-12 rounded-xl text-rose-500 border-rose-100 hover:bg-rose-50 font-bold" disabled={isPending}>
-                                {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <X className="mr-2 h-4 w-4" />}
-                                {t('job_card.reject')}
-                            </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent className="rounded-3xl max-w-[90vw]">
-                            <AlertDialogHeader>
-                                <AlertDialogTitle>Reject this job?</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                    This job will be removed from your list and assigned to another technician.
-                                </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                                <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => handleStatusUpdate('job_rejected')} className="bg-rose-500 hover:bg-rose-600 rounded-xl">
-                                    Confirm Reject
-                                </AlertDialogAction>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialog>
-                    <Button className="flex-1 h-12 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold shadow-lg shadow-primary/20" onClick={() => handleStatusUpdate('accepted')} disabled={isPending}>
-                        {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Check className="mr-2 h-4 w-4" />}
-                        {t('job_card.accept')}
-                    </Button>
+                <div className="flex flex-col w-full p-4 bg-slate-50 border-t border-slate-100">
+                    {allowCommunication && communicationButtons}
+                    <div className="flex gap-3">
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button variant="outline" className="flex-1 h-12 rounded-xl text-rose-500 border-rose-100 hover:bg-rose-50 font-bold" disabled={isPending}>
+                                    {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <X className="mr-2 h-4 w-4" />}
+                                    {t('job_card.reject')}
+                                </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent className="rounded-3xl max-w-[90vw]">
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>Reject this job?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        This job will be removed from your list and assigned to another technician.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
+                                    <AlertDialogAction onClick={() => handleStatusUpdate('job_rejected')} className="bg-rose-500 hover:bg-rose-600 rounded-xl">
+                                        Confirm Reject
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+                        <Button className="flex-1 h-12 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold shadow-lg shadow-primary/20" onClick={() => handleStatusUpdate('accepted')} disabled={isPending}>
+                            {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Check className="mr-2 h-4 w-4" />}
+                            {t('job_card.accept')}
+                        </Button>
+                    </div>
                 </div>
             )
         }
@@ -331,7 +355,7 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
                 <InspectionDetailsForm
                     job={job}
                     technicianId={technicianId}
-                    onFormSubmit={onJobsUpdate}
+                    onFormSubmit={() => onJobsUpdate()}
                 >
                     <Button className="h-11 flex-1 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold shadow-lg shadow-primary/20" disabled={isPending}>
                         {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FileText className="mr-2 h-4 w-4" />}
@@ -341,15 +365,21 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
             );
         } else if (job.status === 'inspection_completed') {
             mainActionButton = (
-                <ShareQuoteForm
-                    job={job}
-                    onFormSubmit={onJobsUpdate}
-                >
-                    <Button className="h-11 flex-1 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold shadow-lg shadow-primary/20" disabled={isPending}>
-                        {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Share2 className="mr-2 h-4 w-4" />}
-                        {t('status_updater.share_quote')}
+                <div className="flex gap-2 flex-1">
+                    <ShareQuoteForm
+                        job={job}
+                        onFormSubmit={() => onJobsUpdate()}
+                    >
+                        <Button className="h-11 flex-1 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold shadow-lg shadow-primary/20" disabled={isPending}>
+                            {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Share2 className="mr-2 h-4 w-4" />}
+                            {t('status_updater.share_quote')}
+                        </Button>
+                    </ShareQuoteForm>
+                    <Button className="h-11 flex-1 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold shadow-lg shadow-amber-500/20" onClick={() => setPaymentOpen(true)}>
+                        <Wallet className="mr-2 h-4 w-4" />
+                        Collect
                     </Button>
-                </ShareQuoteForm>
+                </div>
             );
         } else if (job.status === 'quotation_shared') {
             mainActionButton = (
@@ -388,22 +418,7 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
 
         return (
             <div className="flex flex-col gap-3 w-full p-4 bg-slate-50 border-t border-slate-100">
-                <div className="flex gap-2">
-                    <Button variant="outline" className="flex-1 h-11 rounded-xl border-slate-200 bg-white" asChild>
-                        <a href={`tel:${job.mobile_number}`}><Phone className="mr-2 h-4 w-4 text-primary" /> Call</a>
-                    </Button>
-                    {job.map_url ? (
-                        <Button variant="outline" className="flex-1 h-11 rounded-xl border-slate-200 bg-white" asChild>
-                            <a href={job.map_url} target="_blank" rel="noopener noreferrer">
-                                <Navigation className="mr-2 h-4 w-4 text-primary" /> Map
-                            </a>
-                        </Button>
-                    ) : (
-                        <Button variant="outline" className="flex-1 h-11 rounded-xl border-slate-200 bg-white opacity-50 cursor-not-allowed">
-                            <Navigation className="mr-2 h-4 w-4" /> Map
-                        </Button>
-                    )}
-                </div>
+                {allowCommunication && communicationButtons}
                 {mainActionButton}
             </div>
         )

@@ -79,8 +79,19 @@ function JobsPageContent() {
     fetchJobs();
   }, [technicianId]); // This will run whenever technicianId is set.
 
-  const refreshJobs = () => {
-    getJobsAction().then(setJobs);
+  const refreshJobs = async (newTab?: 'new' | 'ongoing' | 'completed') => {
+    setLoading(true);
+    try {
+      const fetchedJobs = await getJobsAction();
+      setJobs(fetchedJobs);
+      if (newTab) {
+        handleTabChange(newTab);
+      }
+    } catch (e: any) {
+      setError(e.message || "Failed to fetch jobs.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
