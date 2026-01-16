@@ -155,6 +155,46 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
         }
     }
 
+    const handleMapClick = () => {
+        if (!job.map_url) return;
+
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition((position) => {
+                const origin = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+
+                // Extraction logic for destination from job.map_url
+                // Example format: .../@25.6173525,85.602243,10z/...
+                // or .../!3d25.50452!4d86.4701416...
+                const coordsMatch = job.map_url!.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/) ||
+                    job.map_url!.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/);
+
+                if (coordsMatch) {
+                    const destLat = coordsMatch[1];
+                    const destLng = coordsMatch[2];
+                    const directionsUrl = `https://www.google.com/maps/dir/?api=1&origin=${origin.lat},${origin.lng}&destination=${destLat},${destLng}&travelmode=driving`;
+                    window.open(directionsUrl, "_blank");
+                } else {
+                    // Fallback to static URL if extraction fails
+                    window.open(job.map_url!, "_blank");
+                }
+            }, (error) => {
+                console.error("Geolocation error:", error);
+                // Fallback to static URL if geolocation fails or is denied
+                window.open(job.map_url!, "_blank");
+            }, {
+                enableHighAccuracy: true,
+                timeout: 5000,
+                maximumAge: 0
+            });
+        } else {
+            // Browser doesn't support geolocation
+            window.open(job.map_url!, "_blank");
+        }
+    };
+
     const onPaymentSuccess = async () => {
         if (!technicianId) {
             toast({ title: "Error", description: "Repair details are missing.", variant: "destructive" });
@@ -259,10 +299,12 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
                 <a href={`tel:${job.mobile_number}`}><Phone className="mr-2 h-4 w-4 text-primary" /> Call</a>
             </Button>
             {job.map_url ? (
-                <Button variant="outline" className="flex-1 h-11 rounded-xl border-slate-200 bg-white" asChild>
-                    <a href={job.map_url} target="_blank" rel="noopener noreferrer">
-                        <Navigation className="mr-2 h-4 w-4 text-primary" /> Map
-                    </a>
+                <Button
+                    variant="outline"
+                    className="flex-1 h-11 rounded-xl border-slate-200 bg-white"
+                    onClick={handleMapClick}
+                >
+                    <Navigation className="mr-2 h-4 w-4 text-primary" /> Map
                 </Button>
             ) : (
                 <Button variant="outline" className="flex-1 h-11 rounded-xl border-slate-200 bg-white opacity-50 cursor-not-allowed">
