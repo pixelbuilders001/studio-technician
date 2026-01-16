@@ -537,8 +537,10 @@ export async function verifyCompletionCodeAction(payload: VerifyCodePayload) {
 
 type VerifyPaymentPayload = {
   booking_id: string;
+  status: string;
   payment_method: 'cash' | 'upi';
   final_amount_paid: number;
+  inspection_fee: number;
 }
 
 export async function verifyPaymentAction(payload: VerifyPaymentPayload) {

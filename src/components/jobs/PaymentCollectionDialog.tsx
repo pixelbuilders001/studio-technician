@@ -20,7 +20,9 @@ import { useToast } from "@/hooks/use-toast";
 
 type PaymentCollectionDialogProps = {
   job: Job;
+  status: string;
   totalAmount: number;
+  inspectionFee: number;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onPaymentSuccess: () => void;
@@ -28,7 +30,9 @@ type PaymentCollectionDialogProps = {
 
 export function PaymentCollectionDialog({
   job,
+  status,
   totalAmount,
+  inspectionFee,
   open,
   onOpenChange,
   onPaymentSuccess,
@@ -42,13 +46,15 @@ export function PaymentCollectionDialog({
     try {
       await verifyPaymentAction({
         booking_id: job.id,
+        status: status,
         payment_method: 'cash',
         final_amount_paid: totalAmount,
+        inspection_fee: inspectionFee,
       });
 
       await onPaymentSuccess();
     } catch (error: any) {
-       toast({
+      toast({
         variant: "destructive",
         title: "Payment Verification Failed",
         description: error.message || "Could not verify cash payment.",
@@ -69,7 +75,7 @@ export function PaymentCollectionDialog({
         <div className="flex flex-col items-center justify-center space-y-4 py-4">
           <p className="text-muted-foreground">{t('payment_collection_dialog.total_due')}</p>
           <p className="text-4xl font-bold">
-           {new Intl.NumberFormat('en-IN', {
+            {new Intl.NumberFormat('en-IN', {
               style: 'currency',
               currency: 'INR',
               minimumFractionDigits: 0,
@@ -95,7 +101,7 @@ export function PaymentCollectionDialog({
               {t('payment_collection_dialog.paid_by_cash')}
             </Button>
             <DialogClose asChild>
-                <Button type="button" variant="ghost" className="w-full">{t('repair_details_form.cancel_button')}</Button>
+              <Button type="button" variant="ghost" className="w-full">{t('repair_details_form.cancel_button')}</Button>
             </DialogClose>
           </div>
         </DialogFooter>

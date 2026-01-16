@@ -89,6 +89,8 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
     const platformFeePercentage = 18;
     const technicianPayout = finalCost - ((finalCost * platformFeePercentage) / 100);
 
+
+
     const handleStatusUpdate = (status: JobStatus) => {
         if (!technicianId) {
             toast({ title: "Error", description: "Technician profile not found.", variant: "destructive" });
@@ -550,7 +552,9 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
 
                     <PaymentCollectionDialog
                         job={job}
+                        status={job.status}
                         totalAmount={finalCost}
+                        inspectionFee={job.net_inspection_fee}
                         open={paymentOpen}
                         onOpenChange={setPaymentOpen}
                         onPaymentSuccess={onPaymentSuccess}
