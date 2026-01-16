@@ -40,7 +40,7 @@ export function PaymentCollectionDialog({
   const [isLoading, setIsLoading] = useState(false);
   const { t } = useTranslation();
   const { toast } = useToast();
-
+  console.log("status---", status);
   const handleCashPayment = async () => {
     setIsLoading(true);
     try {

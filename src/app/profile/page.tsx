@@ -115,7 +115,7 @@ export default function ProfilePage() {
                             <CardContent className="p-5 relative">
                                 <div className="absolute -right-4 -top-4 w-12 h-12 bg-green-50 rounded-full transition-transform group-hover:scale-150 duration-500"></div>
                                 <div className="space-y-1 relative z-10">
-                                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Today</p>
+                                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Today's Earnings</p>
                                     <p className="text-xl font-bold font-headline text-slate-900">
                                         ₹{new Intl.NumberFormat('en-IN', {
                                             maximumFractionDigits: 0,
@@ -128,7 +128,7 @@ export default function ProfilePage() {
                             <CardContent className="p-5 relative">
                                 <div className="absolute -right-4 -top-4 w-12 h-12 bg-primary/5 rounded-full transition-transform group-hover:scale-150 duration-500"></div>
                                 <div className="space-y-1 relative z-10">
-                                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Lifetime</p>
+                                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Lifetime Earnings</p>
                                     <p className="text-xl font-bold font-headline text-slate-900">
                                         ₹{new Intl.NumberFormat('en-IN', {
                                             maximumFractionDigits: 0,
@@ -155,11 +155,11 @@ export default function ProfilePage() {
                                 </div>
                                 <div className="flex flex-col items-center justify-center space-y-1 rounded-2xl p-4 bg-emerald-50/50 border border-emerald-100/50 transition-colors hover:bg-emerald-50">
                                     <p className="text-2xl font-bold text-emerald-600">{stats.total_jobs_completed ?? 0}</p>
-                                    <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-tighter">Done</p>
+                                    <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-tighter">Completed</p>
                                 </div>
                                 <div className="flex flex-col items-center justify-center space-y-1 rounded-2xl p-4 bg-rose-50/50 border border-rose-100/50 transition-colors hover:bg-rose-50">
                                     <p className="text-2xl font-bold text-rose-600">{stats.total_jobs_cancelled ?? 0}</p>
-                                    <p className="text-[10px] font-bold text-rose-400 uppercase tracking-tighter">Failed</p>
+                                    <p className="text-[10px] font-bold text-rose-400 uppercase tracking-tighter">Rejected</p>
                                 </div>
                             </div>
 
