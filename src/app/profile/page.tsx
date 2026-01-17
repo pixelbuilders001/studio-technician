@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { User, Phone, Map, Tag, Briefcase, LogOut, Star, CheckCircle, XCircle } from 'lucide-react';
+import { User, Phone, Map, Tag, Briefcase, LogOut, Star, CheckCircle, XCircle, IndianRupee } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { LanguageSelector } from '@/components/common/LanguageSelector';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -105,6 +105,11 @@ export default function ProfilePage() {
                                 ID: {profile.id.substring(0, 8).toUpperCase()}
                             </span>
                         </div>
+                        <div className="mt-1 flex items-center gap-2 text-slate-500 font-medium">
+                            <span className="bg-slate-200/50 px-2 py-0.5 rounded text-xs uppercase tracking-wider">
+                                {stats?.primary_skill ? stats?.primary_skill : "Not mentioned"}
+                            </span>
+                        </div>
                     </div>
                 </div>
 
@@ -116,11 +121,10 @@ export default function ProfilePage() {
                                 <div className="absolute -right-4 -top-4 w-12 h-12 bg-green-50 rounded-full transition-transform group-hover:scale-150 duration-500"></div>
                                 <div className="space-y-1 relative z-10">
                                     <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Today's Earnings</p>
-                                    <p className="text-xl font-bold font-headline text-slate-900">
-                                        ₹{new Intl.NumberFormat('en-IN', {
-                                            maximumFractionDigits: 0,
-                                        }).format(stats.today_earnings ?? 0)}
-                                    </p>
+                                    <div className="flex items-center text-lg font-semibold text-slate-800">
+                                        <IndianRupee className="w-4 h-4" />
+                                        <span>{stats.today_earnings ?? 0}</span>
+                                    </div>
                                 </div>
                             </CardContent>
                         </Card>
@@ -129,11 +133,10 @@ export default function ProfilePage() {
                                 <div className="absolute -right-4 -top-4 w-12 h-12 bg-primary/5 rounded-full transition-transform group-hover:scale-150 duration-500"></div>
                                 <div className="space-y-1 relative z-10">
                                     <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Lifetime Earnings</p>
-                                    <p className="text-xl font-bold font-headline text-slate-900">
-                                        ₹{new Intl.NumberFormat('en-IN', {
-                                            maximumFractionDigits: 0,
-                                        }).format(stats.lifetime_earnings ?? 0)}
-                                    </p>
+                                    <div className="flex items-center text-lg font-semibold text-slate-800">
+                                        <IndianRupee className="w-4 h-4" />
+                                        <span>{stats.lifetime_earnings ?? 0}</span>
+                                    </div>
                                 </div>
                             </CardContent>
                         </Card>
@@ -287,7 +290,10 @@ export default function ProfilePage() {
                                     </div>
                                     <div>
                                         <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Today Earnings</p>
-                                        <p className="text-lg font-bold text-slate-900">₹{stats.today_earnings || 0}</p>
+                                        <div className="flex items-center text-lg font-semibold text-slate-800">
+                                            <IndianRupee className="w-4 h-4" />
+                                            <span>{stats.today_earnings ?? 0}</span>
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="flex items-start gap-3">
@@ -296,7 +302,10 @@ export default function ProfilePage() {
                                     </div>
                                     <div>
                                         <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Lifetime Earnings</p>
-                                        <p className="text-lg font-bold text-slate-900">₹{stats.lifetime_earnings || 0}</p>
+                                        <div className="flex items-center text-lg font-semibold text-slate-800">
+                                            <IndianRupee className="w-4 h-4" />
+                                            <span>{stats.lifetime_earnings ?? 0}</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

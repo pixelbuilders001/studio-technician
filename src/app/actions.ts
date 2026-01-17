@@ -8,6 +8,7 @@ import {
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { CloudCog } from "lucide-react";
 
 export async function estimateTimeAction(input: EstimateCompletionTimeInput) {
   try {
@@ -417,7 +418,7 @@ export async function getTechnicianStats(): Promise<TechnicianStats | null> {
     }
 
     const data = await response.json();
-
+    console.log("the technician stats", data)
     if (data && data.length > 0) {
       return data[0];
     }
@@ -602,25 +603,35 @@ export async function verifyPaymentAction(payload: VerifyPaymentPayload) {
 }
 export async function getProfileAction() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { session } } = await supabase.auth.getSession();
 
-  if (!user) {
+  if (!session) {
     throw new Error("Unauthorized");
   }
 
-  const { data: profile, error } = await supabase
-    .from('profiles')
-    .select('id, full_name, role, phone')
-    .eq('id', user.id)
-    .single();
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/profiles?id=eq.${session.user.id}&limit=1`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+        apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    }
+  );
 
-  if (error) {
-    console.error('Error fetching profile:', error);
-    throw new Error(error.message || "Failed to fetch profile");
+  if (!response.ok) {
+    const err = await response.json();
+    throw new Error(err.message || "Failed to fetch profile");
   }
 
-  return profile;
+  const data = await response.json();
+  console.log("the profile", data)
+  return data[0];
 }
+
 
 export async function logoutAction() {
   const supabase = await createClient();
@@ -628,3 +639,54 @@ export async function logoutAction() {
   redirect('/');
 }
 
+
+export type PlatformEarnings = {
+  id: string;
+  booking_id: string;
+  technician_id: string;
+  earning_type: string;
+  gross_amount: number;
+  commission_amount: number;
+  technician_amount: number;
+  commission_percentage: number;
+  payment_method: string | null;
+  payment_status: string | null;
+  created_at: string | null;
+};
+
+export async function getPlatformEarningsAction(bookingId: string): Promise<PlatformEarnings | null> {
+  const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/platform_earnings?booking_id=eq.${bookingId}&select=*`;
+  const apikey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!url || !apikey) {
+    console.error("Supabase URL or anon key is not defined in environment variables.");
+    throw new Error("Server configuration error.");
+  }
+
+  const supabase = await createClient();
+  const { data: { session } } = await supabase.auth.getSession();
+  const token = session?.access_token || apikey;
+
+  try {
+    const response = await fetch(url, {
+      headers: {
+        'apikey': apikey,
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `API Error: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    if (data && data.length > 0) {
+      return data[0];
+    }
+    return null;
+  } catch (error: any) {
+    console.error('Get platform earnings API error:', error);
+    throw new Error(error.message || "An unexpected error occurred while fetching platform earnings.");
+  }
+}

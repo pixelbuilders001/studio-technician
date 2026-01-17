@@ -291,7 +291,7 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
     const nextAction = statusFlow[job.status];
     const NextActionIcon = nextAction?.buttonIcon;
 
-    const allowCommunication = ['assigned', 'pending', 'on_the_way', 'accepted'].includes(job.status);
+    const allowCommunication = ['on_the_way', 'accepted'].includes(job.status);
 
     const communicationButtons = (
         <div className="flex gap-2 mb-3">
@@ -508,7 +508,10 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
                             </div>
                         </div>
                         <div className="text-right flex-shrink-0">
-                            <div className="text-xl font-extrabold text-slate-900 tracking-tight">₹{finalCost}</div>
+                            <div className="flex items-center text-lg font-semibold text-slate-800">
+                                <IndianRupee className="w-4 h-4" />
+                                <span>{finalCost}</span>
+                            </div>
                             <div className="mt-1 flex justify-end">
                                 {statusBadge()}
                             </div>

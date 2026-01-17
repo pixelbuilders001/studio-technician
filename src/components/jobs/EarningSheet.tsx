@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -12,7 +13,8 @@ import {
 } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
 import type { Job } from "@/lib/types";
-import { IndianRupee, HandCoins } from "lucide-react";
+import { HandCoins, IndianRupee, Loader2 } from "lucide-react";
+import { getPlatformEarningsAction, type PlatformEarnings } from "@/app/actions";
 
 type EarningSheetProps = {
   job: Job;
@@ -20,10 +22,19 @@ type EarningSheetProps = {
 };
 
 export function EarningSheet({ job, children }: EarningSheetProps) {
-  const finalCost = job.finalCost ?? 0;
-  const platformFeePercentage = 20; // Assuming 20% platform fee
-  const platformFee = (finalCost * platformFeePercentage) / 100;
-  const technicianPayout = finalCost - platformFee;
+  const [earnings, setEarnings] = useState<PlatformEarnings | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    if (isOpen && job.id) {
+      setLoading(true);
+      getPlatformEarningsAction(job.id)
+        .then((data) => setEarnings(data))
+        .catch((err) => console.error("Failed to fetch earnings:", err))
+        .finally(() => setLoading(false));
+    }
+  }, [isOpen, job.id]);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-IN", {
@@ -34,7 +45,7 @@ export function EarningSheet({ job, children }: EarningSheetProps) {
   };
 
   return (
-    <Sheet>
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>{children}</SheetTrigger>
       <SheetContent>
         <SheetHeader>
@@ -43,28 +54,67 @@ export function EarningSheet({ job, children }: EarningSheetProps) {
             Job Earning Breakdown
           </SheetTitle>
         </SheetHeader>
-        <div className="py-8 space-y-4">
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Final Amount Collected</span>
-              <span className="font-medium">{formatCurrency(finalCost)}</span>
+
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-12 space-y-4">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <p className="text-sm text-muted-foreground">Loading earnings details...</p>
+          </div>
+        ) : earnings ? (
+          <div className="py-8 space-y-4">
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Final Amount Collected</span>
+                <div className="flex items-center text-lg font-semibold text-slate-800">
+                  <IndianRupee className="w-4 h-4" />
+                  <span>{earnings.gross_amount}</span>
+                </div>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Platform Fee ({earnings.commission_percentage}%)</span>
+                <div className="flex items-center text-lg font-semibold text-slate-800">
+                  <IndianRupee className="w-4 h-4" />
+                  <span>{earnings.commission_amount}</span>
+                </div>
+              </div>
             </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Platform Fee ({platformFeePercentage}%)</span>
-              <span className="font-medium text-red-600">
-                - {formatCurrency(platformFee)}
-              </span>
+            <Separator />
+            <div className="flex justify-between items-center text-lg font-bold">
+              <span>Your Payout</span>
+              <div className="flex items-center text-lg font-semibold text-slate-800">
+                <IndianRupee className="w-4 h-4" />
+                <span>{earnings.technician_amount}</span>
+              </div>
+            </div>
+            <div className="text-xs text-muted-foreground pt-4">
+              This is the final breakdown for this job.
             </div>
           </div>
-          <Separator />
-          <div className="flex justify-between items-center text-lg font-bold">
-            <span>Your Payout</span>
-            <span className="text-green-600">{formatCurrency(technicianPayout)}</span>
+        ) : (
+          <div className="py-8 text-center text-muted-foreground">
+            {/* Fallback to estimated calculation if no record found, or show empty state */}
+            <div className="space-y-4">
+              <p>No earnings record found for this job yet.</p>
+              <div className="space-y-2 text-sm text-left opacity-70">
+                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Estimated Breakdown</p>
+                <div className="flex justify-between">
+                  <span>Estimated Amount</span>
+                  <span>{formatCurrency(job.finalCost ?? job.total_estimated_price ?? 0)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Est. Platform Fee (20%)</span>
+                  <span>- {formatCurrency((job.finalCost ?? job.total_estimated_price ?? 0) * 0.20)}</span>
+                </div>
+                <Separator className="my-2" />
+                <div className="flex justify-between font-bold">
+                  <span>Est. Payout</span>
+                  <span>{formatCurrency((job.finalCost ?? job.total_estimated_price ?? 0) * 0.80)}</span>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="text-xs text-muted-foreground pt-4">
-             This is an estimate. The final payout will be reflected in your weekly statement after any adjustments.
-          </div>
-        </div>
+        )}
+
         <SheetFooter>
           <SheetClose asChild>
             <Button className="w-full">Close</Button>
