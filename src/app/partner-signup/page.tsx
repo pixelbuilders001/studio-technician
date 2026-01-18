@@ -22,12 +22,12 @@ export default function PartnerSignupPage() {
   }
 
   return (
-    <div className="flex flex-col">
-        <PageHeader title={t('partner_signup_page.title')} />
-        <div className="p-4">
-            <p className="text-muted-foreground mb-6">{t('partner_signup_page.subtitle')}</p>
-            <PartnerSignupForm pincode={pincode} city={city} />
-        </div>
+    <div className="flex flex-col min-h-screen bg-slate-50/50">
+      <PageHeader title={t('partner_signup_page.title')} />
+      <div className="p-4 flex-1 flex flex-col">
+        {!isPincodeVerified && <p className="text-muted-foreground mb-6 text-center">{t('partner_signup_page.subtitle')}</p>}
+        <PartnerSignupForm pincode={pincode} city={city} />
+      </div>
     </div>
   )
 }
