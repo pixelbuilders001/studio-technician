@@ -1,5 +1,5 @@
 
-import type {NextConfig} from 'next';
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   /* config options here */
@@ -56,6 +56,14 @@ const nextConfig: NextConfig = {
   ],
 };
 
-export default nextConfig;
+const withSerwist = require("@serwist/next").default({
+  swSrc: "src/app/sw.ts",
+  swDest: "public/sw.js",
+  disable: process.env.NODE_ENV === "development",
+  reloadOnOnline: true,
+  // User requested no precaching. 
+  // Serwist might still look for a manifest, but we can control the strategy in sw.ts
+});
 
-    
+export default withSerwist(nextConfig);
+
