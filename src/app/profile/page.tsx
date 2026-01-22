@@ -5,18 +5,20 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { User, Phone, Map, Tag, Briefcase, LogOut, Star, CheckCircle, XCircle, IndianRupee } from 'lucide-react';
+import { User, Phone, Map, Tag, Briefcase, LogOut, Star, CheckCircle, XCircle, IndianRupee, CloudCog } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { LanguageSelector } from '@/components/common/LanguageSelector';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useEffect, useState } from 'react';
 import { getTechnicianStats, getProfileAction, logoutAction } from '@/app/actions';
+import { FullPageLoader } from '@/components/ui/FullPageLoader';
 
 export default function ProfilePage() {
     const { t } = useTranslation();
     const [profile, setProfile] = useState<any>(null);
     const [stats, setStats] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
 
     useEffect(() => {
         const fetchProfileData = async () => {
@@ -38,10 +40,17 @@ export default function ProfilePage() {
     }, []);
 
     const handleLogout = async () => {
+        setIsLoggingOut(true);
+        // Add a small delay for better UX so the loader is visible
+        await new Promise(resolve => setTimeout(resolve, 1500));
         localStorage.removeItem('authToken');
         localStorage.removeItem('technicianProfile');
         await logoutAction();
     };
+
+    if (isLoggingOut) {
+        return <FullPageLoader text="Logging out..." subtext="Thanks for your hard work today!" />;
+    }
 
     if (loading) {
         return (
