@@ -10,6 +10,7 @@ import { createClient } from "@/lib/supabase/client";
 import type { Job } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSearchParams, useRouter } from "next/navigation";
+import Image from "next/image";
 
 function JobsSkeleton() {
   return (
@@ -26,7 +27,6 @@ function JobsPageContent() {
   const { t } = useTranslation();
   const [profile, setProfile] = useState<any>(null);
   const [jobs, setJobs] = useState<Job[]>([]);
-  console.log("jfjjfdjfdjj", jobs)
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [technicianId, setTechnicianId] = useState<string | null>(null);
@@ -97,9 +97,16 @@ function JobsPageContent() {
   return (
     <div className="flex h-full flex-col">
       <header className="flex h-16 items-center border-b border-white/20 bg-white/70 backdrop-blur-lg px-4 justify-between sticky top-0 z-50">
-        <h1 className="text-xl font-bold font-headline bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-          {t('jobs_page.title')}
-        </h1>
+        <div className="flex items-center gap-2">
+          <Image
+            src="/logo-image.png"
+            alt="Brand Logo"
+            width={84}
+            height={84}
+            className="object-contain"
+            priority
+          />
+        </div>
         {profile && (
           <div className="flex items-center gap-2 px-3 py-1 bg-primary/5 rounded-full border border-primary/10">
             <span className="text-xs font-semibold text-primary">{profile.full_name}</span>
