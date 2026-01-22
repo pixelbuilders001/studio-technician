@@ -100,27 +100,24 @@ export function SignUpForm() {
 
     if (isSuccess) {
         return (
-            <div className="flex flex-col items-center text-center space-y-6 py-6">
+            <div className="flex flex-col items-center text-center space-y-4 py-3">
                 <div className="relative">
                     <div className="absolute inset-0 bg-green-100 rounded-full blur-xl animate-pulse"></div>
-                    <div className="relative h-20 w-20 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center shadow-lg">
-                        <MailCheck className="h-10 w-10 text-white" />
+                    <div className="relative h-14 w-14 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center shadow-lg">
+                        <MailCheck className="h-7 w-7 text-white" />
                     </div>
                 </div>
-                <div className="space-y-2">
-                    <h3 className="text-xl font-bold text-slate-900">
+                <div className="space-y-1">
+                    <h3 className="text-base font-bold text-slate-900">
                         Check Your Email!
                     </h3>
-                    <p className="text-sm text-slate-600 max-w-sm">
-                        We've sent a confirmation link to
-                    </p>
-                    <p className="text-sm font-semibold text-primary break-all px-4">
-                        {emailSentTo}
+                    <p className="text-xs text-slate-600 max-w-sm px-2">
+                        Confirmation link sent to <span className="font-semibold text-primary">{emailSentTo}</span>
                     </p>
                 </div>
                 <Button
                     variant="outline"
-                    className="w-full h-11 rounded-xl border-2 hover:bg-slate-50"
+                    className="w-full h-9 rounded-xl border-2 hover:bg-slate-50 text-sm"
                     onClick={() => router.push("/login")}
                 >
                     Back to Login
@@ -131,24 +128,24 @@ export function SignUpForm() {
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
                 {/* EMAIL */}
                 <FormField
                     control={form.control}
                     name="email"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel className="text-sm font-medium text-slate-700">
+                            <FormLabel className="text-xs font-medium text-slate-700">
                                 {t("signup_form.email_label")}
                             </FormLabel>
                             <FormControl>
                                 <div className="relative">
-                                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
                                     <Input
                                         placeholder="tech@example.com"
                                         {...field}
                                         type="email"
-                                        className="pl-10 h-12 bg-slate-50/50 border-slate-200 focus:bg-white focus:border-primary rounded-xl transition-all"
+                                        className="pl-9 h-10 bg-slate-50/50 border-slate-200 focus:bg-white focus:border-primary rounded-xl transition-all text-sm"
                                     />
                                 </div>
                             </FormControl>
@@ -163,17 +160,17 @@ export function SignUpForm() {
                     name="password"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel className="text-sm font-medium text-slate-700">
+                            <FormLabel className="text-xs font-medium text-slate-700">
                                 {t("signup_form.password_label")}
                             </FormLabel>
                             <FormControl>
                                 <div className="relative">
-                                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
                                     <Input
                                         placeholder="Min. 6 characters"
                                         {...field}
                                         type="password"
-                                        className="pl-10 h-12 bg-slate-50/50 border-slate-200 focus:bg-white focus:border-primary rounded-xl transition-all"
+                                        className="pl-9 h-10 bg-slate-50/50 border-slate-200 focus:bg-white focus:border-primary rounded-xl transition-all text-sm"
                                     />
                                 </div>
                             </FormControl>
@@ -188,17 +185,17 @@ export function SignUpForm() {
                     name="confirmPassword"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel className="text-sm font-medium text-slate-700">
+                            <FormLabel className="text-xs font-medium text-slate-700">
                                 {t("signup_form.confirm_password_label")}
                             </FormLabel>
                             <FormControl>
                                 <div className="relative">
-                                    <CheckCircle className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                    <CheckCircle className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
                                     <Input
                                         placeholder="Re-enter password"
                                         {...field}
                                         type="password"
-                                        className="pl-10 h-12 bg-slate-50/50 border-slate-200 focus:bg-white focus:border-primary rounded-xl transition-all"
+                                        className="pl-9 h-10 bg-slate-50/50 border-slate-200 focus:bg-white focus:border-primary rounded-xl transition-all text-sm"
                                     />
                                 </div>
                             </FormControl>
@@ -209,12 +206,12 @@ export function SignUpForm() {
 
                 <Button
                     type="submit"
-                    className="w-full h-12 text-base font-semibold bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary/80 rounded-xl shadow-lg shadow-primary/20 transition-all hover:shadow-xl hover:shadow-primary/30 active:scale-[0.98]"
+                    className="w-full h-10 text-sm font-semibold bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary/80 rounded-xl shadow-lg shadow-primary/20 transition-all hover:shadow-xl hover:shadow-primary/30 active:scale-[0.98]"
                     disabled={isLoading}
                 >
                     {isLoading ? (
                         <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
                             {t("signup_form.submitting")}
                         </>
                     ) : (
@@ -222,8 +219,8 @@ export function SignUpForm() {
                     )}
                 </Button>
 
-                <div className="text-center pt-3">
-                    <p className="text-sm text-slate-600">
+                <div className="text-center pt-1.5">
+                    <p className="text-xs text-slate-600">
                         Already have an account?{" "}
                         <button
                             type="button"

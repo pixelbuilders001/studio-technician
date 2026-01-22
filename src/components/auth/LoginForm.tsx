@@ -145,22 +145,22 @@ export function LoginForm() {
       {isLoading && <FullPageLoader text="Signing you in..." subtext="Please wait a moment" />}
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
           <FormField
             control={form.control}
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-sm font-medium text-slate-700">
+                <FormLabel className="text-xs font-medium text-slate-700">
                   {t("login_form.email_label")}
                 </FormLabel>
                 <FormControl>
                   <div className="relative">
-                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
                     <Input
                       type="email"
                       placeholder={t("login_form.email_placeholder")}
-                      className="pl-10 h-12 bg-slate-50/50 border-slate-200 focus:bg-white focus:border-primary rounded-xl transition-all"
+                      className="pl-9 h-10 bg-slate-50/50 border-slate-200 focus:bg-white focus:border-primary rounded-xl transition-all text-sm"
                       {...field}
                     />
                   </div>
@@ -175,16 +175,16 @@ export function LoginForm() {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-sm font-medium text-slate-700">
+                <FormLabel className="text-xs font-medium text-slate-700">
                   {t("login_form.password_label")}
                 </FormLabel>
                 <FormControl>
                   <div className="relative">
-                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
                     <Input
                       type="password"
                       placeholder={t("login_form.password_placeholder")}
-                      className="pl-10 h-12 bg-slate-50/50 border-slate-200 focus:bg-white focus:border-primary rounded-xl transition-all"
+                      className="pl-9 h-10 bg-slate-50/50 border-slate-200 focus:bg-white focus:border-primary rounded-xl transition-all text-sm"
                       {...field}
                     />
                   </div>
@@ -196,12 +196,12 @@ export function LoginForm() {
 
           <Button
             type="submit"
-            className="w-full h-12 text-base font-semibold bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary/80 rounded-xl shadow-lg shadow-primary/20 transition-all hover:shadow-xl hover:shadow-primary/30 active:scale-[0.98]"
+            className="w-full h-10 text-sm font-semibold bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary/80 rounded-xl shadow-lg shadow-primary/20 transition-all hover:shadow-xl hover:shadow-primary/30 active:scale-[0.98]"
             disabled={isLoading}
           >
             {isLoading ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
                 {t("login_form.logging_in")}
               </>
             ) : (
@@ -209,8 +209,8 @@ export function LoginForm() {
             )}
           </Button>
 
-          <div className="text-center pt-3">
-            <p className="text-sm text-slate-600">
+          <div className="text-center pt-1.5">
+            <p className="text-xs text-slate-600">
               Don't have an account?{" "}
               <button
                 type="button"
