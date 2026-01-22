@@ -19,6 +19,7 @@ import { Loader2, MailCheck } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import Image from "next/image";
 
 const signUpSchema = z
     .object({
@@ -126,6 +127,17 @@ export function SignUpForm() {
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <div className="flex justify-center mb-4">
+                    <Image
+                        src="/logo-image.png"
+                        alt="App Logo"
+                        width={80}
+                        height={80}
+                        className="object-contain"
+                        priority
+                        style={{ width: "auto", height: "auto", maxHeight: "80px" }}
+                    />
+                </div>
                 {/* EMAIL */}
                 <FormField
                     control={form.control}

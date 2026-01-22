@@ -22,14 +22,25 @@ function LoginContent() {
     <div className="bg-background p-8 rounded-t-3xl -mt-6 relative z-20">
       <Card className="border-none shadow-none">
         <CardHeader className="p-0 text-center">
-          <CardTitle className="text-2xl font-bold font-headline">
+          <div className="flex justify-center my-4">
+            <Image
+              src="/logo-image.png"
+              alt="App Logo"
+              width={80}
+              height={80}
+              className="object-contain"
+              priority
+              style={{ width: "auto", height: "auto", maxHeight: "80px" }}
+            />
+          </div>
+          {/* <CardTitle className="text-2xl font-bold font-headline">
             {t('login_page.title')}
-          </CardTitle>
-          <CardDescription className="pt-1">
+          </CardTitle> */}
+          <CardDescription className="pt-0">
             {t('login_page.subtitle')}
           </CardDescription>
         </CardHeader>
-        <CardContent className="p-0 pt-6">
+        <CardContent className="p-0 pt-4">
           <LoginForm />
         </CardContent>
       </Card>

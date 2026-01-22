@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -36,10 +36,19 @@ export function LoginForm({ }) {
   const errorParam = searchParams.get('error');
 
   // Show error from query params if redirect back from auth
-  if (errorParam === 'verification_failed') {
-    // One time toast? or just let user see it.
-    // Better to handle in useEffect but this is simple for now.
-  }
+  useEffect(() => {
+    if (errorParam === 'access_denied') {
+      toast({
+        variant: "destructive",
+        title: "Login Failed",
+        description: t('login_form.invalid_credentials') || "Invalid login credentials",
+      });
+      // Clean up the URL
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.delete('error');
+      window.history.replaceState({}, '', newUrl.toString());
+    }
+  }, [errorParam, toast, t]);
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),

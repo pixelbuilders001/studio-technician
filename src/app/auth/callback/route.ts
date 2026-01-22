@@ -75,17 +75,12 @@ export async function GET(request: Request) {
         )
     }
 
-    if (profile.role === 'customer') {
-        return NextResponse.redirect(
-            new URL('/', origin)
-        )
-    }
+    // Block other roles
+    await supabase.auth.signOut()
 
-    if (profile.role === 'admin') {
-        return NextResponse.redirect(
-            new URL('/admin', origin)
-        )
-    }
+    return NextResponse.redirect(
+        new URL('/login?error=access_denied', origin)
+    )
 
     /**
      * 5️⃣ FALLBACK

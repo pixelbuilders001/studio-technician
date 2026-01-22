@@ -33,14 +33,14 @@ export default function SignUpPage() {
             <div className="bg-background p-8 rounded-t-3xl -mt-6 relative z-20">
                 <Card className="border-none shadow-none">
                     <CardHeader className="p-0 text-center">
-                        <CardTitle className="text-2xl font-bold font-headline">
+                        {/* <CardTitle className="text-2xl font-bold font-headline">
                             {t('signup_page.title')}
-                        </CardTitle>
+                        </CardTitle> */}
                         <CardDescription className="pt-1">
                             {t('signup_page.subtitle')}
                         </CardDescription>
                     </CardHeader>
-                    <CardContent className="p-0 pt-6">
+                    <CardContent className="p-0 pt-4">
                         <Suspense fallback={<div className="h-64 flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin" /></div>}>
                             <SignUpForm />
                         </Suspense>
