@@ -79,8 +79,8 @@ export default function ProfilePage() {
                     <Image
                         src="/logo-image.png"
                         alt="Brand Logo"
-                        width={84}
-                        height={84}
+                        width={96}
+                        height={96}
                         className="object-contain"
                         priority
                     />

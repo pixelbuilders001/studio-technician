@@ -2,8 +2,8 @@ import { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'FixFast Technician',
-    short_name: 'FixFast',
+    name: 'helloFixo Technician',
+    short_name: 'helloFixo Technician',
     description: 'Repair jobs management app for technicians.',
     start_url: '/',
     display: 'standalone',

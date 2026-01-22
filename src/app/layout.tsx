@@ -5,7 +5,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { LanguageProvider } from '@/context/LanguageContext';
 
 export const metadata: Metadata = {
-  title: 'FixFast Technician',
+  title: 'helloFixo Technician',
   description: 'Repair jobs management app for technicians.',
   manifest: '/manifest.webmanifest',
   icons: {
