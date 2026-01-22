@@ -17,7 +17,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-import { Loader2 } from "lucide-react";
+import { Loader2, Mail, Lock } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
 import { createClient } from "@/lib/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -142,24 +142,30 @@ export function LoginForm() {
 
   return (
     <>
-      {isLoading && <FullPageLoader />}
+      {isLoading && <FullPageLoader text="Signing you in..." subtext="Please wait a moment" />}
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
           <FormField
             control={form.control}
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("login_form.email_label")}</FormLabel>
+                <FormLabel className="text-sm font-medium text-slate-700">
+                  {t("login_form.email_label")}
+                </FormLabel>
                 <FormControl>
-                  <Input
-                    type="email"
-                    placeholder={t("login_form.email_placeholder")}
-                    {...field}
-                  />
+                  <div className="relative">
+                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <Input
+                      type="email"
+                      placeholder={t("login_form.email_placeholder")}
+                      className="pl-10 h-12 bg-slate-50/50 border-slate-200 focus:bg-white focus:border-primary rounded-xl transition-all"
+                      {...field}
+                    />
+                  </div>
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-xs" />
               </FormItem>
             )}
           />
@@ -169,40 +175,51 @@ export function LoginForm() {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("login_form.password_label")}</FormLabel>
+                <FormLabel className="text-sm font-medium text-slate-700">
+                  {t("login_form.password_label")}
+                </FormLabel>
                 <FormControl>
-                  <Input
-                    type="password"
-                    placeholder={t("login_form.password_placeholder")}
-                    {...field}
-                  />
+                  <div className="relative">
+                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <Input
+                      type="password"
+                      placeholder={t("login_form.password_placeholder")}
+                      className="pl-10 h-12 bg-slate-50/50 border-slate-200 focus:bg-white focus:border-primary rounded-xl transition-all"
+                      {...field}
+                    />
+                  </div>
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-xs" />
               </FormItem>
             )}
           />
 
           <Button
             type="submit"
-            className="w-full h-12 text-lg"
+            className="w-full h-12 text-base font-semibold bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary/80 rounded-xl shadow-lg shadow-primary/20 transition-all hover:shadow-xl hover:shadow-primary/30 active:scale-[0.98]"
             disabled={isLoading}
           >
-            {isLoading && (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                {t("login_form.logging_in")}
+              </>
+            ) : (
+              t("login_form.submit_button")
             )}
-            {isLoading
-              ? t("login_form.logging_in")
-              : t("login_form.submit_button")}
           </Button>
 
-          <div className="text-center pt-2">
-            <Button
-              variant="link"
-              type="button"
-              onClick={() => router.push("/signup")}
-            >
-              {t("login_form.dont_have_account")}
-            </Button>
+          <div className="text-center pt-3">
+            <p className="text-sm text-slate-600">
+              Don't have an account?{" "}
+              <button
+                type="button"
+                onClick={() => router.push("/signup")}
+                className="font-semibold text-primary hover:text-primary/80 transition-colors underline-offset-4 hover:underline"
+              >
+                Sign up now
+              </button>
+            </p>
           </div>
         </form>
       </Form>

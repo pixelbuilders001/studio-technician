@@ -15,11 +15,10 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form";
-import { Loader2, MailCheck } from "lucide-react";
+import { Loader2, MailCheck, Mail, Lock, CheckCircle } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import Image from "next/image";
 
 const signUpSchema = z
     .object({
@@ -101,21 +100,27 @@ export function SignUpForm() {
 
     if (isSuccess) {
         return (
-            <div className="flex flex-col items-center text-center space-y-6 py-8">
-                <div className="h-20 w-20 bg-green-100 rounded-full flex items-center justify-center">
-                    <MailCheck className="h-10 w-10 text-green-600" />
+            <div className="flex flex-col items-center text-center space-y-6 py-6">
+                <div className="relative">
+                    <div className="absolute inset-0 bg-green-100 rounded-full blur-xl animate-pulse"></div>
+                    <div className="relative h-20 w-20 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center shadow-lg">
+                        <MailCheck className="h-10 w-10 text-white" />
+                    </div>
                 </div>
-                <div>
-                    <h3 className="text-2xl font-bold">
-                        {t("signup_form.success_title")}
+                <div className="space-y-2">
+                    <h3 className="text-xl font-bold text-slate-900">
+                        Check Your Email!
                     </h3>
-                    <p className="text-muted-foreground mt-2 max-w-sm mx-auto">
-                        {t("signup_form.success_message", emailSentTo)}
+                    <p className="text-sm text-slate-600 max-w-sm">
+                        We've sent a confirmation link to
+                    </p>
+                    <p className="text-sm font-semibold text-primary break-all px-4">
+                        {emailSentTo}
                     </p>
                 </div>
                 <Button
                     variant="outline"
-                    className="w-full max-w-xs"
+                    className="w-full h-11 rounded-xl border-2 hover:bg-slate-50"
                     onClick={() => router.push("/login")}
                 >
                     Back to Login
@@ -126,29 +131,28 @@ export function SignUpForm() {
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <div className="flex justify-center mb-4">
-                    <Image
-                        src="/logo-image.png"
-                        alt="App Logo"
-                        width={80}
-                        height={80}
-                        className="object-contain"
-                        priority
-                        style={{ width: "auto", height: "auto", maxHeight: "80px" }}
-                    />
-                </div>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
                 {/* EMAIL */}
                 <FormField
                     control={form.control}
                     name="email"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>{t("signup_form.email_label")}</FormLabel>
+                            <FormLabel className="text-sm font-medium text-slate-700">
+                                {t("signup_form.email_label")}
+                            </FormLabel>
                             <FormControl>
-                                <Input placeholder="tech@example.com" {...field} type="email" />
+                                <div className="relative">
+                                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                    <Input
+                                        placeholder="tech@example.com"
+                                        {...field}
+                                        type="email"
+                                        className="pl-10 h-12 bg-slate-50/50 border-slate-200 focus:bg-white focus:border-primary rounded-xl transition-all"
+                                    />
+                                </div>
                             </FormControl>
-                            <FormMessage />
+                            <FormMessage className="text-xs" />
                         </FormItem>
                     )}
                 />
@@ -159,11 +163,21 @@ export function SignUpForm() {
                     name="password"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>{t("signup_form.password_label")}</FormLabel>
+                            <FormLabel className="text-sm font-medium text-slate-700">
+                                {t("signup_form.password_label")}
+                            </FormLabel>
                             <FormControl>
-                                <Input placeholder="******" {...field} type="password" />
+                                <div className="relative">
+                                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                    <Input
+                                        placeholder="Min. 6 characters"
+                                        {...field}
+                                        type="password"
+                                        className="pl-10 h-12 bg-slate-50/50 border-slate-200 focus:bg-white focus:border-primary rounded-xl transition-all"
+                                    />
+                                </div>
                             </FormControl>
-                            <FormMessage />
+                            <FormMessage className="text-xs" />
                         </FormItem>
                     )}
                 />
@@ -174,26 +188,51 @@ export function SignUpForm() {
                     name="confirmPassword"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>{t("signup_form.confirm_password_label")}</FormLabel>
+                            <FormLabel className="text-sm font-medium text-slate-700">
+                                {t("signup_form.confirm_password_label")}
+                            </FormLabel>
                             <FormControl>
-                                <Input placeholder="******" {...field} type="password" />
+                                <div className="relative">
+                                    <CheckCircle className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                    <Input
+                                        placeholder="Re-enter password"
+                                        {...field}
+                                        type="password"
+                                        className="pl-10 h-12 bg-slate-50/50 border-slate-200 focus:bg-white focus:border-primary rounded-xl transition-all"
+                                    />
+                                </div>
                             </FormControl>
-                            <FormMessage />
+                            <FormMessage className="text-xs" />
                         </FormItem>
                     )}
                 />
 
-                <Button type="submit" className="w-full h-12 text-lg" disabled={isLoading}>
-                    {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    {isLoading
-                        ? t("signup_form.submitting")
-                        : t("signup_form.submit_button")}
+                <Button
+                    type="submit"
+                    className="w-full h-12 text-base font-semibold bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary/80 rounded-xl shadow-lg shadow-primary/20 transition-all hover:shadow-xl hover:shadow-primary/30 active:scale-[0.98]"
+                    disabled={isLoading}
+                >
+                    {isLoading ? (
+                        <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            {t("signup_form.submitting")}
+                        </>
+                    ) : (
+                        t("signup_form.submit_button")
+                    )}
                 </Button>
 
-                <div className="text-center pt-2">
-                    <Button variant="link" type="button" onClick={() => router.push("/login")}>
-                        {t("signup_form.already_have_account")}
-                    </Button>
+                <div className="text-center pt-3">
+                    <p className="text-sm text-slate-600">
+                        Already have an account?{" "}
+                        <button
+                            type="button"
+                            onClick={() => router.push("/login")}
+                            className="font-semibold text-primary hover:text-primary/80 transition-colors underline-offset-4 hover:underline"
+                        >
+                            Sign in
+                        </button>
+                    </p>
                 </div>
             </form>
         </Form>
