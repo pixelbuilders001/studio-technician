@@ -17,7 +17,7 @@ export default function SignUpPage() {
     return (
         <main className="flex flex-col h-screen overflow-hidden bg-slate-50">
             {/* Hero Image Section */}
-            <div className="relative h-[28vh] flex-shrink-0 overflow-hidden">
+            <div className="relative h-[35vh] flex-shrink-0 overflow-hidden">
                 <Image
                     src="https://dv09dhgcrv5ld6ct.public.blob.vercel-storage.com/ChatGPT%20Image%20Jan%205%2C%202026%2C%2002_26_40%20PM.png"
                     alt="Technician working"
@@ -36,7 +36,7 @@ export default function SignUpPage() {
 
             {/* Form Section */}
             <div className="w-full">
-                <div className="bg-white rounded-t-[2rem] -mt-8 relative z-20 shadow-2xl min-h-[calc(100vh-28vh)]">
+                <div className="bg-white rounded-t-[2rem] -mt-8 relative z-20 shadow-2xl min-h-[calc(100vh-35vh)]">
                     <div className="w-full max-w-md mx-auto px-6 pt-6 pb-8">
                         <Card className="border-none shadow-none bg-transparent">
                             <CardHeader className="space-y-3 pb-4 px-0">
@@ -44,8 +44,8 @@ export default function SignUpPage() {
                                     <Image
                                         src="/logo-image.png"
                                         alt="helloFixo"
-                                        width={80}
-                                        height={80}
+                                        width={95}
+                                        height={95}
                                         className="object-contain"
                                         priority
                                     />
