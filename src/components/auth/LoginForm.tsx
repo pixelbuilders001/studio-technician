@@ -38,10 +38,6 @@ export function LoginForm() {
 
   const errorParam = searchParams.get("error");
 
-  /**
-   * ✅ Handle access_denied ONLY ONCE when page loads
-   * No refs, no loops, no stale state
-   */
   useEffect(() => {
     if (errorParam === "access_denied") {
       toast({
@@ -52,7 +48,6 @@ export function LoginForm() {
           "You are not allowed to access this account",
       });
 
-      // Clean URL safely (App Router way)
       router.replace("/login", { scroll: false });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -71,7 +66,6 @@ export function LoginForm() {
     const supabase = createClient();
 
     try {
-      /** 1️⃣ Sign in */
       const { error } = await supabase.auth.signInWithPassword({
         email: values.email,
         password: values.password,
@@ -79,7 +73,6 @@ export function LoginForm() {
 
       if (error) throw error;
 
-      /** 2️⃣ Get logged-in user */
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -88,7 +81,6 @@ export function LoginForm() {
         throw new Error("User not found");
       }
 
-      /** 3️⃣ Fetch role */
       const { data: profile, error: roleError } = await supabase
         .from("profiles")
         .select("role")
@@ -99,7 +91,6 @@ export function LoginForm() {
         throw new Error("Unable to fetch user role");
       }
 
-      /** 4️⃣ Role-based access */
       if (profile.role !== "technician") {
         await supabase.auth.signOut();
 
@@ -112,7 +103,6 @@ export function LoginForm() {
         return;
       }
 
-      /** 5️⃣ Success */
       toast({
         title: "Login Successful",
         description: "Welcome back!",
@@ -145,22 +135,22 @@ export function LoginForm() {
       {isLoading && <FullPageLoader text="Signing you in..." subtext="Please wait a moment" />}
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <FormField
             control={form.control}
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-xs font-medium text-slate-700">
-                  {t("login_form.email_label")}
+                <FormLabel className="text-sm font-medium text-slate-700">
+                  Email Address
                 </FormLabel>
                 <FormControl>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                     <Input
                       type="email"
-                      placeholder={t("login_form.email_placeholder")}
-                      className="pl-9 h-10 bg-slate-50/50 border-slate-200 focus:bg-white focus:border-primary rounded-xl transition-all text-sm"
+                      placeholder="tech@example.com"
+                      className="pl-10 h-11 bg-slate-50 border-slate-200 focus:bg-white focus:border-primary rounded-lg"
                       {...field}
                     />
                   </div>
@@ -175,16 +165,16 @@ export function LoginForm() {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-xs font-medium text-slate-700">
-                  {t("login_form.password_label")}
+                <FormLabel className="text-sm font-medium text-slate-700">
+                  Password
                 </FormLabel>
                 <FormControl>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                     <Input
                       type="password"
-                      placeholder={t("login_form.password_placeholder")}
-                      className="pl-9 h-10 bg-slate-50/50 border-slate-200 focus:bg-white focus:border-primary rounded-xl transition-all text-sm"
+                      placeholder="******"
+                      className="pl-10 h-11 bg-slate-50 border-slate-200 focus:bg-white focus:border-primary rounded-lg"
                       {...field}
                     />
                   </div>
@@ -196,26 +186,26 @@ export function LoginForm() {
 
           <Button
             type="submit"
-            className="w-full h-10 text-sm font-semibold bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary/80 rounded-xl shadow-lg shadow-primary/20 transition-all hover:shadow-xl hover:shadow-primary/30 active:scale-[0.98]"
+            className="w-full h-12 text-base font-semibold bg-primary hover:bg-primary/90 rounded-xl"
             disabled={isLoading}
           >
             {isLoading ? (
               <>
-                <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 {t("login_form.logging_in")}
               </>
             ) : (
-              t("login_form.submit_button")
+              "Login"
             )}
           </Button>
 
-          <div className="text-center pt-1.5">
-            <p className="text-xs text-slate-600">
+          <div className="text-center pt-2">
+            <p className="text-sm text-slate-600">
               Don't have an account?{" "}
               <button
                 type="button"
                 onClick={() => router.push("/signup")}
-                className="font-semibold text-primary hover:text-primary/80 transition-colors underline-offset-4 hover:underline"
+                className="font-semibold text-primary hover:underline"
               >
                 Sign up now
               </button>
