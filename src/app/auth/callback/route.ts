@@ -7,9 +7,7 @@ export async function GET(request: Request) {
 
     const supabase = await createClient()
 
-    /**
-     * 1️⃣ MAGIC LINK / EMAIL VERIFY FLOW
-     */
+    // 1️⃣ Exchange magic link code for session
     if (code) {
         const { error } = await supabase.auth.exchangeCodeForSession(code)
 
@@ -20,72 +18,6 @@ export async function GET(request: Request) {
         }
     }
 
-    /**
-     * 2️⃣ CHECK SESSION (works for password login too)
-     */
-    const {
-        data: { user },
-    } = await supabase.auth.getUser()
-
-    if (!user) {
-        return NextResponse.redirect(
-            new URL('/login?error=unauthenticated', origin)
-        )
-    }
-
-    /**
-     * 3️⃣ FETCH PROFILE
-     */
-    const { data: profile } = await supabase
-        .from('profiles')
-        .select('role, onboarding_status, is_verified')
-        .eq('id', user.id)
-        .single()
-
-    if (!profile) {
-        return NextResponse.redirect(
-            new URL('/login?error=profile_missing', origin)
-        )
-    }
-
-    /**
-     * 4️⃣ ROLE + ONBOARDING BASED REDIRECT
-     */
-    if (profile.role === 'technician') {
-        if (profile.onboarding_status == 'pending') {
-            return NextResponse.redirect(
-                new URL('/partner-signup', origin)
-            )
-        }
-
-        if (profile.onboarding_status == 'submitted') {
-            return NextResponse.redirect(
-                new URL('/partner/waiting-approval', origin)
-            )
-        }
-
-        if (profile.onboarding_status == 'rejected') {
-            return NextResponse.redirect(
-                new URL('/onboarding?resubmit=true', origin)
-            )
-        }
-
-        return NextResponse.redirect(
-            new URL('/jobs', origin)
-        )
-    }
-
-    // Block other roles
-    await supabase.auth.signOut()
-
-    return NextResponse.redirect(
-        new URL('/login?error=access_denied', origin)
-    )
-
-    /**
-     * 5️⃣ FALLBACK
-     */
-    return NextResponse.redirect(
-        new URL('/login?error=unknown_role', origin)
-    )
+    // 2️⃣ ALWAYS redirect to post-login (important)
+    return NextResponse.redirect(new URL('/post-login', origin))
 }
