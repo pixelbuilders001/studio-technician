@@ -24,6 +24,8 @@ export const viewport: Viewport = {
   themeColor: '#F0F4F8',
 }
 
+import { ProfileCheck } from '@/components/auth/ProfileCheck';
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -38,6 +40,7 @@ export default function RootLayout({
       </head>
       <body className={cn("font-body antialiased", "bg-background")}>
         <LanguageProvider>
+          <ProfileCheck />
           {children}
           <Toaster />
         </LanguageProvider>
