@@ -5,13 +5,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { User, Phone, Map, Tag, Briefcase, LogOut, Star, CheckCircle, XCircle, IndianRupee, CloudCog } from 'lucide-react';
+import { User, Phone, Map, Tag, Briefcase, LogOut, Star, CheckCircle, XCircle, IndianRupee, CloudCog, HelpCircle } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { LanguageSelector } from '@/components/common/LanguageSelector';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useEffect, useState } from 'react';
 import { getTechnicianStats, getProfileAction, logoutAction } from '@/app/actions';
 import { FullPageLoader } from '@/components/ui/FullPageLoader';
+import { formatSkillName } from '@/lib/utils';
 
 export default function ProfilePage() {
     const { t } = useTranslation();
@@ -85,7 +86,16 @@ export default function ProfilePage() {
                         priority
                     />
                 </div>
-                {/* <LanguageSelector /> */}
+                <div className="flex items-center gap-3">
+                    <a
+                        href="tel:+918000000000"
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-all active:scale-95"
+                    >
+                        <Phone className="h-4 w-4" />
+                        <span className="text-sm font-bold">Help</span>
+                    </a>
+                    {/* <LanguageSelector /> */}
+                </div>
             </header>
 
             <div className="flex-1 space-y-6">
@@ -108,8 +118,8 @@ export default function ProfilePage() {
                                 />
                             </div>
                             {profile.role && (
-                                <Badge className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-3 py-1 bg-primary text-white border-white shadow-lg">
-                                    {profile.role.toUpperCase()}
+                                <Badge className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-3 py-1 bg-primary text-white border-white shadow-lg whitespace-nowrap">
+                                    {formatSkillName(stats?.primary_skill)} Expert
                                 </Badge>
                             )}
                         </div>
@@ -121,11 +131,11 @@ export default function ProfilePage() {
                                 ID: {profile.id.substring(0, 8).toUpperCase()}
                             </span>
                         </div>
-                        <div className="mt-1 flex items-center gap-2 text-slate-500 font-medium">
+                        {/* <div className="mt-1 flex items-center gap-2 text-slate-500 font-medium">
                             <span className="bg-slate-200/50 px-2 py-0.5 rounded text-xs uppercase tracking-wider">
-                                {stats?.primary_skill ? stats?.primary_skill : "Not mentioned"}
+                                {formatSkillName(stats?.primary_skill)} expert
                             </span>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
 
@@ -229,17 +239,17 @@ export default function ProfilePage() {
                                         <div className="p-1.5 bg-violet-50 rounded-lg">
                                             <Tag className="h-4 w-4 text-violet-500" />
                                         </div>
-                                        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Specialties</p>
+                                        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Other Skills</p>
                                     </div>
                                     <div className="flex flex-wrap gap-2">
                                         {profile.primary_skill && (
                                             <Badge className="bg-violet-100 text-violet-700 border-none hover:bg-violet-200 transition-colors">
-                                                {profile.primary_skill}
+                                                {formatSkillName(profile.primary_skill)}
                                             </Badge>
                                         )}
                                         {stats.other_skills?.map((cat: string) => (
                                             <Badge key={cat} variant="secondary" className="bg-slate-100 text-slate-600 border-none capitalize">
-                                                {cat.replace(/_/g, ' ')}
+                                                {formatSkillName(cat)}
                                             </Badge>
                                         ))}
                                     </div>

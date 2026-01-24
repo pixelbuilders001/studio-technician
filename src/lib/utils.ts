@@ -7,3 +7,11 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const get = lodashGet;
+
+export function formatSkillName(skill: string | undefined | null): string {
+  if (!skill) return "Not mentioned";
+  return skill
+    .split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}

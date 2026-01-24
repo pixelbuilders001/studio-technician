@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -32,15 +32,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
 
-const serviceCategories = [
-  { id: "tv_repair", label: "TV Repair" },
-  { id: "washing_machine_repair", label: "Washing Machine Repair" },
-  { id: "refrigerator_repair", label: "Refrigerator Repair" },
-  { id: "ac_repair", label: "AC Repair" },
-  { id: "smartphone_repair", label: "Smartphone Repair" },
-  { id: "plumber", label: "Plumber" },
-  { id: "electrician", label: "Electrician" },
-] as const;
+
 
 const formSchema = z.object({
   full_name: z.string().min(2, { message: "Please enter your full name." }),
@@ -65,7 +57,28 @@ export function PartnerSignupForm({ pincode, city }: PartnerSignupFormProps) {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [categories, setCategories] = useState<any[]>([]);
   const { t } = useTranslation();
+
+  useEffect(() => {
+    async function fetchCategories() {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from("categories")
+        .select("*, issues(*)")
+        .order("sort_order", { ascending: true })
+        .eq("issues.is_active", true);
+
+      if (error) {
+        console.error("Error fetching categories:", error);
+        return;
+      }
+
+      setCategories(data || []);
+    }
+
+    fetchCategories();
+  }, []);
 
   // Multi-step state
   const [currentStep, setCurrentStep] = useState(1);
@@ -99,8 +112,17 @@ export function PartnerSignupForm({ pincode, city }: PartnerSignupFormProps) {
     const formData = new FormData();
     Object.entries(values).forEach(([key, value]) => {
       if (value !== null && value !== undefined) {
-        if (key === 'other_skills' && Array.isArray(value)) {
-          formData.append(key, JSON.stringify(value));
+        if (key === 'primary_skill') {
+          // values.primary_skill is ID, but we want to send the Name in this key
+          const category = categories.find(c => c.id === value);
+          formData.append(key, category ? category.name : String(value));
+        } else if (key === 'other_skills' && Array.isArray(value)) {
+          // values.other_skills are IDs, but we want to send an array of Names in this key
+          const names = value.map(id => {
+            const cat = categories.find(c => c.id === id);
+            return cat ? cat.name : String(id);
+          });
+          formData.append(key, JSON.stringify(names));
         } else if (value instanceof File) {
           formData.append(key, value);
         } else {
@@ -109,8 +131,56 @@ export function PartnerSignupForm({ pincode, city }: PartnerSignupFormProps) {
       }
     });
 
+    // Construct category_ids array
+    const categoryIds = [];
+
+    // Add primary skill
+    const primaryCategory = categories.find(cat => cat.id === values.primary_skill);
+    if (primaryCategory) {
+      categoryIds.push({
+        category_id: primaryCategory.id,
+        name: primaryCategory.name,
+        is_primary: true,
+        experience_years: values.total_experience
+      });
+    }
+
+    // Add other skills
+    if (values.other_skills && Array.isArray(values.other_skills)) {
+      values.other_skills.forEach(skillId => {
+        const cat = categories.find(c => c.id === skillId);
+        if (cat) {
+          categoryIds.push({
+            category_id: cat.id,
+            name: cat.name,
+            is_primary: false,
+            experience_years: values.total_experience
+          });
+        }
+      });
+    }
+
+    formData.append('category_ids', JSON.stringify(categoryIds));
     formData.append('pincode', pincode);
     formData.append('service_area', city);
+
+    // --- PAYLOAD INSPECTION ---
+    console.log("=== FINAL PAYLOAD LOG ===");
+    const payloadObject: Record<string, any> = {};
+    formData.forEach((value, key) => {
+      if (value instanceof File) {
+        payloadObject[key] = `File: ${value.name}`;
+      } else {
+        try {
+          payloadObject[key] = JSON.parse(value as string);
+        } catch {
+          payloadObject[key] = value;
+        }
+      }
+    });
+    // console.table(payloadObject);
+    // console.log("Category IDs Structure:", JSON.parse(formData.get('category_ids') as string));
+    // --------------------------
 
 
     const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/create-technician`;
@@ -329,8 +399,8 @@ export function PartnerSignupForm({ pincode, city }: PartnerSignupFormProps) {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  {serviceCategories.map(cat => (
-                                    <SelectItem key={cat.id} value={cat.id}>{cat.label}</SelectItem>
+                                  {categories.map(cat => (
+                                    <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
                                   ))}
                                 </SelectContent>
                               </Select>
@@ -366,11 +436,11 @@ export function PartnerSignupForm({ pincode, city }: PartnerSignupFormProps) {
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                {serviceCategories
+                                {categories
                                   .filter(cat => cat.id !== watchPrimarySkill && !watchOtherSkills.includes(cat.id))
                                   .map(cat => (
                                     <SelectItem key={cat.id} value={cat.id} disabled={watchOtherSkills.length >= 2}>
-                                      {cat.label}
+                                      {cat.name}
                                     </SelectItem>
                                   ))}
                               </SelectContent>
@@ -379,10 +449,10 @@ export function PartnerSignupForm({ pincode, city }: PartnerSignupFormProps) {
                             {watchOtherSkills.length > 0 && (
                               <div className="flex flex-wrap gap-2 pt-2">
                                 {watchOtherSkills.map(skillId => {
-                                  const skill = serviceCategories.find(s => s.id === skillId);
+                                  const skill = categories.find(s => s.id === skillId);
                                   return (
                                     <Badge key={skillId} variant="secondary" className="flex items-center gap-1 pl-2 pr-1 py-1 text-sm font-normal bg-primary/10 text-primary border-primary/20">
-                                      {skill?.label}
+                                      {skill?.name}
                                       <button type="button" onClick={() => handleRemoveOtherSkill(skillId)} className="rounded-full p-0.5 hover:bg-primary/20 transition-colors">
                                         <X className="h-3 w-3" />
                                       </button>
