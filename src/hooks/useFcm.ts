@@ -115,6 +115,10 @@ export const useFcm = (userIdProp: string | undefined) => {
                 title: payload.notification?.title || "Update",
                 description: payload.notification?.body || "New job notification",
             });
+
+            // Trigger data refresh if app is open
+            console.log("Foreground message received, triggering refresh...");
+            window.dispatchEvent(new CustomEvent("fcm-refresh-data", { detail: payload.data }));
         });
 
         return () => {
