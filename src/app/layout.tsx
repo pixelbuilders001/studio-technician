@@ -25,6 +25,7 @@ export const viewport: Viewport = {
 }
 
 import { ProfileCheck } from '@/components/auth/ProfileCheck';
+import { FcmInitializer } from '@/components/auth/FcmInitializer';
 
 export default function RootLayout({
   children,
@@ -41,6 +42,7 @@ export default function RootLayout({
       <body className={cn("font-body antialiased", "bg-background")}>
         <LanguageProvider>
           <ProfileCheck />
+          <FcmInitializer />
           {children}
           <Toaster />
         </LanguageProvider>

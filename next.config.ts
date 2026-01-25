@@ -59,7 +59,7 @@ const nextConfig: NextConfig = {
 const withSerwist = require("@serwist/next").default({
   swSrc: "src/app/sw.ts",
   swDest: "public/sw.js",
-  disable: process.env.NODE_ENV === "development",
+  disable: false,
   reloadOnOnline: true,
   // User requested no precaching. 
   // Serwist might still look for a manifest, but we can control the strategy in sw.ts

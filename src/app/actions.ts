@@ -690,3 +690,42 @@ export async function getPlatformEarningsAction(bookingId: string): Promise<Plat
     throw new Error(error.message || "An unexpected error occurred while fetching platform earnings.");
   }
 }
+export async function updateFcmTokenAction(token: string) {
+  const supabase = await createClient();
+  const { data: { session } } = await supabase.auth.getSession();
+
+  if (!session) {
+    throw new Error("Unauthorized");
+  }
+
+  const userId = session.user.id;
+  console.log(`[SERVER] Update FCM Token for user: ${userId}`);
+
+  // Strategy 1: Update technicians table where id = userId
+  const { error: err1, count: count1 } = await supabase
+    .from('technicians')
+    .update({ fcm_token: token })
+    .eq('id', userId);
+
+  console.log(`[SERVER] Update strategy 1 (technicians.id): ${count1} rows affected. Error:`, err1?.message || 'none');
+
+  // Strategy 2: Update technicians table where technician_id = userId (if technician_id is the link)
+  // Actually, let's try 'user_id' if that's common
+  const { error: err2, count: count2 } = await supabase
+    .from('technicians')
+    .update({ fcm_token: token })
+    .eq('user_id', userId);
+
+  console.log(`[SERVER] Update strategy 2 (technicians.user_id): ${count2} rows affected. Error:`, err2?.message || 'none');
+
+
+  // Strategy 3: Update profiles table as fallback if user meant profile
+  const { error: err3, count: count3 } = await supabase
+    .from('profiles')
+    .update({ fcm_token: token })
+    .eq('id', userId);
+
+  console.log(`[SERVER] Update strategy 3 (profiles.id): ${count3} rows affected. Error:`, err3?.message || 'none');
+
+  return { success: true };
+}
