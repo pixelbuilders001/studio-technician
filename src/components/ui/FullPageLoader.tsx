@@ -3,7 +3,12 @@
 import Image from "next/image";
 import { useTranslation } from "@/hooks/useTranslation";
 
-export function FullPageLoader() {
+export interface FullPageLoaderProps {
+    text?: string;
+    subtext?: string;
+}
+
+export function FullPageLoader({ text, subtext }: FullPageLoaderProps) {
     const { t } = useTranslation();
 
     return (
@@ -20,11 +25,11 @@ export function FullPageLoader() {
                 </div>
 
                 <div className="flex flex-col items-center gap-2">
-                    <h2 className="text-2xl font-bold text-primary animate-pulse">
-                        {t?.('login_form.verifying') || 'Verifying Your Details...'}
+                    <h2 className="text-2xl font-bold text-primary animate-pulse text-center">
+                        {text || t?.('login_form.verifying') || 'Verifying Your Details...'}
                     </h2>
                     <p className="text-muted-foreground text-center">
-                        {t?.('login_form.please_wait') || 'Hang tight! once verified you will be redirected.'}
+                        {subtext || t?.('login_form.please_wait') || 'Hang tight! once verified you will be redirected.'}
                     </p>
                 </div>
 

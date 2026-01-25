@@ -7,39 +7,67 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
 import { useTranslation } from "@/hooks/useTranslation";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ShieldCheck, Zap, Star } from "lucide-react";
 
 function LoginContent() {
   const { t } = useTranslation();
 
   return (
-    <div className="w-full">
-      <div className="bg-white rounded-t-[2rem] -mt-8 relative z-20 shadow-2xl min-h-[calc(100vh-28vh)]">
-        <div className="w-full max-w-md mx-auto px-6 pt-6 pb-8">
+    <div className="w-full flex-1 flex flex-col">
+      <div className="bg-white rounded-t-[2.5rem] -mt-10 relative z-20 shadow-[0_-8px_30px_rgb(0,0,0,0.04)] flex-1">
+        <div className="w-full max-w-md mx-auto px-6 pt-10 pb-12">
           <Card className="border-none shadow-none bg-transparent">
-            <CardHeader className="space-y-3 pb-4 px-0">
-              <div className="flex justify-center">
+            <CardHeader className="space-y-4 pb-8 px-0 text-center">
+              <div className="flex justify-center transition-transform hover:scale-105 duration-300">
                 <Image
                   src="/logo-image.png"
                   alt="helloFixo"
-                  width={95}
-                  height={95}
+                  width={110}
+                  height={110}
                   className="object-contain"
                   priority
                 />
               </div>
-              <div className="text-center space-y-1">
-
-                <CardDescription className="text-sm text-slate-600">
+              <div className="space-y-2">
+                <CardTitle className="text-2xl font-extrabold tracking-tight text-slate-900">
+                  Welcome Back
+                </CardTitle>
+                <CardDescription className="text-sm font-medium text-slate-500 max-w-[280px] mx-auto leading-relaxed">
                   {t('login_page.subtitle')}
                 </CardDescription>
               </div>
             </CardHeader>
             <CardContent className="px-0 pb-0">
-              <LoginForm />
+              <div className="bg-slate-50/50 p-6 rounded-3xl border border-slate-100 shadow-sm mb-8">
+                <LoginForm />
+              </div>
+
+              {/* Benefits Section */}
+              <div className="grid grid-cols-3 gap-3 pt-4 border-t border-slate-100">
+                <div className="flex flex-col items-center text-center space-y-1">
+                  <div className="p-2 bg-primary/10 rounded-xl">
+                    <ShieldCheck className="w-4 h-4 text-primary" />
+                  </div>
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">Verified</span>
+                </div>
+                <div className="flex flex-col items-center text-center space-y-1">
+                  <div className="p-2 bg-amber-50 rounded-xl">
+                    <Zap className="w-4 h-4 text-amber-500" />
+                  </div>
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">Fast Payouts</span>
+                </div>
+                <div className="flex flex-col items-center text-center space-y-1">
+                  <div className="p-2 bg-emerald-50 rounded-xl">
+                    <Star className="w-4 h-4 text-emerald-500" />
+                  </div>
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">Best Rating</span>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -50,15 +78,20 @@ function LoginContent() {
 
 function LoginSkeleton() {
   return (
-    <div className="w-full">
-      <div className="bg-white rounded-t-[2rem] -mt-8 relative z-20 shadow-2xl min-h-[calc(100vh-28vh)]">
-        <div className="w-full max-w-md mx-auto px-6 pt-6 pb-8">
-          <div className="space-y-4 text-center">
-            <Skeleton className="h-20 w-20 rounded-full mx-auto" />
-            <Skeleton className="h-6 w-40 mx-auto" />
-            <Skeleton className="h-4 w-56 mx-auto" />
-            <Skeleton className="h-11 w-full mt-6" />
-            <Skeleton className="h-11 w-full" />
+    <div className="w-full h-full flex flex-col">
+      <div className="bg-white rounded-t-[2.5rem] -mt-10 relative z-20 shadow-2xl flex-1">
+        <div className="w-full max-w-md mx-auto px-6 pt-10 pb-8">
+          <div className="space-y-6 text-center">
+            <Skeleton className="h-24 w-24 rounded-2xl mx-auto" />
+            <div className="space-y-2">
+              <Skeleton className="h-8 w-48 mx-auto" />
+              <Skeleton className="h-4 w-64 mx-auto" />
+            </div>
+            <div className="bg-slate-50 p-6 rounded-3xl space-y-4">
+              <Skeleton className="h-12 w-full rounded-xl" />
+              <Skeleton className="h-12 w-full rounded-xl" />
+              <Skeleton className="h-12 w-full rounded-xl" />
+            </div>
           </div>
         </div>
       </div>
@@ -68,21 +101,31 @@ function LoginSkeleton() {
 
 export default function LoginPage() {
   return (
-    <main className="flex flex-col h-screen overflow-hidden bg-slate-50">
-      {/* Hero Image Section */}
-      <div className="relative h-[35vh] flex-shrink-0 overflow-hidden">
+    <main className="flex flex-col min-h-screen bg-slate-50 font-inter">
+      {/* Hero Image Section with Enhanced Visuals */}
+      <div className="relative h-[38vh] flex-shrink-0 overflow-hidden">
         <Image
           src="https://dv09dhgcrv5ld6ct.public.blob.vercel-storage.com/ChatGPT%20Image%20Jan%205%2C%202026%2C%2002_26_40%20PM.png"
           alt="Technician working"
           fill
-          className="object-cover"
+          className="object-cover scale-110"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-primary/40 to-primary/70"></div>
+        {/* Modern multi-layer gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-primary/95 via-primary/60 to-transparent"></div>
+        <div className="absolute inset-0 bg-black/10 backdrop-blur-[1px]"></div>
 
-        <div className="absolute inset-0 flex flex-col items-center justify-end pb-10 px-6 text-center z-10">
-          <h2 className="text-white text-xl font-bold drop-shadow-lg leading-tight">
-            Join Thousands of Technicians
+        {/* Floating Decorative Elements */}
+        <div className="absolute top-6 left-6 w-24 h-24 bg-white/10 rounded-full blur-2xl"></div>
+        <div className="absolute bottom-20 right-10 w-32 h-32 bg-primary-foreground/10 rounded-full blur-3xl"></div>
+
+        <div className="absolute inset-0 flex flex-col items-center justify-end pb-16 px-6 text-center z-10">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/20 backdrop-blur-md rounded-full border border-white/30 text-white text-[10px] font-bold uppercase tracking-widest mb-3">
+            <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+            Premium Partner Network
+          </div>
+          <h2 className="text-white text-2xl font-extrabold drop-shadow-md leading-tight tracking-tight">
+            Join Thousands of<br />Expert Technicians
           </h2>
         </div>
       </div>
