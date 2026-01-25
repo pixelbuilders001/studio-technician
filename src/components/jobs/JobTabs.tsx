@@ -6,7 +6,7 @@ import type { Job } from "@/lib/types";
 import { JobCard } from "./JobCard";
 import { ScrollArea } from "../ui/scroll-area";
 import { useTranslation } from "@/hooks/useTranslation";
-import { Briefcase } from "lucide-react";
+import { Briefcase, RefreshCcw } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 type JobTabsProps = {
@@ -48,13 +48,24 @@ export function JobTabs({ jobs, activeTab, onTabChange, technicianId, onJobsUpda
   const renderJobList = (jobList: Job[], emptyMessage: string) => {
     if (jobList.length === 0) {
       return (
-        <div className="flex h-96 flex-col items-center justify-center p-8 text-center space-y-4">
-          <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center">
-            <Briefcase className="w-10 h-10 text-slate-300" />
+        <div className="flex h-96 flex-col items-center justify-center p-8 text-center space-y-6">
+          <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center relative">
+            <div className="absolute inset-0 bg-slate-200/50 rounded-full animate-ping [animation-duration:3s]"></div>
+            <Briefcase className="w-10 h-10 text-slate-300 relative z-10" />
           </div>
-          <div className="space-y-1">
-            <p className="font-bold text-slate-900">{emptyMessage}</p>
-            <p className="text-sm text-slate-400">Pull down to refresh or check back later.</p>
+          <div className="space-y-4 max-w-[280px]">
+            <div className="space-y-1">
+              <p className="font-bold text-slate-900">{emptyMessage}</p>
+              <p className="text-sm text-slate-400">Pull down to refresh or check back later.</p>
+            </div>
+
+            <button
+              onClick={() => onJobsUpdate()}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-full text-sm font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-95 transition-all w-full justify-center"
+            >
+              <RefreshCcw className="w-4 h-4" />
+              Refresh Now
+            </button>
           </div>
         </div>
       );

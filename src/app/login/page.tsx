@@ -120,10 +120,10 @@ export default function LoginPage() {
         <div className="absolute bottom-20 right-10 w-32 h-32 bg-primary-foreground/10 rounded-full blur-3xl"></div>
 
         <div className="absolute inset-0 flex flex-col items-center justify-end pb-16 px-6 text-center z-10">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/20 backdrop-blur-md rounded-full border border-white/30 text-white text-[10px] font-bold uppercase tracking-widest mb-3">
+          {/* <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/20 backdrop-blur-md rounded-full border border-white/30 text-white text-[10px] font-bold uppercase tracking-widest mb-3">
             <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
             Premium Partner Network
-          </div>
+          </div> */}
           <h2 className="text-white text-2xl font-extrabold drop-shadow-md leading-tight tracking-tight">
             Join Thousands of<br />Expert Technicians
           </h2>
