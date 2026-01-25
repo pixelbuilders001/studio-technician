@@ -94,6 +94,19 @@ function JobsPageContent() {
     }
   }
 
+  // Effect 3: Listen for FCM refresh event
+  useEffect(() => {
+    const handleFcmRefresh = () => {
+      console.log("FCM refresh event received, refreshing jobs...");
+      refreshJobs();
+    };
+
+    window.addEventListener("fcm-refresh-data", handleFcmRefresh);
+    return () => {
+      window.removeEventListener("fcm-refresh-data", handleFcmRefresh);
+    };
+  }, []);
+
   return (
     <div className="flex h-full flex-col">
       <header className="flex h-16 items-center border-b border-white/20 bg-white/70 backdrop-blur-lg px-4 justify-between sticky top-0 z-50">

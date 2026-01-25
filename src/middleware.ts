@@ -52,6 +52,7 @@ export async function updateSession(request: NextRequest) {
     // Redirect unauthenticated users away from protected routes
     if (!user && isProtectedRoute) {
         url.pathname = '/login'
+        url.searchParams.set('next', request.nextUrl.pathname + request.nextUrl.search)
         return NextResponse.redirect(url)
     }
 

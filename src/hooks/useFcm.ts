@@ -91,6 +91,18 @@ export const useFcm = (userIdProp: string | undefined) => {
             if (user?.id) setupFcm(user.id);
         });
 
+        // Listen for messages from SW
+        const handleSwMessage = (event: MessageEvent) => {
+            if (event.data && event.data.type === "REFRESH_DATA") {
+                console.log("Received REFRESH_DATA from SW");
+                window.dispatchEvent(new CustomEvent("fcm-refresh-data", { detail: event.data.payload }));
+            }
+        };
+
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.addEventListener("message", handleSwMessage);
+        }
+
         // Foreground handler
         const unsubscribe = onMessage(messaging, (payload) => {
             console.log("Foreground message:", payload);

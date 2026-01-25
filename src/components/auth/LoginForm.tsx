@@ -108,7 +108,12 @@ export function LoginForm() {
         description: "Welcome back!",
       });
 
-      router.push("/auth/callback");
+      const next = searchParams.get("next");
+      if (next) {
+        router.push(next);
+      } else {
+        router.push("/auth/callback");
+      }
     } catch (error: any) {
       console.error("Login error:", error);
 

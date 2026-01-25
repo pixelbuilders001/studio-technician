@@ -7,6 +7,12 @@ import { getMessaging, onBackgroundMessage } from "firebase/messaging/sw";
 declare global {
     interface WorkerGlobalScope extends SerwistGlobalConfig {
         __SW_MANIFEST: (PrecacheEntry | string)[] | undefined;
+        addEventListener: (type: string, listener: (event: any) => void) => void;
+        location: { origin: string };
+        clients: {
+            matchAll: (options?: any) => Promise<any[]>;
+            openWindow: (url: string) => Promise<any>;
+        };
     }
 }
 
@@ -47,3 +53,39 @@ const serwist = new Serwist({
 });
 
 serwist.addEventListeners();
+
+// Handle notification click
+self.addEventListener('notificationclick', (event: any) => {
+    event.notification.close();
+
+    const urlToOpen = new URL('/jobs?tab=new', self.location.origin).href;
+
+    const promiseChain = self.clients.matchAll({
+        type: 'window',
+        includeUncontrolled: true
+    }).then((windowClients: any[]) => {
+        let matchingClient = null;
+
+        for (let i = 0; i < windowClients.length; i++) {
+            const client = windowClients[i];
+            if (client.url === urlToOpen || client.url.includes('/jobs')) {
+                matchingClient = client;
+                break;
+            }
+        }
+
+        if (matchingClient) {
+            // Focus existing window and send refresh signal
+            matchingClient.postMessage({
+                type: 'REFRESH_DATA',
+                payload: event.notification.data
+            });
+            return matchingClient.focus();
+        } else {
+            // Open new window
+            return self.clients.openWindow(urlToOpen);
+        }
+    });
+
+    event.waitUntil(promiseChain);
+});
