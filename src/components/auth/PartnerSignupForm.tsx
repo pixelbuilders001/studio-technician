@@ -140,6 +140,7 @@ export function PartnerSignupForm({ pincode, city }: PartnerSignupFormProps) {
       categoryIds.push({
         category_id: primaryCategory.id,
         name: primaryCategory.name,
+        slug: primaryCategory.slug,
         is_primary: true,
         experience_years: values.total_experience
       });
@@ -153,6 +154,7 @@ export function PartnerSignupForm({ pincode, city }: PartnerSignupFormProps) {
           categoryIds.push({
             category_id: cat.id,
             name: cat.name,
+            slug: cat.slug,
             is_primary: false,
             experience_years: values.total_experience
           });
