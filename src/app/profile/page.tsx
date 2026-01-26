@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { User, Phone, Map, Tag, Briefcase, LogOut, Star, CheckCircle, XCircle, IndianRupee, CloudCog, HelpCircle } from 'lucide-react';
+import { User, Phone, Map, Tag, Briefcase, LogOut, Star, CheckCircle, XCircle, IndianRupee, CloudCog, HelpCircle, Download, Share2, Smartphone, Instagram, Twitter } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { LanguageSelector } from '@/components/common/LanguageSelector';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -13,6 +13,7 @@ import { useEffect, useState } from 'react';
 import { getTechnicianStats, getProfileAction, logoutAction } from '@/app/actions';
 import { FullPageLoader } from '@/components/ui/FullPageLoader';
 import { formatSkillName } from '@/lib/utils';
+import { usePwa } from '@/hooks/usePwa';
 
 export default function ProfilePage() {
     const { t } = useTranslation();
@@ -20,6 +21,40 @@ export default function ProfilePage() {
     const [stats, setStats] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [isLoggingOut, setIsLoggingOut] = useState(false);
+    const { isInstallable, installPwa } = usePwa();
+
+    const handleInstallClick = async () => {
+        const result = await installPwa();
+        if (result.isIOS) {
+            alert("To install: Tap the share button below and select 'Add to Home Screen' 📲");
+        } else if (!result.success && !isInstallable) {
+            alert("App is already installed or your browser doesn't support installation.");
+        }
+    };
+
+    const handleShareApp = async () => {
+        const shareData = {
+            title: 'helloFixo Technician',
+            text: 'Join helloFixo as a professional technician and grow your business!',
+            url: window.location.origin
+        };
+
+        if (navigator.share) {
+            try {
+                await navigator.share(shareData);
+            } catch (err) {
+                console.error('Error sharing:', err);
+            }
+        } else {
+            // Fallback to clipboard
+            try {
+                await navigator.clipboard.writeText(window.location.origin);
+                alert('App link copied to clipboard!');
+            } catch (err) {
+                console.error('Failed to copy:', err);
+            }
+        }
+    };
 
     useEffect(() => {
         const fetchProfileData = async () => {
@@ -337,6 +372,64 @@ export default function ProfilePage() {
                             </div>
                         </CardContent>
                     </Card>
+
+                    {/* PWA Download Strip - Redesigned to match image but with project brand consistency */}
+                    <div
+                        onClick={handleInstallClick}
+                        className="bg-white rounded-[24px] p-5 flex items-center justify-between border border-slate-100 shadow-sm transition-all active:scale-[0.98] cursor-pointer"
+                    >
+                        <div className="flex items-center gap-4">
+                            <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center">
+                                <Smartphone className="h-7 w-7 text-slate-900" />
+                            </div>
+                            <div className="flex flex-col">
+                                <span className="text-sm font-black italic tracking-tight text-slate-900 leading-tight uppercase">NATIVE APP</span>
+                                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">FASTER EXPERIENCE</span>
+                            </div>
+                        </div>
+                        <div className="bg-primary/10 text-primary px-5 py-2.5 rounded-2xl text-[11px] font-black uppercase tracking-widest border border-primary/20 hover:bg-primary/20 transition-colors">
+                            GET APP
+                        </div>
+                    </div>
+
+                    {/* Quick Share Strip - Redesigned to match image */}
+                    <div
+                        className="bg-white rounded-[24px] p-5 flex items-center justify-between border border-dashed border-slate-200 transition-all shadow-sm"
+                    >
+                        <span className="text-xs font-black text-slate-400 uppercase tracking-widest pl-1">QUICK SHARE</span>
+                        <div className="flex items-center gap-5 pr-1">
+                            {/* WhatsApp Share */}
+                            <div
+                                onClick={handleShareApp}
+                                className="cursor-pointer text-emerald-500 hover:scale-110 transition-transform p-1"
+                            >
+                                <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.284l-.539 2.016 2.074-.544c.953.519 1.945.835 3.16.835 3.226 0 5.851-2.624 5.852-5.852 0-3.182-2.587-5.764-5.853-5.764h-.001zm3.435 8.169c-.147.415-.845.749-1.2.791-.326.039-.752.074-1.205-.074-.294-.097-.66-.231-1.123-.432-1.968-.857-3.236-2.842-3.334-2.975-.098-.133-.794-.949-.794-1.81s.449-1.284.609-1.442c.16-.158.348-.198.464-.198l.332.006c.093.003.222-.034.348.274.129.315.441 1.073.48 1.15.039.078.065.168.012.274-.052.106-.078.17-.154.259-.077.089-.161.2-.23.269-.078.077-.16.16-.068.318.093.158.411.678.882 1.097.607.541 1.118.71 1.285.811.166.101.263.084.361-.027.098-.111.42-.489.532-.656.113-.167.227-.14.382-.084l1.073.504c.156.074.259.111.298.177.039.066.039.382-.108.797zM12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2z" />
+                                </svg>
+                            </div>
+                            {/* Instagram Share Fallback */}
+                            <div
+                                onClick={handleShareApp}
+                                className="cursor-pointer text-pink-600 hover:scale-110 transition-transform p-1"
+                            >
+                                <Instagram className="w-6 h-6" />
+                            </div>
+                            {/* Twitter/X Share Fallback */}
+                            <div
+                                onClick={handleShareApp}
+                                className="cursor-pointer text-slate-900 hover:scale-110 transition-transform p-1"
+                            >
+                                <Twitter className="w-5 h-5 fill-current" />
+                            </div>
+                            {/* Generic Share */}
+                            <div
+                                onClick={handleShareApp}
+                                className="cursor-pointer text-blue-600 hover:scale-110 transition-transform p-1"
+                            >
+                                <Share2 className="w-6 h-6" />
+                            </div>
+                        </div>
+                    </div>
 
                     {/* Actions */}
                     <div className="pt-4 space-y-3">

@@ -11,6 +11,7 @@ import type { Job } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
+import { PwaInstallBanner } from "@/components/common/PwaInstallBanner";
 
 function JobsSkeleton() {
   return (
@@ -139,6 +140,7 @@ function JobsPageContent() {
           onJobsUpdate={refreshJobs}
         />
       )}
+      <PwaInstallBanner />
     </div>
   );
 }

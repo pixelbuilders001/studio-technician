@@ -6,7 +6,7 @@ import { LanguageProvider } from '@/context/LanguageContext';
 
 export const metadata: Metadata = {
   title: 'helloFixo Technician',
-  description: 'Repair jobs management app for technicians.',
+  description: 'Repair jobs management app for technicians. Join helloFixo as a professional technician and grow your business!',
   manifest: '/manifest.webmanifest',
   icons: {
     icon: [
@@ -17,6 +17,27 @@ export const metadata: Metadata = {
     apple: [
       { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
     ],
+  },
+  openGraph: {
+    title: 'helloFixo Technician',
+    description: 'Repair jobs management app for technicians. Join helloFixo as a professional technician and grow your business!',
+    url: 'https://technician.hellofixo.com',
+    siteName: 'helloFixo',
+    images: [
+      {
+        url: '/logo-image.png',
+        width: 800,
+        height: 600,
+      },
+    ],
+    locale: 'en_IN',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'helloFixo Technician',
+    description: 'Repair jobs management app for technicians. Join helloFixo as a professional technician and grow your business!',
+    images: ['/logo-image.png'],
   },
 };
 
