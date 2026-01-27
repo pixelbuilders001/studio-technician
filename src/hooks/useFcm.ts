@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { messaging } from "@/lib/firebase/config";
-import { getToken, onMessage } from "firebase/messaging";
+import { getToken, onMessage, deleteToken } from "firebase/messaging";
 import { updateFcmTokenAction } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
 import { createClient } from "@/lib/supabase/client";
@@ -54,7 +54,15 @@ export const useFcm = (userIdProp: string | undefined) => {
 
                 console.log("Using Service Worker registration:", registration.scope);
 
-                // 3. Get Token
+                // 3. Delete existing token first to force a new unique token for this user
+                try {
+                    const deleted = await deleteToken(messaging!);
+                    console.log("Existing FCM token deleted:", deleted);
+                } catch (deleteError) {
+                    console.log("No existing token to delete or deletion failed:", deleteError);
+                }
+
+                // 4. Get NEW Token (will be unique for this user session)
                 const vapidKey = process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY;
                 if (!vapidKey) {
                     console.error("FATAL: NEXT_PUBLIC_FIREBASE_VAPID_KEY is missing from .env!");
