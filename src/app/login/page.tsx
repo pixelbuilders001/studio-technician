@@ -23,15 +23,16 @@ function LoginContent() {
         <div className="w-full max-w-md mx-auto px-6 pt-10 pb-12">
           <Card className="border-none shadow-none bg-transparent">
             <CardHeader className="space-y-4 pb-8 px-0 text-center">
-              <div className="flex justify-center transition-transform hover:scale-105 duration-300">
+              <div className="flex flex-col items-center -space-y-1 transition-transform hover:scale-105 duration-300">
                 <Image
                   src="/logo-image.png"
                   alt="helloFixo"
-                  width={110}
-                  height={110}
+                  width={96}
+                  height={96}
                   className="object-contain"
                   priority
                 />
+                <span className="text-[11px] font-black tracking-[0.2em] text-primary uppercase pl-1">EXPERT</span>
               </div>
               <div className="space-y-2">
                 <CardTitle className="text-2xl font-extrabold tracking-tight text-slate-900">

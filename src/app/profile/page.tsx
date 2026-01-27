@@ -104,22 +104,39 @@ export default function ProfilePage() {
     }
 
     if (!profile || !stats) {
-        return <div className="p-8 text-center text-destructive">No profile data found.</div>;
+        return (
+            <div className="flex flex-col items-center justify-center min-h-screen p-6 bg-slate-50 text-center">
+                <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mb-6">
+                    <User className="h-10 w-10 text-primary" />
+                </div>
+                <h1 className="text-2xl font-bold text-slate-900 mb-2">Profile Incomplete</h1>
+                <p className="text-slate-500 mb-8 max-w-xs">
+                    We couldn't find your profile data. Please complete your registration or contact support.
+                </p>
+                <Button
+                    onClick={handleLogout}
+                    className="w-full max-w-xs h-14 text-base font-bold rounded-2xl shadow-lg shadow-primary/20 transition-all active:scale-95"
+                >
+                    Complete your profile
+                </Button>
+            </div>
+        );
     }
 
     return (
         <div className="flex flex-col bg-slate-50 min-h-screen pb-10">
             {/* Glassmorphism Header */}
             <header className="flex h-16 items-center border-b border-white/20 bg-white/70 backdrop-blur-lg px-4 justify-between sticky top-0 z-50">
-                <div className="flex items-center gap-2">
+                <div className="flex flex-col items-center -space-y-1">
                     <Image
                         src="/logo-image.png"
                         alt="Brand Logo"
-                        width={96}
-                        height={96}
+                        width={84}
+                        height={84}
                         className="object-contain"
                         priority
                     />
+                    <span className="text-[10px] font-black tracking-[0.2em] text-primary/80 uppercase pl-1">EXPERT</span>
                 </div>
                 <div className="flex items-center gap-3">
                     <a

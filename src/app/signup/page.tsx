@@ -48,15 +48,16 @@ export default function SignUpPage() {
                     <div className="w-full max-w-md mx-auto px-6 pt-10 pb-12">
                         <Card className="border-none shadow-none bg-transparent">
                             <CardHeader className="space-y-4 pb-8 px-0 text-center">
-                                <div className="flex justify-center transition-transform hover:scale-105 duration-300">
+                                <div className="flex flex-col items-center -space-y-1 transition-transform hover:scale-105 duration-300">
                                     <Image
                                         src="/logo-image.png"
                                         alt="helloFixo"
-                                        width={100}
-                                        height={100}
+                                        width={90}
+                                        height={90}
                                         className="object-contain"
                                         priority
                                     />
+                                    <span className="text-[11px] font-black tracking-[0.2em] text-primary uppercase pl-1">EXPERT</span>
                                 </div>
                                 <div className="space-y-1">
                                     <CardTitle className="text-2xl font-extrabold tracking-tight text-slate-900">
