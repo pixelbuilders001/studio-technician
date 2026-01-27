@@ -701,6 +701,40 @@ export async function updateFcmTokenAction(token: string) {
   const userId = session.user.id;
   console.log(`[SERVER] Update FCM Token for user: ${userId}`);
 
+  // STEP 1: Remove this FCM token from ALL other users first
+  // This prevents duplicate tokens when different accounts login from the same device
+  console.log(`[SERVER] Cleaning up duplicate FCM tokens...`);
+
+  // Clean from technicians table (id column)
+  const { error: cleanErr1, count: cleanCount1 } = await supabase
+    .from('technicians')
+    .update({ fcm_token: null })
+    .eq('fcm_token', token)
+    .neq('id', userId);
+
+  console.log(`[SERVER] Cleanup strategy 1 (technicians.id): ${cleanCount1} rows cleaned. Error:`, cleanErr1?.message || 'none');
+
+  // Clean from technicians table (user_id column)
+  const { error: cleanErr2, count: cleanCount2 } = await supabase
+    .from('technicians')
+    .update({ fcm_token: null })
+    .eq('fcm_token', token)
+    .neq('user_id', userId);
+
+  console.log(`[SERVER] Cleanup strategy 2 (technicians.user_id): ${cleanCount2} rows cleaned. Error:`, cleanErr2?.message || 'none');
+
+  // Clean from profiles table
+  const { error: cleanErr3, count: cleanCount3 } = await supabase
+    .from('profiles')
+    .update({ fcm_token: null })
+    .eq('fcm_token', token)
+    .neq('id', userId);
+
+  console.log(`[SERVER] Cleanup strategy 3 (profiles.id): ${cleanCount3} rows cleaned. Error:`, cleanErr3?.message || 'none');
+
+  // STEP 2: Now assign the token to the current user
+  console.log(`[SERVER] Assigning FCM token to current user...`);
+
   // Strategy 1: Update technicians table where id = userId
   const { error: err1, count: count1 } = await supabase
     .from('technicians')
