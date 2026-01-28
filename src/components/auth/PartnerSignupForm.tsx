@@ -19,6 +19,7 @@ import { Loader2, PartyPopper, X, ChevronRight, ChevronLeft, Upload, CheckCircle
 import { useTranslation } from "@/hooks/useTranslation";
 import { useToast } from "@/hooks/use-toast";
 import { createClient } from "@/lib/supabase/client";
+import { FullPageLoader } from "@/components/ui/FullPageLoader";
 import {
   Select,
   SelectContent,
@@ -285,6 +286,12 @@ export function PartnerSignupForm({ pincode, city }: PartnerSignupFormProps) {
 
   return (
     <div className="w-full max-w-lg mx-auto">
+      {isLoading && currentStep === totalSteps && (
+        <FullPageLoader
+          text="Submitting Application..."
+          subtext="Please wait while we process your details"
+        />
+      )}
       {/* Progress Stepper */}
       <div className="mb-8 relative">
         <div className="absolute top-1/2 left-0 w-full h-1 bg-muted -translate-y-1/2 rounded-full -z-10" />

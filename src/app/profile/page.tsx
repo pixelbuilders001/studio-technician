@@ -127,16 +127,15 @@ export default function ProfilePage() {
         <div className="flex flex-col bg-slate-50 min-h-screen pb-10">
             {/* Glassmorphism Header */}
             <header className="flex h-16 items-center border-b border-white/20 bg-white/70 backdrop-blur-lg px-4 justify-between sticky top-0 z-50">
-                <div className="flex flex-col items-center -space-y-1">
+                <div className="flex items-center">
                     <Image
                         src="/logo-image.png"
-                        alt="Brand Logo"
-                        width={84}
-                        height={84}
+                        alt="helloFixo"
+                        width={120}
+                        height={40}
                         className="object-contain"
                         priority
                     />
-                    <span className="text-[10px] font-black tracking-[0.2em] text-primary/80 uppercase pl-1">EXPERT</span>
                 </div>
                 <div className="flex items-center gap-3">
                     <a

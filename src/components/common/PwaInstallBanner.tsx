@@ -45,9 +45,9 @@ export function PwaInstallBanner() {
                     <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center flex-shrink-0 border border-slate-50 shadow-sm overflow-hidden">
                         <Image
                             src="/logo-image.png"
-                            alt="Brand Logo"
-                            width={40}
-                            height={40}
+                            alt="helloFixo"
+                            width={48}
+                            height={48}
                             className="object-contain"
                         />
                     </div>

@@ -20,28 +20,20 @@ function LoginContent() {
   return (
     <div className="w-full flex-1 flex flex-col">
       <div className="bg-white rounded-t-[2.5rem] -mt-10 relative z-20 shadow-[0_-8px_30px_rgb(0,0,0,0.04)] flex-1">
-        <div className="w-full max-w-md mx-auto px-6 pt-10 pb-12">
+        <div className="w-full max-w-md mx-auto px-6 pt-4 pb-12">
           <Card className="border-none shadow-none bg-transparent">
-            <CardHeader className="space-y-4 pb-8 px-0 text-center">
-              <div className="flex flex-col items-center -space-y-1 transition-transform hover:scale-105 duration-300">
+            <CardHeader className="space-y-4 pb-4 px-0 text-center">
+              <div className="flex justify-center transition-transform hover:scale-105 duration-300">
                 <Image
                   src="/logo-image.png"
                   alt="helloFixo"
-                  width={96}
-                  height={96}
+                  width={120}
+                  height={37}
                   className="object-contain"
                   priority
                 />
-                <span className="text-[11px] font-black tracking-[0.2em] text-primary uppercase pl-1">EXPERT</span>
               </div>
-              <div className="space-y-2">
-                <CardTitle className="text-2xl font-extrabold tracking-tight text-slate-900">
-                  Welcome Back
-                </CardTitle>
-                <CardDescription className="text-sm font-medium text-slate-500 max-w-[280px] mx-auto leading-relaxed">
-                  {t('login_page.subtitle')}
-                </CardDescription>
-              </div>
+
             </CardHeader>
             <CardContent className="px-0 pb-0">
               <div className="bg-slate-50/50 p-6 rounded-3xl border border-slate-100 shadow-sm mb-8">
@@ -104,9 +96,9 @@ export default function LoginPage() {
   return (
     <main className="flex flex-col min-h-screen bg-slate-50 font-inter">
       {/* Hero Image Section with Enhanced Visuals */}
-      <div className="relative h-[38vh] flex-shrink-0 overflow-hidden">
+      <div className="relative h-[42vh] flex-shrink-0 overflow-hidden">
         <Image
-          src="https://dv09dhgcrv5ld6ct.public.blob.vercel-storage.com/ChatGPT%20Image%20Jan%205%2C%202026%2C%2002_26_40%20PM.png"
+          src="/hero-bg.jpg"
           alt="Technician working"
           fill
           className="object-cover scale-110"

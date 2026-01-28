@@ -130,14 +130,22 @@ export function LoginForm() {
         title: "Login Failed",
         description: message,
       });
-    } finally {
       setIsLoading(false);
+    } finally {
+      // We don't set isLoading to false here on success because we want the loader 
+      // to persist until the next page (auth/callback or jobs) loads.
+      // If there was an error, it will be caught and we can reset there.
     }
   }
 
   return (
     <>
-      {isLoading && <FullPageLoader text="Signing you in..." subtext="Please wait a moment" />}
+      {isLoading && (
+        <FullPageLoader
+          text="Verifying Your Details..."
+          subtext="Please wait while we secure your session"
+        />
+      )}
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
