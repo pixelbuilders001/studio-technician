@@ -27,7 +27,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { useTranslation } from "@/hooks/useTranslation";
+
 import { type Job } from "@/lib/types";
 import { Loader2, X, Camera } from "lucide-react";
 import { saveInspectionDetailsAction, getIssuesForCategoryAction, updateJobStatusAction } from "@/app/actions";
@@ -57,10 +57,10 @@ type Issue = {
 }
 
 type InspectionDetailsFormProps = {
-    job: Job;
-    technicianId: string;
-    children: React.ReactNode;
-    onFormSubmit: () => void;
+  job: Job;
+  technicianId: string;
+  children: React.ReactNode;
+  onFormSubmit: () => void;
 }
 
 export function InspectionDetailsForm({ job, technicianId, children, onFormSubmit }: InspectionDetailsFormProps) {
@@ -71,7 +71,7 @@ export function InspectionDetailsForm({ job, technicianId, children, onFormSubmi
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
-  const { t } = useTranslation();
+
 
   const form = useForm<z.infer<typeof inspectionDetailsSchema>>({
     resolver: zodResolver(inspectionDetailsSchema),
@@ -105,7 +105,7 @@ export function InspectionDetailsForm({ job, technicianId, children, onFormSubmi
       };
       fetchIssues();
     }
-     // Reset form and preview on close
+    // Reset form and preview on close
     if (!open) {
       form.reset({
         selected_issues: [],
@@ -120,49 +120,49 @@ export function InspectionDetailsForm({ job, technicianId, children, onFormSubmi
   const onSubmit = async (values: z.infer<typeof inspectionDetailsSchema>) => {
     setIsLoading(true);
     try {
-        const formData = new FormData();
-        formData.append('booking_id', job.id);
-        formData.append('technician_id', technicianId);
-        formData.append('inspection_fee', String(values.inspection_fee));
-        
-        const allFindings = [...values.selected_issues];
-        if (values.other_findings) {
-            allFindings.push(`Other: ${values.other_findings}`);
-        }
-        formData.append('findings', JSON.stringify(allFindings));
+      const formData = new FormData();
+      formData.append('booking_id', job.id);
+      formData.append('technician_id', technicianId);
+      formData.append('inspection_fee', String(values.inspection_fee));
 
-        if (values.issue_image) {
-            formData.append('issue_image_url', values.issue_image);
-        }
+      const allFindings = [...values.selected_issues];
+      if (values.other_findings) {
+        allFindings.push(`Other: ${values.other_findings}`);
+      }
+      formData.append('findings', JSON.stringify(allFindings));
 
-        await saveInspectionDetailsAction(formData);
+      if (values.issue_image) {
+        formData.append('issue_image_url', values.issue_image);
+      }
 
-        // Now, update the job status
-        await updateJobStatusAction({
-            booking_id: job.id,
-            order_id: job.order_id,
-            status: 'inspection_completed',
-            note: 'Technician has completed the inspection.'
-        });
+      await saveInspectionDetailsAction(formData);
 
-        toast({
-            title: t('inspection_details_form.toast_title_success'),
-            description: t('inspection_details_form.toast_description_success'),
-        });
+      // Now, update the job status
+      await updateJobStatusAction({
+        booking_id: job.id,
+        order_id: job.order_id,
+        status: 'inspection_completed',
+        note: 'Technician has completed the inspection.'
+      });
 
-        setOpen(false);
-        onFormSubmit();
+      toast({
+        title: "Inspection Completed",
+        description: "Findings have been saved.",
+      });
+
+      setOpen(false);
+      onFormSubmit();
     } catch (error: any) {
-        toast({
-            title: "Update Failed",
-            description: error.message || "Could not save inspection details.",
-            variant: "destructive",
-        })
+      toast({
+        title: "Update Failed",
+        description: error.message || "Could not save inspection details.",
+        variant: "destructive",
+      })
     } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
   };
-  
+
   const handleIssueSelect = (issueTitle: string) => {
     const currentIssues = form.getValues("selected_issues") || [];
     if (!currentIssues.includes(issueTitle)) {
@@ -177,25 +177,25 @@ export function InspectionDetailsForm({ job, technicianId, children, onFormSubmi
       currentIssues.filter((issue) => issue !== issueTitle)
     );
   };
-  
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-      const file = event.target.files?.[0];
-      if (file) {
-          form.setValue('issue_image', file);
-          const reader = new FileReader();
-          reader.onloadend = () => {
-              setImagePreview(reader.result as string);
-          };
-          reader.readAsDataURL(file);
-      }
+    const file = event.target.files?.[0];
+    if (file) {
+      form.setValue('issue_image', file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleRemoveImage = () => {
-      form.setValue('issue_image', null);
-      setImagePreview(null);
-      if (fileInputRef.current) {
-          fileInputRef.current.value = '';
-      }
+    form.setValue('issue_image', null);
+    setImagePreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   }
 
 
@@ -206,45 +206,45 @@ export function InspectionDetailsForm({ job, technicianId, children, onFormSubmi
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{t('inspection_details_form.title')}</DialogTitle>
+          <DialogTitle>Inspection Details</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
-            
+
             <FormField
               control={form.control}
               name="selected_issues"
               render={() => (
                 <FormItem>
-                  <FormLabel className="text-base">{t('inspection_details_form.findings_label')}</FormLabel>
-                   {isFetchingIssues ? (
-                     <Skeleton className="h-10 w-full" />
-                   ) : (
+                  <FormLabel className="text-base">Select all applicable issues</FormLabel>
+                  {isFetchingIssues ? (
+                    <Skeleton className="h-10 w-full" />
+                  ) : (
                     <Select onValueChange={handleIssueSelect} value="">
-                        <FormControl>
+                      <FormControl>
                         <SelectTrigger>
-                            <SelectValue placeholder="Add an issue from the list" />
+                          <SelectValue placeholder="Add an issue from the list" />
                         </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
+                      </FormControl>
+                      <SelectContent>
                         {issues.filter(issue => !selectedIssues.includes(issue.title)).map(issue => (
-                            <SelectItem key={issue.id} value={issue.title}>
-                                {issue.title}
-                            </SelectItem>
+                          <SelectItem key={issue.id} value={issue.title}>
+                            {issue.title}
+                          </SelectItem>
                         ))}
-                        </SelectContent>
+                      </SelectContent>
                     </Select>
-                   )}
-                   <div className="flex flex-wrap gap-2 pt-2 min-h-[24px]">
-                        {selectedIssues.map(issue => (
-                            <Badge key={issue} variant="secondary" className="flex items-center gap-1">
-                                {issue}
-                                <button type="button" onClick={() => handleRemoveIssue(issue)} className="rounded-full hover:bg-muted-foreground/20">
-                                    <X className="h-3 w-3" />
-                                </button>
-                            </Badge>
-                        ))}
-                   </div>
+                  )}
+                  <div className="flex flex-wrap gap-2 pt-2 min-h-[24px]">
+                    {selectedIssues.map(issue => (
+                      <Badge key={issue} variant="secondary" className="flex items-center gap-1">
+                        {issue}
+                        <button type="button" onClick={() => handleRemoveIssue(issue)} className="rounded-full hover:bg-muted-foreground/20">
+                          <X className="h-3 w-3" />
+                        </button>
+                      </Badge>
+                    ))}
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
@@ -255,55 +255,55 @@ export function InspectionDetailsForm({ job, technicianId, children, onFormSubmi
               name="other_findings"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('inspection_details_form.other_findings_label')}</FormLabel>
+                  <FormLabel>Other Findings (if any)</FormLabel>
                   <FormControl>
-                    <Textarea placeholder={t('inspection_details_form.other_findings_placeholder')} {...field} />
+                    <Textarea placeholder="Describe any other issues found..." {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            
-             <FormField
-                control={form.control}
-                name="issue_image"
-                render={() => (
-                    <FormItem>
-                        <FormLabel>{t('inspection_details_form.upload_photo_label')}</FormLabel>
-                        <div className="flex items-center gap-4">
-                            {imagePreview ? (
-                                <div className="relative w-20 h-20 rounded-md overflow-hidden border">
-                                    <Image src={imagePreview} alt="Issue preview" layout="fill" objectFit="cover" />
-                                     <Button
-                                        type="button"
-                                        variant="destructive"
-                                        size="icon"
-                                        className="absolute top-0 right-0 h-6 w-6"
-                                        onClick={handleRemoveImage}
-                                    >
-                                        <X className="h-4 w-4" />
-                                    </Button>
-                                </div>
-                            ) : (
-                                <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
-                                    <Camera className="mr-2 h-4 w-4" />
-                                    Take Photo
-                                </Button>
-                            )}
-                        </div>
-                        <FormControl>
-                           <Input 
-                                type="file" 
-                                accept="image/*" 
-                                capture="environment" 
-                                ref={fileInputRef}
-                                className="hidden"
-                                onChange={handleFileChange} 
-                            />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )}
+
+            <FormField
+              control={form.control}
+              name="issue_image"
+              render={() => (
+                <FormItem>
+                  <FormLabel>Upload Issue Photo</FormLabel>
+                  <div className="flex items-center gap-4">
+                    {imagePreview ? (
+                      <div className="relative w-20 h-20 rounded-md overflow-hidden border">
+                        <Image src={imagePreview} alt="Issue preview" layout="fill" objectFit="cover" />
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="icon"
+                          className="absolute top-0 right-0 h-6 w-6"
+                          onClick={handleRemoveImage}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
+                        <Camera className="mr-2 h-4 w-4" />
+                        Take Photo
+                      </Button>
+                    )}
+                  </div>
+                  <FormControl>
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      capture="environment"
+                      ref={fileInputRef}
+                      className="hidden"
+                      onChange={handleFileChange}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
 
 
@@ -312,7 +312,7 @@ export function InspectionDetailsForm({ job, technicianId, children, onFormSubmi
               name="inspection_fee"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('inspection_details_form.inspection_fee_label')}</FormLabel>
+                  <FormLabel>Final Inspection Fee</FormLabel>
                   <FormControl>
                     <Input type="number" placeholder="e.g., 300" {...field} />
                   </FormControl>
@@ -323,11 +323,11 @@ export function InspectionDetailsForm({ job, technicianId, children, onFormSubmi
 
             <DialogFooter className="pt-4">
               <DialogClose asChild>
-                <Button type="button" variant="outline">{t('repair_details_form.cancel_button')}</Button>
+                <Button type="button" variant="outline">Cancel</Button>
               </DialogClose>
               <Button type="submit" disabled={isLoading || isFetchingIssues}>
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {t('inspection_details_form.submit_button')}
+                Submit Findings
               </Button>
             </DialogFooter>
           </form>

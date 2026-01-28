@@ -1,12 +1,12 @@
 "use client"
 import { PartnerSignupForm } from "@/components/auth/PartnerSignupForm";
 import { PageHeader } from "@/components/layout/PageHeader";
-import { useTranslation } from "@/hooks/useTranslation";
+
 import { PincodeVerifier } from "@/components/auth/PincodeVerifier";
 import { useState } from "react";
 
 export default function PartnerSignupPage() {
-  const { t } = useTranslation();
+
   const [isPincodeVerified, setIsPincodeVerified] = useState(false);
   const [pincode, setPincode] = useState("");
   const [city, setCity] = useState("");
@@ -23,9 +23,9 @@ export default function PartnerSignupPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-slate-50/50">
-      <PageHeader title={t('partner_signup_page.title')} />
+      <PageHeader title="Become a Partner" />
       <div className="p-4 flex-1 flex flex-col">
-        {!isPincodeVerified && <p className="text-muted-foreground mb-6 text-center">{t('partner_signup_page.subtitle')}</p>}
+        {!isPincodeVerified && <p className="text-muted-foreground mb-6 text-center">Fill out the form below to start the process of joining our network of skilled technicians.</p>}
         <PartnerSignupForm pincode={pincode} city={city} />
       </div>
     </div>

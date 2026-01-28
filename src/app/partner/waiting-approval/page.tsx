@@ -3,11 +3,11 @@
 import { CheckCircle2, Clock, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { useTranslation } from "@/hooks/useTranslation";
+
 
 export default function WaitingApprovalPage() {
     const router = useRouter();
-    const { t } = useTranslation();
+
 
     return (
         <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 text-center">

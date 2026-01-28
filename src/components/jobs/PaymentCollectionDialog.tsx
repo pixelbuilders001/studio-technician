@@ -12,7 +12,7 @@ import {
   DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog";
-import { useTranslation } from "@/hooks/useTranslation";
+
 import { type Job } from "@/lib/types";
 import { Loader2 } from "lucide-react";
 import { verifyPaymentAction } from "@/app/actions";
@@ -38,7 +38,7 @@ export function PaymentCollectionDialog({
   onPaymentSuccess,
 }: PaymentCollectionDialogProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const { t } = useTranslation();
+
   const { toast } = useToast();
   console.log("status---", status);
   const handleCashPayment = async () => {
@@ -70,10 +70,10 @@ export function PaymentCollectionDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-sm">
         <DialogHeader>
-          <DialogTitle className="text-center">{t('payment_collection_dialog.title')}</DialogTitle>
+          <DialogTitle className="text-center">Collect Payment</DialogTitle>
         </DialogHeader>
         <div className="flex flex-col items-center justify-center space-y-4 py-4">
-          <p className="text-muted-foreground">{t('payment_collection_dialog.total_due')}</p>
+          <p className="text-muted-foreground">Total Amount Due</p>
           <p className="text-4xl font-bold">
             {new Intl.NumberFormat('en-IN', {
               style: 'currency',
@@ -92,16 +92,16 @@ export function PaymentCollectionDialog({
               />
             </a>
           </div>
-          <p className="text-sm text-muted-foreground">{t('payment_collection_dialog.scan_to_pay')}</p>
+          <p className="text-sm text-muted-foreground">Scan QR to pay with any UPI app</p>
         </div>
         <DialogFooter className="pt-4">
           <div className="w-full space-y-2">
             <Button onClick={handleCashPayment} disabled={isLoading} className="w-full h-12" variant="outline">
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {t('payment_collection_dialog.paid_by_cash')}
+              Paid by Cash
             </Button>
             <DialogClose asChild>
-              <Button type="button" variant="ghost" className="w-full">{t('repair_details_form.cancel_button')}</Button>
+              <Button type="button" variant="ghost" className="w-full">Cancel</Button>
             </DialogClose>
           </div>
         </DialogFooter>

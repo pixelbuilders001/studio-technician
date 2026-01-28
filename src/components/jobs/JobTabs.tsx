@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Job } from "@/lib/types";
 import { JobCard } from "./JobCard";
 import { ScrollArea } from "../ui/scroll-area";
-import { useTranslation } from "@/hooks/useTranslation";
+
 import { Briefcase, RefreshCcw } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -18,7 +18,7 @@ type JobTabsProps = {
 };
 
 export function JobTabs({ jobs, activeTab, onTabChange, technicianId, onJobsUpdate }: JobTabsProps) {
-  const { t } = useTranslation();
+
   const router = useRouter();
 
   const newJobs = jobs.filter((job) => job.status === "assigned");
@@ -88,25 +88,25 @@ export function JobTabs({ jobs, activeTab, onTabChange, technicianId, onJobsUpda
       <div className="p-4 pb-2 sticky top-16 bg-white/50 backdrop-blur-md z-40">
         <TabsList className="grid w-full grid-cols-3 bg-slate-100/80 p-1.5 h-12 rounded-2xl border border-white">
           <TabsTrigger value="new" className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-primary transition-all font-bold text-xs uppercase tracking-wider">
-            {t('job_tabs.new')} ({newJobs.length})
+            New ({newJobs.length})
           </TabsTrigger>
           <TabsTrigger value="ongoing" className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-primary transition-all font-bold text-xs uppercase tracking-wider">
-            {t('job_tabs.ongoing')} ({ongoingJobs.length})
+            Ongoing ({ongoingJobs.length})
           </TabsTrigger>
           <TabsTrigger value="completed" className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-primary transition-all font-bold text-xs uppercase tracking-wider">
-            {t('job_tabs.completed')} ({completedJobs.length})
+            Completed ({completedJobs.length})
           </TabsTrigger>
         </TabsList>
       </div>
       <ScrollArea className="flex-1">
         <TabsContent value="new" className="m-0 focus-visible:ring-0">
-          {renderJobList(newJobs, t('job_tabs.no_new_jobs'))}
+          {renderJobList(newJobs, "No new jobs available.")}
         </TabsContent>
         <TabsContent value="ongoing" className="m-0 focus-visible:ring-0">
-          {renderJobList(ongoingJobs, t('job_tabs.no_ongoing_jobs'))}
+          {renderJobList(ongoingJobs, "You have no ongoing jobs.")}
         </TabsContent>
         <TabsContent value="completed" className="m-0 focus-visible:ring-0">
-          {renderJobList(completedJobs, t('job_tabs.no_completed_jobs'))}
+          {renderJobList(completedJobs, "No jobs completed yet.")}
         </TabsContent>
       </ScrollArea>
     </Tabs>

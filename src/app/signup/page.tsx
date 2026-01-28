@@ -9,12 +9,12 @@ import {
     CardTitle,
     CardDescription
 } from "@/components/ui/card";
-import { useTranslation } from "@/hooks/useTranslation";
+
 import { SignUpForm } from "@/components/auth/SignUpForm";
 import { Loader2, Star, UserPlus, ShieldCheck } from "lucide-react";
 
 export default function SignUpPage() {
-    const { t } = useTranslation();
+
 
     return (
         <main className="flex flex-col min-h-screen bg-slate-50 font-inter">

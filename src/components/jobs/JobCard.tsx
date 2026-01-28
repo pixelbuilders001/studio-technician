@@ -27,7 +27,7 @@ import {
 import { MapPin, Check, X, Wrench, Tv, Refrigerator, Smartphone, AirVent, WashingMachine, Info, IndianRupee, Phone, Navigation, CheckCircle, ArrowRight, HandCoins, FileText, Share2, Wallet, Download, Clock, User, ChevronRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import React, { useState, useTransition } from "react";
-import { useTranslation } from "@/hooks/useTranslation";
+
 import { format } from 'date-fns';
 import { Separator } from "../ui/separator";
 import { updateJobStatusAction } from "@/app/actions";
@@ -57,6 +57,31 @@ type StatusConfig = {
     }
 }
 
+const jobApiStatusLabels: Record<string, string> = {
+    assigned: "Assigned",
+    accepted: "Accepted",
+    on_the_way: "On the way",
+    "in-progress": "In Progress",
+    completed: "Completed",
+    cancelled: "Cancelled",
+    rejected: "Rejected",
+    inspection_started: "Inspection Started",
+    inspection_completed: "Inspection Completed",
+    quotation_shared: "Quote Shared",
+    quotation_approved: "Quote Approved",
+    quotation_rejected: "Quote Rejected",
+    repair_started: "Repair Started",
+    repair_completed: "Repair Completed",
+    closed_no_repair: "Closed (No Repair)",
+    code_sent: "Code Sent"
+};
+
+const statusButtonLabels: Record<string, string> = {
+    start_travel: "Start Travel",
+    start_inspection: "Start Inspection",
+    start_repair: "Start Repair",
+};
+
 const statusFlow: StatusConfig = {
     'accepted': {
         nextStatus: 'on_the_way',
@@ -78,7 +103,7 @@ const statusFlow: StatusConfig = {
 export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technicianId: string | null, onJobsUpdate: (newTab?: 'new' | 'ongoing' | 'completed') => void }) {
     const router = useRouter();
     const { toast } = useToast();
-    const { t } = useTranslation();
+
     const [isPending, startTransition] = useTransition();
 
     const [codeOpen, setCodeOpen] = useState(false);
@@ -106,8 +131,8 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
                     order_id: job.order_id,
                 });
                 toast({
-                    title: t('status_updater.toast_title'),
-                    description: `${t('status_updater.toast_description')} ${t(`job_api_status.${status}`)}`,
+                    title: "Status Updated",
+                    description: `Job status is now: ${jobApiStatusLabels[status] || status}`,
                 });
                 onJobsUpdate(status === 'accepted' ? 'ongoing' : undefined);
 
@@ -210,8 +235,8 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
             });
 
             toast({
-                title: t('payment_collection_dialog.toast_title_success'),
-                description: t('payment_collection_dialog.toast_description_success'),
+                title: "Payment Complete",
+                description: "Job has been marked as completed.",
             });
 
             setPaymentOpen(false);
@@ -333,7 +358,7 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
                             <AlertDialogTrigger asChild>
                                 <Button variant="outline" className="flex-1 h-12 rounded-xl text-rose-500 border-rose-100 hover:bg-rose-50 font-bold" disabled={isPending}>
                                     {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <X className="mr-2 h-4 w-4" />}
-                                    {t('job_card.reject')}
+                                    Reject
                                 </Button>
                             </AlertDialogTrigger>
                             <AlertDialogContent className="rounded-3xl max-w-[90vw]">
@@ -353,7 +378,7 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
                         </AlertDialog>
                         <Button className="flex-1 h-12 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold shadow-lg shadow-primary/20" onClick={() => handleStatusUpdate('accepted')} disabled={isPending}>
                             {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Check className="mr-2 h-4 w-4" />}
-                            {t('job_card.accept')}
+                            Accept
                         </Button>
                     </div>
                 </div>
@@ -391,7 +416,7 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
             mainActionButton = (
                 <Button className="h-11 flex-1 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold shadow-lg shadow-primary/20" onClick={() => handleStatusUpdate(nextAction.nextStatus)} disabled={isPending}>
                     {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <NextActionIcon className="mr-2 h-4 w-4" />}
-                    {t(`status_updater.${nextAction.buttonTextKey}`)}
+                    {statusButtonLabels[nextAction.buttonTextKey] || nextAction.buttonTextKey}
                 </Button>
             );
         } else if (job.status === 'inspection_started') {
@@ -403,7 +428,7 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
                 >
                     <Button className="h-11 flex-1 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold shadow-lg shadow-primary/20" disabled={isPending}>
                         {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FileText className="mr-2 h-4 w-4" />}
-                        {t('status_updater.inspection_done')}
+                        Inspection Done
                     </Button>
                 </InspectionDetailsForm>
             );
@@ -416,7 +441,7 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
                     >
                         <Button className="h-11 flex-1 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold shadow-lg shadow-primary/20" disabled={isPending}>
                             {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Share2 className="mr-2 h-4 w-4" />}
-                            {t('status_updater.share_quote')}
+                            Share Quote
                         </Button>
                     </ShareQuoteForm>
                     <Button className="h-11 flex-1 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold shadow-lg shadow-amber-500/20" onClick={() => setPaymentOpen(true)}>
@@ -429,7 +454,7 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
             mainActionButton = (
                 <Button className="h-11 flex-1 rounded-xl bg-slate-100 text-slate-500 font-bold cursor-not-allowed" disabled>
                     <Check className="mr-2 h-4 w-4" />
-                    {t('status_updater.quote_sent')}
+                    Quote Sent
                 </Button>
             );
         } else if (job.status === 'repair_started') {
@@ -440,7 +465,7 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
                 >
                     <Button className="h-11 flex-1 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold shadow-lg shadow-emerald-500/20" disabled={isPending}>
                         {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle className="mr-2 h-4 w-4" />}
-                        {t('status_updater.complete_job')}
+                        Complete Job
                     </Button>
                 </RepairDetailsForm>
             );
@@ -448,7 +473,7 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
             mainActionButton = (
                 <Button className="h-11 flex-1 rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white font-bold shadow-lg shadow-indigo-500/20" onClick={() => setCodeOpen(true)}>
                     <CheckCircle className="mr-2 h-4 w-4" />
-                    {t('status_updater.enter_code')}
+                    Enter Code
                 </Button>
             )
         } else if (job.status === 'payment_pending') {

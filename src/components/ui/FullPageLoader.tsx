@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useTranslation } from "@/hooks/useTranslation";
+
 import { Loader2 } from "lucide-react";
 
 export interface FullPageLoaderProps {
@@ -10,7 +10,7 @@ export interface FullPageLoaderProps {
 }
 
 export function FullPageLoader({ text, subtext }: FullPageLoaderProps) {
-    const { t } = useTranslation();
+
 
     return (
         <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-white/90 backdrop-blur-md animate-in fade-in duration-500">
@@ -37,10 +37,10 @@ export function FullPageLoader({ text, subtext }: FullPageLoaderProps) {
 
                 <div className="flex flex-col items-center gap-3">
                     <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary via-primary/80 to-primary font-inter tracking-tight text-center">
-                        {text || t?.('login_form.verifying') || 'Verifying Your Details...'}
+                        {text || 'Verifying Your Details...'}
                     </h2>
                     <p className="text-slate-500 font-medium text-center text-sm max-w-[250px] leading-relaxed">
-                        {subtext || t?.('login_form.please_wait') || 'Hang tight! once verified you will be redirected.'}
+                        {subtext || 'Hang tight! once verified you will be redirected.'}
                     </p>
                 </div>
 

@@ -16,7 +16,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Loader2, PartyPopper, X, ChevronRight, ChevronLeft, Upload, CheckCircle2, User, Briefcase, FileText } from "lucide-react";
-import { useTranslation } from "@/hooks/useTranslation";
+
 import { useToast } from "@/hooks/use-toast";
 import { createClient } from "@/lib/supabase/client";
 import { FullPageLoader } from "@/components/ui/FullPageLoader";
@@ -59,7 +59,7 @@ export function PartnerSignupForm({ pincode, city }: PartnerSignupFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [categories, setCategories] = useState<any[]>([]);
-  const { t } = useTranslation();
+
 
   useEffect(() => {
     async function fetchCategories() {
@@ -343,9 +343,9 @@ export function PartnerSignupForm({ pincode, city }: PartnerSignupFormProps) {
                         name="full_name"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t('partner_signup_form.full_name')}</FormLabel>
+                            <FormLabel>Full Name</FormLabel>
                             <FormControl>
-                              <Input className="bg-white/80 h-12" placeholder={t('partner_signup_form.full_name_placeholder')} {...field} />
+                              <Input className="bg-white/80 h-12" placeholder="e.g., Ramesh Kumar" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -356,7 +356,7 @@ export function PartnerSignupForm({ pincode, city }: PartnerSignupFormProps) {
                         name="mobile"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t('login_form.mobile_number')}</FormLabel>
+                            <FormLabel>Mobile Number</FormLabel>
                             <FormControl>
                               <div className="relative">
                                 <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
@@ -380,7 +380,7 @@ export function PartnerSignupForm({ pincode, city }: PartnerSignupFormProps) {
                         name="aadhaar_number"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t('partner_signup_form.aadhar_number')}</FormLabel>
+                            <FormLabel>Aadhar Number</FormLabel>
                             <FormControl>
                               <Input className="bg-white/80 h-12" placeholder="1234 5678 9012" {...field} maxLength={12} type="number" />
                             </FormControl>
@@ -642,7 +642,7 @@ export function PartnerSignupForm({ pincode, city }: PartnerSignupFormProps) {
             ) : (
               <Button type="submit" className="flex-1 h-12 text-base font-bold shadow-xl shadow-primary/20" disabled={isLoading}>
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {isLoading ? t('partner_signup_form.submitting') : t('partner_signup_form.submit_application')}
+                {isLoading ? "Submitting..." : "Submit Application"}
               </Button>
             )}
           </div>

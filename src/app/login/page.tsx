@@ -9,13 +9,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useTranslation } from "@/hooks/useTranslation";
+
 import { LoginForm } from "@/components/auth/LoginForm";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ShieldCheck, Zap, Star } from "lucide-react";
 
 function LoginContent() {
-  const { t } = useTranslation();
+
 
   return (
     <div className="w-full flex-1 flex flex-col">

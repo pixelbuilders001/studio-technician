@@ -2,7 +2,7 @@
 
 "use client"
 import { JobTabs } from "@/components/jobs/JobTabs";
-import { useTranslation } from "@/hooks/useTranslation";
+
 import { useEffect, useState, Suspense } from "react";
 import { getJobsAction, getProfileAction } from "../actions";
 import { useProfile } from "@/hooks/useProfile";
@@ -25,7 +25,7 @@ function JobsSkeleton() {
 }
 
 function JobsPageContent() {
-  const { t } = useTranslation();
+
   const [profile, setProfile] = useState<any>(null);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);

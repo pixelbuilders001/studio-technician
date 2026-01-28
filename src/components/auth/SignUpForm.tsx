@@ -16,7 +16,7 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Loader2, MailCheck, Mail, Lock, CheckCircle } from "lucide-react";
-import { useTranslation } from "@/hooks/useTranslation";
+
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
@@ -34,7 +34,7 @@ const signUpSchema = z
 export function SignUpForm() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { t } = useTranslation();
+
     const [isLoading, setIsLoading] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
     const [emailSentTo, setEmailSentTo] = useState("");

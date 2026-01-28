@@ -26,7 +26,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { useTranslation } from "@/hooks/useTranslation";
+
 import { type Job } from "@/lib/types";
 import { Loader2 } from "lucide-react";
 import { shareQuoteAction, updateJobStatusAction } from "@/app/actions";
@@ -39,16 +39,16 @@ const shareQuoteSchema = z.object({
 });
 
 type ShareQuoteFormProps = {
-    job: Job;
-    children: React.ReactNode;
-    onFormSubmit: () => void;
+  job: Job;
+  children: React.ReactNode;
+  onFormSubmit: () => void;
 }
 
 export function ShareQuoteForm({ job, children, onFormSubmit }: ShareQuoteFormProps) {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  const { t } = useTranslation();
+
 
   const form = useForm<z.infer<typeof shareQuoteSchema>>({
     resolver: zodResolver(shareQuoteSchema),
@@ -72,36 +72,36 @@ export function ShareQuoteForm({ job, children, onFormSubmit }: ShareQuoteFormPr
   const onSubmit = async (values: z.infer<typeof shareQuoteSchema>) => {
     setIsLoading(true);
     try {
-        await shareQuoteAction({
-            booking_id: job.id,
-            labor_cost: values.labor_cost,
-            parts_cost: values.parts_cost,
-            total_amount: values.total_amount,
-            notes: values.notes,
-        });
+      await shareQuoteAction({
+        booking_id: job.id,
+        labor_cost: values.labor_cost,
+        parts_cost: values.parts_cost,
+        total_amount: values.total_amount,
+        notes: values.notes,
+      });
 
-        await updateJobStatusAction({
-            booking_id: job.id,
-            order_id: job.order_id,
-            status: 'quotation_shared',
-            note: `Quote of INR ${values.total_amount} shared with customer.`
-        });
+      await updateJobStatusAction({
+        booking_id: job.id,
+        order_id: job.order_id,
+        status: 'quotation_shared',
+        note: `Quote of INR ${values.total_amount} shared with customer.`
+      });
 
-        toast({
-            title: t('share_quote_form.toast_title_success'),
-            description: `${t('share_quote_form.toast_description_success')} ${values.total_amount}.`,
-        });
+      toast({
+        title: "Quote Shared",
+        description: `The quote has been shared with the customer: ₹ ${values.total_amount}.`,
+      });
 
-        setOpen(false);
-        onFormSubmit();
+      setOpen(false);
+      onFormSubmit();
     } catch (error: any) {
-        toast({
-            title: "Quote Submission Failed",
-            description: error.message || "Could not share the quote.",
-            variant: "destructive",
-        })
+      toast({
+        title: "Quote Submission Failed",
+        description: error.message || "Could not share the quote.",
+        variant: "destructive",
+      })
     } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -112,46 +112,46 @@ export function ShareQuoteForm({ job, children, onFormSubmit }: ShareQuoteFormPr
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{t('share_quote_form.title')}</DialogTitle>
+          <DialogTitle>Share Repair Quote</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
             <div className="grid grid-cols-2 gap-4">
-                <FormField
+              <FormField
                 control={form.control}
                 name="labor_cost"
                 render={({ field }) => (
-                    <FormItem>
-                    <FormLabel>{t('share_quote_form.labor_cost_label')}</FormLabel>
+                  <FormItem>
+                    <FormLabel>Labor Cost</FormLabel>
                     <FormControl>
-                        <Input type="number" placeholder="e.g., 500" {...field} />
+                      <Input type="number" placeholder="e.g., 500" {...field} />
                     </FormControl>
                     <FormMessage />
-                    </FormItem>
+                  </FormItem>
                 )}
-                />
-                <FormField
+              />
+              <FormField
                 control={form.control}
                 name="parts_cost"
                 render={({ field }) => (
-                    <FormItem>
-                    <FormLabel>{t('share_quote_form.parts_cost_label')}</FormLabel>
+                  <FormItem>
+                    <FormLabel>Parts Cost</FormLabel>
                     <FormControl>
-                        <Input type="number" placeholder="e.g., 1200" {...field} />
+                      <Input type="number" placeholder="e.g., 1200" {...field} />
                     </FormControl>
                     <FormMessage />
-                    </FormItem>
+                  </FormItem>
                 )}
-                />
+              />
             </div>
             <FormField
               control={form.control}
               name="total_amount"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('share_quote_form.total_amount_label')}</FormLabel>
+                  <FormLabel>Total Quote Amount</FormLabel>
                   <FormControl>
-                    <Input type="number" {...field} readOnly className="bg-muted font-bold"/>
+                    <Input type="number" {...field} readOnly className="bg-muted font-bold" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -162,9 +162,9 @@ export function ShareQuoteForm({ job, children, onFormSubmit }: ShareQuoteFormPr
               name="notes"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('share_quote_form.notes_label')}</FormLabel>
+                  <FormLabel>Notes for Customer (Optional)</FormLabel>
                   <FormControl>
-                    <Textarea placeholder={t('share_quote_form.notes_placeholder')} {...field} />
+                    <Textarea placeholder="e.g., Warranty details, repair timeline..." {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -172,11 +172,11 @@ export function ShareQuoteForm({ job, children, onFormSubmit }: ShareQuoteFormPr
             />
             <DialogFooter className="pt-4">
               <DialogClose asChild>
-                <Button type="button" variant="outline">{t('repair_details_form.cancel_button')}</Button>
+                <Button type="button" variant="outline">Cancel</Button>
               </DialogClose>
               <Button type="submit" disabled={isLoading}>
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {t('share_quote_form.submit_button')}
+                Share Quote
               </Button>
             </DialogFooter>
           </form>
@@ -186,4 +186,3 @@ export function ShareQuoteForm({ job, children, onFormSubmit }: ShareQuoteFormPr
   );
 }
 
-    

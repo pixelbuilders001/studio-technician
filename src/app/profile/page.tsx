@@ -6,8 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { User, Phone, Map, Tag, Briefcase, LogOut, Star, CheckCircle, XCircle, IndianRupee, CloudCog, HelpCircle, Download, Share2, Smartphone, Instagram, Twitter } from 'lucide-react';
-import { useTranslation } from '@/hooks/useTranslation';
-import { LanguageSelector } from '@/components/common/LanguageSelector';
+
 import { Skeleton } from '@/components/ui/skeleton';
 import { useEffect, useState } from 'react';
 import { getTechnicianStats, getProfileAction, logoutAction } from '@/app/actions';
@@ -16,7 +15,7 @@ import { formatSkillName } from '@/lib/utils';
 import { usePwa } from '@/hooks/usePwa';
 
 export default function ProfilePage() {
-    const { t } = useTranslation();
+
     const [profile, setProfile] = useState<any>(null);
     const [stats, setStats] = useState<any>(null);
     const [loading, setLoading] = useState(true);
@@ -145,7 +144,7 @@ export default function ProfilePage() {
                         <Phone className="h-4 w-4" />
                         <span className="text-sm font-bold">Help</span>
                     </a>
-                    {/* <LanguageSelector /> */}
+
                 </div>
             </header>
 
@@ -454,7 +453,7 @@ export default function ProfilePage() {
                             className="w-full h-14 text-base font-bold text-rose-500 border-rose-100 bg-rose-50/30 hover:bg-rose-50 hover:text-rose-600 border-2 rounded-2xl transition-all active:scale-[0.98]"
                             onClick={handleLogout}
                         >
-                            <LogOut className="mr-2 h-5 w-5" /> {t('profile_page.logout')}
+                            <LogOut className="mr-2 h-5 w-5" /> Logout
                         </Button>
                         <p className="text-center text-[10px] text-slate-400 font-medium uppercase tracking-widest pb-8">
                             App Version 1.0.4 • © hellofixo

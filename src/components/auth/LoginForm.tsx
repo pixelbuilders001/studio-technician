@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/form";
 
 import { Loader2, Mail, Lock } from "lucide-react";
-import { useTranslation } from "@/hooks/useTranslation";
+
 import { createClient } from "@/lib/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { FullPageLoader } from "@/components/ui/FullPageLoader";
@@ -32,7 +32,7 @@ export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
-  const { t } = useTranslation();
+
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -44,7 +44,7 @@ export function LoginForm() {
         variant: "destructive",
         title: "Access Denied",
         description:
-          t("login_form.invalid_credentials") ||
+          "Invalid email or password" ||
           "You are not allowed to access this account",
       });
 
@@ -117,12 +117,12 @@ export function LoginForm() {
     } catch (error: any) {
       console.error("Login error:", error);
 
-      let message = t("login_form.login_error");
+      let message = "Login failed";
 
       if (error.message?.includes("Email not confirmed")) {
-        message = t("login_form.email_not_confirmed");
+        message = "Email not confirmed. Please check your inbox.";
       } else if (error.message?.includes("Invalid login credentials")) {
-        message = t("login_form.invalid_credentials");
+        message = "Invalid email or password";
       }
 
       toast({
@@ -205,7 +205,7 @@ export function LoginForm() {
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                {t("login_form.logging_in")}
+                Logging in...
               </>
             ) : (
               "Login"

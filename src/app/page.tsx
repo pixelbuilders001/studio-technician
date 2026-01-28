@@ -12,13 +12,13 @@ import {
 } from "@/components/ui/card";
 import { Suspense } from "react";
 import { Loader2 } from "lucide-react";
-import { useTranslation } from "@/hooks/useTranslation";
+
 import { LoginForm } from "@/components/auth/LoginForm";
 import Link from "next/link";
 
 
 export default function WelcomePage() {
-  const { t } = useTranslation();
+
 
   return (
     <main className="flex flex-col min-h-screen bg-background">
@@ -37,10 +37,10 @@ export default function WelcomePage() {
         <Card className="border-none shadow-none">
           <CardHeader className="p-0 text-center">
             <CardTitle className="text-2xl font-bold font-headline">
-              {t('login_form.login_title')}
+              Login
             </CardTitle>
             <CardDescription className="pt-1">
-              {t("login_page.registration_subtitle")}
+              Enter your mobile number to receive a verification code.
             </CardDescription>
           </CardHeader>
           <CardContent className="p-0 pt-6">

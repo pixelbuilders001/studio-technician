@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { cn } from '@/lib/utils';
 import { Toaster } from "@/components/ui/toaster"
-import { LanguageProvider } from '@/context/LanguageContext';
+
 
 export const metadata: Metadata = {
   title: 'helloFixo Technician',
@@ -61,12 +61,10 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet" />
       </head>
       <body className={cn("font-body antialiased", "bg-background")}>
-        <LanguageProvider>
-          <ProfileCheck />
-          <FcmInitializer />
-          {children}
-          <Toaster />
-        </LanguageProvider>
+        <ProfileCheck />
+        <FcmInitializer />
+        {children}
+        <Toaster />
       </body>
     </html>
   );
