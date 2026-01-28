@@ -3,6 +3,10 @@ import { type PrecacheEntry, Serwist, type SerwistGlobalConfig } from "serwist";
 import { initializeApp } from "firebase/app";
 import { getMessaging, onBackgroundMessage } from "firebase/messaging/sw";
 
+// Service Worker Version - Increment this to force browser to update cached assets
+const SW_VERSION = "1.0.1";
+console.log(`Service Worker Version: ${SW_VERSION}`);
+
 // This declares the service worker scope
 declare global {
     interface WorkerGlobalScope extends SerwistGlobalConfig {
@@ -33,14 +37,35 @@ const app = initializeApp(firebaseConfig);
 const messaging = getMessaging(app);
 
 onBackgroundMessage(messaging, (payload) => {
-    const notificationTitle = payload.notification?.title || 'New Job Assigned';
+    console.log("Background message received:", payload);
+
+    // Message all open clients to play sound
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clients => {
+        clients.forEach(client => {
+            client.postMessage({
+                type: 'PLAY_NOTIFICATION_SOUND',
+                payload: payload
+            });
+        });
+    });
+
+    // If notification exists, FCM will show it automatically in background
+    if (payload.notification) {
+        console.log("Notification payload found, FCM will handle display.");
+        return;
+    }
+
+    // Otherwise, show manual notification for data-only messages if they contain title/body
+    const notificationTitle = payload.data?.title || 'New Job Assigned';
     const notificationOptions = {
-        body: payload.notification?.body || 'You have a new job assigned. check it now!',
+        body: payload.data?.body || 'You have a new job assigned. check it now!',
         icon: '/logo-image.png',
         badge: '/icons/icon-192x192.png',
         data: payload.data,
+        vibrate: [200, 100, 200, 100, 200, 100, 200], // "Ringing" vibration pattern
     };
 
+    console.log("Showing manual notification for data-only message.");
     (self as any).registration.showNotification(notificationTitle, notificationOptions);
 });
 

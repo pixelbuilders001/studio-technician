@@ -104,6 +104,12 @@ export const useFcm = (userIdProp: string | undefined) => {
             if (event.data && event.data.type === "REFRESH_DATA") {
                 console.log("Received REFRESH_DATA from SW");
                 window.dispatchEvent(new CustomEvent("fcm-refresh-data", { detail: event.data.payload }));
+            } else if (event.data && event.data.type === "PLAY_NOTIFICATION_SOUND") {
+                console.log("Playing notification sound requested by SW");
+                const audio = new Audio("/notification.mp3");
+                audio.play().catch((err) => {
+                    console.warn("Audio playback failed (browser restrictions):", err);
+                });
             }
         };
 
