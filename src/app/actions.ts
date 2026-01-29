@@ -636,7 +636,7 @@ export async function getProfileAction() {
 export async function logoutAction() {
   const supabase = await createClient();
   await supabase.auth.signOut();
-  redirect('/');
+  redirect('/login');
 }
 
 
