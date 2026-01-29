@@ -8,28 +8,12 @@ import { useToast } from "@/hooks/use-toast";
 import { createClient } from "@/lib/supabase/client";
 
 /**
- * Custom hook to initialize and manage FCM (Firebase Cloud Messaging) notifications.
- * It handles permission requests, token generation, and listening for foreground messages.
- */
+* Custom hook to initialize and manage FCM (Firebase Cloud Messaging) notifications.
+* It handles permission requests, token generation, and listening for foreground messages.
+*/
 export const useFcm = (userIdProp: string | undefined) => {
     const { toast } = useToast();
     const [token, setToken] = useState<string | null>(null);
-
-    const requestPermission = async () => {
-        if (typeof window === "undefined" || !("Notification" in window)) {
-            console.warn("Notifications not supported in this browser.");
-            return false;
-        }
-
-        try {
-            const permission = await Notification.requestPermission();
-            console.log("Notification permission status:", permission);
-            return permission === "granted";
-        } catch (error) {
-            console.error("Error requesting notification permission:", error);
-            return false;
-        }
-    };
 
     useEffect(() => {
         const isBrowser = typeof window !== "undefined";
@@ -38,28 +22,30 @@ export const useFcm = (userIdProp: string | undefined) => {
         const supabase = createClient();
 
         const setupFcm = async (currentUserId: string) => {
+            // Add a small delay to ensure SW is actually ready and controlling
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
             console.log("FCM setup Triggered for user:", currentUserId);
 
             try {
-                // 1. Check/Request Permission (non-blocking for background logic)
-                // note: on iOS this MUST be called from a user gesture. 
-                // We keep it here as a fallback/check, but the main trigger should be manual.
-                const permission = Notification.permission;
-                if (permission === "default") {
-                    console.log("Permission is default, waiting for user gesture trigger...");
-                    // Don't auto-request here with a delay as it fails on iOS
-                } else if (permission !== "granted") {
+                // 1. Request Permission
+                const permission = await Notification.requestPermission();
+                if (permission !== "granted") {
                     console.warn("Notification permission NOT granted.");
                     return;
                 }
 
-                // 2. Get registration - much more robust waiting
-                if (!("serviceWorker" in navigator)) {
-                    console.error("Service workers are not supported.");
-                    return;
-                }
+                // 2. Get registration with fallback
+                let registration: ServiceWorkerRegistration | undefined;
 
-                let registration = await navigator.serviceWorker.ready;
+                // Try to get existing registration
+                const registrations = await navigator.serviceWorker.getRegistrations();
+                registration = registrations.find(r => r.active);
+
+                if (!registration) {
+                    console.log("No active registration found, waiting for ready...");
+                    registration = await navigator.serviceWorker.ready;
+                }
 
                 if (!registration) {
                     console.error("Failed to find or wait for service worker registration.");
@@ -70,18 +56,18 @@ export const useFcm = (userIdProp: string | undefined) => {
 
                 // 3. Delete existing token first to force a new unique token for this user
                 try {
-                    await deleteToken(messaging!);
+                    const deleted = await deleteToken(messaging!);
+                    console.log("Existing FCM token deleted:", deleted);
                 } catch (deleteError) {
-                    // Ignore deletion errors
+                    console.log("No existing token to delete or deletion failed:", deleteError);
                 }
 
-                // 4. Get NEW Token
+                // 4. Get NEW Token (will be unique for this user session)
                 const vapidKey = process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY;
                 if (!vapidKey) {
-                    console.error("FATAL: NEXT_PUBLIC_FIREBASE_VAPID_KEY is missing!");
+                    console.error("FATAL: NEXT_PUBLIC_FIREBASE_VAPID_KEY is missing from .env!");
                     return;
                 }
-
                 const fcmToken = await getToken(messaging!, {
                     vapidKey,
                     serviceWorkerRegistration: registration,
@@ -92,6 +78,8 @@ export const useFcm = (userIdProp: string | undefined) => {
                     setToken(fcmToken);
                     await updateFcmTokenAction(fcmToken);
                     console.log("Token storage process completed.");
+                } else {
+                    console.warn("Firebase getToken returned an empty string/null.");
                 }
 
             } catch (error: any) {
@@ -114,12 +102,15 @@ export const useFcm = (userIdProp: string | undefined) => {
         // Listen for messages from SW
         const handleSwMessage = (event: MessageEvent) => {
             if (event.data && event.data.type === "REFRESH_DATA") {
+                console.log("Received REFRESH_DATA from SW");
                 window.dispatchEvent(new CustomEvent("fcm-refresh-data", { detail: event.data.payload }));
             } else if (event.data && event.data.type === "PLAY_NOTIFICATION_SOUND") {
+                console.log("Playing notification sound and refreshing data requested by SW");
                 const audio = new Audio("/notification.mp3");
                 audio.play().catch((err) => {
-                    console.warn("Audio playback failed:", err);
+                    console.warn("Audio playback failed (browser restrictions):", err);
                 });
+                // Trigger data refresh on arrival
                 window.dispatchEvent(new CustomEvent("fcm-refresh-data", { detail: event.data.payload?.data }));
             }
         };
@@ -129,7 +120,7 @@ export const useFcm = (userIdProp: string | undefined) => {
         }
 
         // Foreground handler
-        const unsubscribeOnMessage = onMessage(messaging, (payload) => {
+        const unsubscribe = onMessage(messaging, (payload) => {
             console.log("Foreground message:", payload);
             try {
                 const audio = new Audio("/notification.mp3");
@@ -141,17 +132,17 @@ export const useFcm = (userIdProp: string | undefined) => {
                 description: payload.notification?.body || "New job notification",
             });
 
+            // Trigger data refresh if app is open
+            console.log("Foreground message received, triggering refresh...");
             window.dispatchEvent(new CustomEvent("fcm-refresh-data", { detail: payload.data }));
         });
 
         return () => {
             subscription.unsubscribe();
-            unsubscribeOnMessage();
-            if ("serviceWorker" in navigator) {
-                navigator.serviceWorker.removeEventListener("message", handleSwMessage);
-            }
+            unsubscribe();
         };
     }, [toast]);
 
-    return { token, requestPermission };
+    return { token };
 };
+
