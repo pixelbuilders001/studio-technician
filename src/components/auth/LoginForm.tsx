@@ -22,6 +22,7 @@ import { Loader2, Mail, Lock } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { FullPageLoader } from "@/components/ui/FullPageLoader";
+import { useFcm } from "@/hooks/useFcm";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -61,8 +62,16 @@ export function LoginForm() {
     },
   });
 
+  const { requestPermission } = useFcm(undefined);
+
   async function onSubmit(values: z.infer<typeof loginSchema>) {
     setIsLoading(true);
+
+    // Request notification permission immediately on user gesture
+    if (typeof window !== "undefined") {
+      requestPermission().catch(console.error);
+    }
+
     const supabase = createClient();
 
     try {

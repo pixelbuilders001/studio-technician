@@ -32,6 +32,7 @@ import { Badge } from "../ui/badge";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
+import { useFcm } from "@/hooks/useFcm";
 
 
 
@@ -107,8 +108,15 @@ export function PartnerSignupForm({ pincode, city }: PartnerSignupFormProps) {
   const watchAadhaarBack = form.watch("aadhaar_back");
   const watchSelfie = form.watch("selfie");
 
+  const { requestPermission } = useFcm(undefined);
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
+
+    // Request notification permission immediately on user gesture
+    if (typeof window !== "undefined") {
+      requestPermission().catch(console.error);
+    }
 
     const formData = new FormData();
     Object.entries(values).forEach(([key, value]) => {
