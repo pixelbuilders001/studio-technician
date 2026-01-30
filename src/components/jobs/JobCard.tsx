@@ -122,12 +122,21 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
             return;
         }
 
+        const notes: Record<string, string> = {
+            accepted: "Technician has accepted the job.",
+            on_the_way: "Technician is on the way to your location.",
+            inspection_started: "Technician has started the inspection.",
+            job_rejected: "Technician has declined the job request.",
+        };
+
+        const note = notes[status] || `Technician has updated the job to ${status}.`;
+
         startTransition(async () => {
             try {
                 await updateJobStatusAction({
                     booking_id: job.id,
                     status: status,
-                    note: `Technician has updated the job to ${status}.`,
+                    note: note,
                     order_id: job.order_id,
                 });
                 toast({
