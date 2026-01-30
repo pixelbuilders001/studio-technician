@@ -49,23 +49,18 @@ onBackgroundMessage(messaging, (payload) => {
         });
     });
 
-    // If notification exists, FCM will show it automatically in background
-    if (payload.notification) {
-        console.log("Notification payload found, FCM will handle display.");
-        return;
-    }
-
-    // Otherwise, show manual notification for data-only messages if they contain title/body
-    const notificationTitle = payload.data?.title || 'New Job Assigned';
+    // Handle notification display manually to ensure custom sound and vibration
+    const notificationTitle = payload.notification?.title || payload.data?.title || 'New Job Assigned';
     const notificationOptions = {
-        body: payload.data?.body || 'You have a new job assigned. check it now!',
+        body: payload.notification?.body || payload.data?.body || 'You have a new job assigned. check it now!',
         icon: '/logo-image.png',
         badge: '/icons/icon-192x192.png',
         data: payload.data,
         vibrate: [200, 100, 200, 100, 200, 100, 200], // "Ringing" vibration pattern
+        sound: '/notification.mp3', // Note: Support varies by browser
     };
 
-    console.log("Showing manual notification for data-only message.");
+    console.log("Showing notification with custom sound and vibration.");
     (self as any).registration.showNotification(notificationTitle, notificationOptions);
 });
 
