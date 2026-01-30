@@ -4,8 +4,19 @@ import { initializeApp } from "firebase/app";
 import { getMessaging, onBackgroundMessage } from "firebase/messaging/sw";
 
 // Service Worker Version - Increment this to force browser to update cached assets
-const SW_VERSION = "1.0.1";
+const SW_VERSION = "1.0.3";
 console.log(`Service Worker Version: ${SW_VERSION}`);
+
+// Force update on install
+self.addEventListener("install", () => {
+    console.log("Service Worker installing...");
+    (self as any).skipWaiting();
+});
+
+self.addEventListener("activate", (event: any) => {
+    console.log("Service Worker activating...");
+    event.waitUntil((self as any).clients.claim());
+});
 
 // This declares the service worker scope
 declare global {
@@ -49,19 +60,28 @@ onBackgroundMessage(messaging, (payload) => {
         });
     });
 
-    // Handle notification display manually to ensure custom sound and vibration
-    const notificationTitle = payload.notification?.title || payload.data?.title || 'New Job Assigned';
-    const notificationOptions = {
-        body: payload.notification?.body || payload.data?.body || 'You have a new job assigned. check it now!',
-        icon: '/logo-image.png',
-        badge: '/icons/icon-192x192.png',
-        data: payload.data,
-        vibrate: [200, 100, 200, 100, 200, 100, 200], // "Ringing" vibration pattern
-        sound: '/notification.mp3', // Note: Support varies by browser
-    };
+    // CRITICAL: Avoid duplicates.
+    // If the payload has a 'notification' property, FCM will display it automatically.
+    // We MUST NOT call showNotification manually in this case.
+    if (payload.notification) {
+        console.log("FCM notification detected. Skipping manual display to prevent duplicates.");
+        return;
+    }
 
-    console.log("Showing notification with custom sound and vibration.");
-    (self as any).registration.showNotification(notificationTitle, notificationOptions);
+    // Only show manual notification for 'data' messages that don't have a 'notification' key
+    if (payload.data && (payload.data.title || payload.data.body)) {
+        console.log("Showing manual notification for data-only message.");
+        const notificationTitle = payload.data.title || 'New Job Assigned';
+        const notificationOptions = {
+            body: payload.data.body || 'You have a new job assigned. check it now!',
+            icon: '/logo-image.png',
+            badge: '/icons/icon-192x192.png',
+            data: payload.data,
+            vibrate: [200, 100, 200, 100, 200, 100, 200],
+            sound: '/notification.mp3',
+        };
+        (self as any).registration.showNotification(notificationTitle, notificationOptions);
+    }
 });
 
 const serwist = new Serwist({
