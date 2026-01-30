@@ -47,6 +47,8 @@ export type Job = {
     id: string;
     title: string;
   };
+  preferred_service_date?: string;
+  preferred_time_slot?: string;
   // The fields below are from the old static data structure and might need to be integrated
   // or removed depending on your final API structure.
   problemDetails?: string;

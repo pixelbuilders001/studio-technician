@@ -24,7 +24,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { MapPin, Check, X, Wrench, Tv, Refrigerator, Smartphone, AirVent, WashingMachine, Info, IndianRupee, Phone, Navigation, CheckCircle, ArrowRight, HandCoins, FileText, Share2, Wallet, Download, Clock, User, ChevronRight } from "lucide-react";
+import { MapPin, Check, X, Wrench, Tv, Refrigerator, Smartphone, AirVent, WashingMachine, Info, IndianRupee, Phone, Navigation, CheckCircle, ArrowRight, HandCoins, FileText, Share2, Wallet, Download, Clock, User, ChevronRight, Calendar } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import React, { useState, useTransition } from "react";
 
@@ -113,6 +113,31 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
     const finalCost = job.final_amount_to_be_paid || job.total_estimated_price;
     const platformFeePercentage = 18;
     const technicianPayout = finalCost - ((finalCost * platformFeePercentage) / 100);
+
+    // Helper to format date in IST (Indian Standard Time)
+    const formatInIST = (dateString: string | undefined, options: Intl.DateTimeFormatOptions) => {
+        if (!dateString) return "N/A";
+        try {
+            // Ensure the date string is treated as UTC if it doesn't have an offset
+            let date = new Date(dateString);
+
+            // If the date is invalid or seems to be missing timezone info (no Z or +), 
+            // treat it as UTC for consistent conversion to IST.
+            if (isNaN(date.getTime())) {
+                date = new Date(dateString.includes('T') ? dateString + 'Z' : dateString);
+            }
+
+            if (isNaN(date.getTime())) return "N/A";
+
+            return new Intl.DateTimeFormat('en-IN', {
+                ...options,
+                timeZone: 'Asia/Kolkata',
+            }).format(date);
+        } catch (e) {
+            console.error("IST Formatting error:", e);
+            return "N/A";
+        }
+    };
 
 
 
@@ -530,13 +555,13 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
                                     {job.categories.name}
                                 </CardTitle>
                                 <div className="flex flex-wrap items-center gap-y-1 gap-x-3 mt-1">
-                                    <div className="flex items-center gap-1.5 text-xs text-slate-400 font-medium">
+                                    <div className="flex items-center gap-1.5 text-xs text-slate-400 font-medium" suppressHydrationWarning>
                                         <Clock size={12} />
-                                        {format(new Date(job.created_at), 'h:mm a')}
+                                        {formatInIST(job.created_at, { hour: 'numeric', minute: 'numeric', hour12: true })}
                                     </div>
-                                    <div className="flex items-center gap-1.5 text-xs text-slate-400 font-medium">
+                                    <div className="flex items-center gap-1.5 text-xs text-slate-400 font-medium" suppressHydrationWarning>
                                         <div className="w-1 h-1 rounded-full bg-slate-300"></div>
-                                        {format(new Date(job.created_at), 'MMM dd')}
+                                        {formatInIST(job.created_at, { month: 'short', day: '2-digit' })}
                                     </div>
                                 </div>
                             </div>
@@ -580,6 +605,38 @@ export function JobCard({ job, technicianId, onJobsUpdate }: { job: Job, technic
                                 <p className="text-sm font-semibold text-slate-800 leading-tight mt-0.5 line-clamp-2">{job.full_address}</p>
                             </div>
                         </div>
+
+                        {(job.preferred_service_date && job.preferred_time_slot) && (
+                            <>
+                                <Separator className="bg-slate-200/50" />
+                                <div className="flex items-center justify-between gap-2">
+                                    {job.preferred_service_date && (
+                                        <div className="flex gap-2 items-center">
+                                            <div className="p-1.5 bg-blue-50 rounded-lg">
+                                                <Calendar className="h-3.5 w-3.5 text-blue-500" />
+                                            </div>
+                                            <div>
+                                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider leading-none">Date</p>
+                                                <p className="text-xs font-bold text-slate-800 mt-0.5" suppressHydrationWarning>
+                                                    {formatInIST(job.preferred_service_date, { day: '2-digit', month: 'short', year: 'numeric' })}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    )}
+                                    {job.preferred_time_slot && (
+                                        <div className="flex gap-2 items-center text-right">
+                                            <div className="flex-1">
+                                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider leading-none">Time Slot</p>
+                                                <p className="text-xs font-bold text-slate-800 mt-0.5">{job.preferred_time_slot}</p>
+                                            </div>
+                                            <div className="p-1.5 bg-amber-50 rounded-lg">
+                                                <Clock className="h-3.5 w-3.5 text-amber-500" />
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </>
+                        )}
                     </div>
 
                     <div className="flex items-center justify-between p-3 border border-slate-100 rounded-xl bg-white shadow-sm">
