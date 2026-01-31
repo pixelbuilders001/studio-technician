@@ -9,15 +9,17 @@ import { User, Phone, Map, Tag, Briefcase, LogOut, Star, CheckCircle, XCircle, I
 
 import { Skeleton } from '@/components/ui/skeleton';
 import { useEffect, useState } from 'react';
-import { getTechnicianStats, getProfileAction, logoutAction } from '@/app/actions';
+import { getTechnicianStats, getProfileAction, logoutAction, getWalletAction } from '@/app/actions';
 import { FullPageLoader } from '@/components/ui/FullPageLoader';
 import { formatSkillName } from '@/lib/utils';
 import { usePwa } from '@/hooks/usePwa';
+import { WalletCard } from '@/components/profile/WalletCard';
 
 export default function ProfilePage() {
 
     const [profile, setProfile] = useState<any>(null);
     const [stats, setStats] = useState<any>(null);
+    const [wallet, setWallet] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [isLoggingOut, setIsLoggingOut] = useState(false);
     const { isInstallable, installPwa } = usePwa();
@@ -64,6 +66,9 @@ export default function ProfilePage() {
 
                 const statsData = await getTechnicianStats();
                 setStats(statsData);
+
+                const walletData = await getWalletAction();
+                setWallet(walletData);
             } catch (error) {
                 console.error("Failed to fetch profile/stats", error);
             } finally {
@@ -149,47 +154,43 @@ export default function ProfilePage() {
             </header>
 
             <div className="flex-1 space-y-6">
-                {/* Hero Section with Gradient */}
-                <div className="relative pt-8 pb-12 px-4 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent overflow-hidden">
-                    <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-primary/10 rounded-full blur-3xl opacity-50"></div>
-                    <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-64 h-64 bg-blue-400/10 rounded-full blur-3xl opacity-50"></div>
+                {/* Hero Section with Gradient - Reduced Size */}
+                <div className="relative pt-6 pb-8 px-4 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent overflow-hidden">
+                    <div className="absolute top-0 right-0 -mr-16 -mt-16 w-48 h-48 bg-primary/10 rounded-full blur-3xl opacity-50"></div>
+                    <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-48 h-48 bg-blue-400/10 rounded-full blur-3xl opacity-50"></div>
 
                     <div className="flex flex-col items-center text-center relative z-10">
                         <div className="relative">
                             <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl animate-pulse"></div>
-                            <div className="relative h-28 w-28 rounded-full border-4 border-white shadow-2xl overflow-hidden ring-4 ring-primary/10">
+                            <div className="relative h-20 w-20 rounded-full border-4 border-white shadow-xl overflow-hidden ring-4 ring-primary/5">
                                 <Image
                                     src={profile.selfie_url || 'https://picsum.photos/seed/tech/200/200'}
                                     alt={profile.full_name}
-                                    width={112}
-                                    height={112}
+                                    width={80}
+                                    height={80}
                                     className="object-cover h-full w-full"
                                     priority
                                 />
                             </div>
                             {profile.role && (
-                                <Badge className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-3 py-1 bg-primary text-white border-white shadow-lg whitespace-nowrap">
+                                <Badge className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-primary text-[10px] text-white border-white shadow-lg whitespace-nowrap">
                                     {formatSkillName(stats?.primary_skill)} Expert
                                 </Badge>
                             )}
                         </div>
-                        <h2 className="mt-6 text-3xl font-extrabold font-headline text-slate-900 tracking-tight">
+                        <h2 className="mt-4 text-2xl font-black font-headline text-slate-900 tracking-tight">
                             {profile.full_name}
                         </h2>
-                        <div className="mt-1 flex items-center gap-2 text-slate-500 font-medium">
-                            <span className="bg-slate-200/50 px-2 py-0.5 rounded text-xs uppercase tracking-wider">
-                                ID: {profile.id.substring(0, 8).toUpperCase()}
-                            </span>
+                        <div className="mt-1 flex items-center gap-2 text-slate-400 font-bold uppercase tracking-[0.1em] text-[10px]">
+                            <span>ID: {profile.id.substring(0, 8).toUpperCase()}</span>
                         </div>
-                        {/* <div className="mt-1 flex items-center gap-2 text-slate-500 font-medium">
-                            <span className="bg-slate-200/50 px-2 py-0.5 rounded text-xs uppercase tracking-wider">
-                                {formatSkillName(stats?.primary_skill)} expert
-                            </span>
-                        </div> */}
                     </div>
                 </div>
 
-                <div className="px-4 space-y-6 -mt-8 relative z-20">
+                <div className="px-4 space-y-6 -mt-4 relative z-20">
+                    {/* Wallet UI Section - NEW */}
+                    <WalletCard balance={wallet?.balance ?? 0} />
+
                     {/* Earnings Quick Stats */}
                     <div className="grid grid-cols-2 gap-4">
                         <Card className="border-none shadow-xl shadow-slate-200/50 bg-white group overflow-hidden">

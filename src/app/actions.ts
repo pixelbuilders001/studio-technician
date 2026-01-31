@@ -729,3 +729,91 @@ export async function updateFcmTokenAction(token: string) {
 
   return { success: true };
 }
+
+export type TechnicianWallet = {
+  technician_id: string;
+  balance: number;
+  min_balance: number;
+  status: string;
+  updated_at: string;
+  user_id: string | null;
+};
+
+export async function getWalletAction(): Promise<TechnicianWallet | null> {
+  const supabase = await createClient();
+  const { data: { session } } = await supabase.auth.getSession();
+
+  if (!session) {
+    throw new Error("Unauthorized");
+  }
+
+  const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/technician_wallets?user_id=eq.${session.user.id}&select=*`;
+  const apikey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  try {
+    const response = await fetch(url, {
+      headers: {
+        'apikey': apikey!,
+        'Authorization': `Bearer ${session.access_token}`,
+      },
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `API Error: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    if (data && data.length > 0) {
+      return data[0];
+    }
+    return null;
+  } catch (error: any) {
+    console.error('Get wallet API error:', error);
+    return null;
+  }
+}
+
+export type WalletTransaction = {
+  id: string;
+  technician_id: string;
+  user_id: string;
+  job_id: string | null;
+  amount: number;
+  type: string;
+  note: string | null;
+  created_at: string;
+};
+
+export async function getWalletTransactionsAction(): Promise<WalletTransaction[]> {
+  const supabase = await createClient();
+  const { data: { session } } = await supabase.auth.getSession();
+
+  if (!session) {
+    throw new Error("Unauthorized");
+  }
+
+  const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/technician_wallet_transactions?user_id=eq.${session.user.id}&select=*&order=created_at.desc`;
+  const apikey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  try {
+    const response = await fetch(url, {
+      headers: {
+        'apikey': apikey!,
+        'Authorization': `Bearer ${session.access_token}`,
+      },
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `API Error: ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error: any) {
+    console.error('Get wallet transactions API error:', error);
+    return [];
+  }
+}
